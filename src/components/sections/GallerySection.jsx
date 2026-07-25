@@ -41,34 +41,47 @@ export default function GallerySection({ images = [] }) {
           className="max-h-[70vh] w-auto max-w-full object-contain"
         />
 
+        {/* The whole photo opens the fullscreen view. The hint bar only appears
+            while the pointer is over the photo itself — the arrows sit above
+            this layer, so hovering or clicking one leaves it hidden without
+            needing any state to coordinate them. */}
+        <button
+          type="button"
+          onClick={() => setPreview(true)}
+          aria-label="צפייה במסך מלא"
+          className="group/fs absolute inset-0 z-10 cursor-zoom-in"
+        >
+          <span
+            className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2
+              bg-black/55 py-2 text-xs text-neutral-200 opacity-0 backdrop-blur-sm
+              transition-opacity duration-200 group-hover/fs:opacity-100
+              group-focus-visible/fs:opacity-100
+              [@media(hover:none)]:opacity-100"
+          >
+            <FaExpand aria-hidden="true" />
+            לחיצה לצפייה במסך מלא
+          </span>
+        </button>
+
         {many && (
           <>
             {/* Right steps backwards, matching the reading direction. */}
             <IconButton
               onClick={() => step(-1)}
               aria-label="התמונה הקודמת"
-              className="absolute end-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70"
+              className="absolute end-2 top-1/2 z-20 -translate-y-1/2 bg-black/50 hover:bg-black/70"
             >
               <FaChevronRight />
             </IconButton>
             <IconButton
               onClick={() => step(1)}
               aria-label="התמונה הבאה"
-              className="absolute start-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70"
+              className="absolute start-2 top-1/2 z-20 -translate-y-1/2 bg-black/50 hover:bg-black/70"
             >
               <FaChevronLeft />
             </IconButton>
           </>
         )}
-
-        <button
-          type="button"
-          onClick={() => setPreview(true)}
-          className="absolute inset-x-0 bottom-0 flex items-center justify-center gap-2 bg-black/55 py-2 text-xs text-neutral-200 backdrop-blur-sm transition hover:bg-black/75"
-        >
-          <FaExpand aria-hidden="true" />
-          לחיצה לצפייה במסך מלא
-        </button>
       </div>
 
       {many && (
