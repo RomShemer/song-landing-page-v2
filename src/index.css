@@ -23,6 +23,20 @@
   --color-hairline: color-mix(in oklab, white 10%, transparent);
 
   --radius-card: 1rem;
+
+  /* Admin dashboard: a light surface of its own, independent of the public
+     page's dark theme and of the client-chosen accent. */
+  --color-adm-bg: #eef2fb;
+  --color-adm-card: #ffffff;
+  --color-adm-line: #e3e9f6;
+  --color-adm-ink: #0f2b5c;
+  --color-adm-ink2: #55658a;
+  --color-adm-muted: #93a2bf;
+  --color-adm-blue: #1f6feb;
+  --color-adm-blue-hover: #1a5fd0;
+  --color-adm-blue-soft: #e9f1ff;
+  --color-adm-teal: #0fae9e;
+  --color-adm-teal-soft: #e2f7f4;
 }
 
 @layer base {

@@ -19,13 +19,15 @@ const RANGES = [
 
 function StatTile({ icon: Icon, label, value, hint }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-3.5">
-      <div className="flex items-center gap-2 text-[11px] text-neutral-400">
-        <Icon className="text-accent-400" />
+    <div className="rounded-2xl border border-adm-line bg-adm-card p-3.5 shadow-[0_2px_12px_-6px_rgba(15,43,92,0.18)]">
+      <div className="flex items-center gap-2 text-[11px] font-medium text-adm-ink2">
+        <span className="inline-flex h-6 w-6 items-center justify-center rounded-lg bg-adm-blue-soft text-adm-blue">
+          <Icon />
+        </span>
         {label}
       </div>
-      <div className="mt-2 text-2xl font-bold tabular-nums text-white">{value}</div>
-      {hint && <div className="mt-0.5 text-[11px] text-neutral-500">{hint}</div>}
+      <div className="mt-2 text-2xl font-bold tabular-nums text-adm-ink">{value}</div>
+      {hint && <div className="mt-0.5 text-[11px] text-adm-muted">{hint}</div>}
     </div>
   );
 }
@@ -70,14 +72,14 @@ export default function AnalyticsTab() {
   return (
     <div className="space-y-4">
       {state === 'unavailable' && (
-        <p className="rounded-2xl border border-amber-400/25 bg-amber-400/10 px-4 py-3 text-xs leading-relaxed text-amber-200">
+        <p className="rounded-2xl border border-amber-300/60 bg-amber-50 px-4 py-3 text-xs leading-relaxed text-amber-700">
           שירות הנתונים עדיין לא מחובר — המסך מציג את המבנה הסופי עם אפסים.
           המדידה תתחיל לפעול עם חיבור השרת.
         </p>
       )}
 
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-semibold text-white">מדידת מעורבות</h2>
+        <h2 className="text-sm font-bold text-adm-ink">מדידת מעורבות</h2>
         <div className="flex gap-1.5">
           {RANGES.map(([value, label]) => (
             <button
@@ -87,8 +89,8 @@ export default function AnalyticsTab() {
               aria-pressed={days === value}
               className={`rounded-lg px-2.5 py-1 text-[11px] transition ${
                 days === value
-                  ? 'bg-accent-500 text-white'
-                  : 'border border-white/10 text-neutral-400 hover:bg-white/10'
+                  ? 'bg-adm-blue text-white'
+                  : 'border border-adm-line bg-white text-adm-ink2 hover:border-adm-blue hover:text-adm-blue'
               }`}
             >
               {label}
@@ -139,20 +141,20 @@ export default function AnalyticsTab() {
         />
       </div>
 
-      <section className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+      <section className="rounded-3xl border border-adm-line bg-adm-card p-4 shadow-[0_4px_20px_-8px_rgba(15,43,92,0.18)]">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <div>
-            <h3 className="text-sm font-semibold text-white">
+            <h3 className="text-sm font-bold text-adm-ink">
               האזנות והורדות לפי יום
             </h3>
-            <p className="mt-0.5 text-[11px] text-neutral-500">
+            <p className="mt-0.5 text-[11px] text-adm-muted">
               {days} הימים האחרונים
             </p>
           </div>
           <button
             type="button"
             onClick={() => setShowTable((v) => !v)}
-            className="inline-flex items-center gap-2 rounded-lg border border-white/10 px-2.5 py-1 text-[11px] text-neutral-400 transition hover:bg-white/10 hover:text-neutral-100"
+            className="inline-flex items-center gap-2 rounded-lg border border-adm-line bg-white px-2.5 py-1 text-[11px] text-adm-ink2 transition hover:border-adm-blue hover:text-adm-blue"
           >
             <FaTable />
             {showTable ? 'תצוגת גרף' : 'תצוגת טבלה'}
@@ -163,8 +165,8 @@ export default function AnalyticsTab() {
           {showTable ? (
             <div className="max-h-80 overflow-auto">
               <table className="w-full text-xs">
-                <thead className="sticky top-0 bg-neutral-900">
-                  <tr className="text-neutral-400">
+                <thead className="sticky top-0 bg-adm-card">
+                  <tr className="text-adm-ink2">
                     <th className="p-1.5 text-right font-medium">תאריך</th>
                     {SERIES.map((s) => (
                       <th key={s.key} className="p-1.5 text-right font-medium">
@@ -175,10 +177,10 @@ export default function AnalyticsTab() {
                 </thead>
                 <tbody>
                   {series.map((d) => (
-                    <tr key={d.date} className="border-t border-white/5">
-                      <td className="p-1.5 tabular-nums text-neutral-300">{d.date}</td>
+                    <tr key={d.date} className="border-t border-adm-line">
+                      <td className="p-1.5 tabular-nums text-adm-ink">{d.date}</td>
                       {SERIES.map((s) => (
-                        <td key={s.key} className="p-1.5 tabular-nums text-neutral-400">
+                        <td key={s.key} className="p-1.5 tabular-nums text-adm-ink2">
                           {d[s.key] ?? 0}
                         </td>
                       ))}
@@ -193,9 +195,9 @@ export default function AnalyticsTab() {
         </div>
       </section>
 
-      <section className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
-        <h3 className="flex items-center gap-2 text-sm font-semibold text-white">
-          <FaImages className="text-accent-400" />
+      <section className="rounded-3xl border border-adm-line bg-adm-card p-4 shadow-[0_4px_20px_-8px_rgba(15,43,92,0.18)]">
+        <h3 className="flex items-center gap-2 text-sm font-bold text-adm-ink">
+          <FaImages className="text-adm-teal" />
           פירוט מעורבות
         </h3>
         <dl className="mt-3 space-y-1.5 text-xs">
@@ -210,10 +212,10 @@ export default function AnalyticsTab() {
           ].map(([label, value]) => (
             <div
               key={label}
-              className="flex items-center justify-between border-b border-white/5 pb-1.5"
+              className="flex items-center justify-between border-b border-adm-line pb-1.5"
             >
-              <dt className="text-neutral-400">{label}</dt>
-              <dd className="tabular-nums text-neutral-100">{value ?? 0}</dd>
+              <dt className="text-adm-ink2">{label}</dt>
+              <dd className="font-semibold tabular-nums text-adm-ink">{value ?? 0}</dd>
             </div>
           ))}
         </dl>

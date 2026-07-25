@@ -50,17 +50,14 @@ export default function ContentTab({ draft, update, replace }) {
     });
 
   return (
-    <div className="space-y-4">
-      <section className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
-        <h2 className="flex items-center gap-2 text-sm font-semibold text-white">
-          <FaPalette className="text-accent-400" />
-          הגדרות כלליות
-        </h2>
-        <p className="mt-0.5 text-[11px] text-neutral-500">
-          חל על כל העמוד — שם, עיצוב, רקע ונגן
-        </p>
-
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+    <Accordion variant="light" defaultOpenId="general">
+      <AccordionItem
+        id="general"
+        title="הגדרות כלליות"
+        hint="חל על כל העמוד — שם, עיצוב, רקע ונגן"
+        icon={FaPalette}
+      >
+        <div className="grid gap-3 sm:grid-cols-2">
           <TextField
             id="song-title"
             label="שם השיר"
@@ -151,10 +148,9 @@ export default function ContentTab({ draft, update, replace }) {
             onChange={(v) => update('media', 'audioStreamUrl', v)}
           />
         </div>
-      </section>
+      </AccordionItem>
 
-      <Accordion>
-        <AccordionItem id="socials" title="קישורי סטרימינג ורשתות" icon={FaShareAlt}>
+      <AccordionItem id="socials" title="קישורי סטרימינג ורשתות" icon={FaShareAlt}>
           <div className="grid gap-3 sm:grid-cols-2">
             {SOCIALS.map(([key, label]) => (
               <TextField
@@ -170,7 +166,7 @@ export default function ContentTab({ draft, update, replace }) {
           </div>
         </AccordionItem>
 
-        <AccordionItem id="gallery" title="גלריית תמונות" icon={FaImages}>
+      <AccordionItem id="gallery" title="גלריית תמונות" icon={FaImages}>
           <div className="space-y-3">
             {downloads.pressImages.map((img, i) => (
               <div key={i} className="grid gap-2 sm:grid-cols-[1fr_auto]">
@@ -197,7 +193,7 @@ export default function ContentTab({ draft, update, replace }) {
                       downloads.pressImages.filter((_, idx) => idx !== i)
                     )
                   }
-                  className="mt-6 h-9 rounded-lg border border-white/10 px-3 text-xs text-neutral-400 transition hover:bg-red-500/20 hover:text-red-300"
+                  className="mt-6 h-9 rounded-lg border border-adm-line bg-white px-3 text-xs text-adm-ink2 transition hover:border-red-300 hover:bg-red-50 hover:text-red-500"
                 >
                   מחיקה
                 </button>
@@ -211,14 +207,14 @@ export default function ContentTab({ draft, update, replace }) {
                   { src: '', name: '' },
                 ])
               }
-              className="rounded-lg border border-dashed border-white/20 px-3 py-2 text-xs text-neutral-400 transition hover:border-accent-500/50 hover:text-accent-300"
+              className="rounded-lg border border-dashed border-adm-muted/50 px-3 py-2 text-xs text-adm-ink2 transition hover:border-adm-blue hover:text-adm-blue"
             >
               הוספת תמונה
             </button>
           </div>
         </AccordionItem>
 
-        <AccordionItem id="clip" title="קליפ רשמי" icon={FaVideo}>
+      <AccordionItem id="clip" title="קליפ רשמי" icon={FaVideo}>
           <TextField
             id="media-video"
             label="כתובת הטמעה של YouTube"
@@ -229,7 +225,7 @@ export default function ContentTab({ draft, update, replace }) {
           />
         </AccordionItem>
 
-        <AccordionItem id="pr" title="קומוניקט" icon={FaFileAlt}>
+      <AccordionItem id="pr" title="קומוניקט" icon={FaFileAlt}>
           <TextArea
             id="content-pr"
             label="תוכן הקומוניקט"
@@ -241,7 +237,7 @@ export default function ContentTab({ draft, update, replace }) {
           />
         </AccordionItem>
 
-        <AccordionItem id="lyrics" title="מילים" icon={FaMusic}>
+      <AccordionItem id="lyrics" title="מילים" icon={FaMusic}>
           <TextArea
             id="content-lyrics"
             label="מילות השיר"
@@ -252,11 +248,11 @@ export default function ContentTab({ draft, update, replace }) {
           />
         </AccordionItem>
 
-        <AccordionItem id="credits" title="קרדיטים" icon={FaAward}>
+      <AccordionItem id="credits" title="קרדיטים" icon={FaAward}>
           <CreditsEditor credits={credits} onChange={(v) => replace('credits', v)} />
         </AccordionItem>
 
-        <AccordionItem id="downloads" title="תיקיית הורדות" icon={FaDownload}>
+      <AccordionItem id="downloads" title="תיקיית הורדות" icon={FaDownload}>
           <div className="space-y-4">
             <div className="grid gap-3 sm:grid-cols-2">
               <Toggle
@@ -306,7 +302,7 @@ export default function ContentTab({ draft, update, replace }) {
             </div>
 
             <div>
-              <h3 className="text-xs font-semibold text-neutral-300">
+              <h3 className="text-xs font-bold text-adm-ink">
                 כתוביות הכרטיסים
               </h3>
               <div className="mt-2 space-y-2">
@@ -329,7 +325,7 @@ export default function ContentTab({ draft, update, replace }) {
               </div>
             </div>
 
-            <div className="space-y-3 border-t border-white/10 pt-3">
+            <div className="space-y-3 border-t border-adm-line pt-3">
               <Toggle
                 id="flags-locked"
                 label="נעילת הורדות"
@@ -348,7 +344,7 @@ export default function ContentTab({ draft, update, replace }) {
           </div>
         </AccordionItem>
 
-        <AccordionItem id="contact" title="יצירת קשר" icon={FaPhone}>
+      <AccordionItem id="contact" title="יצירת קשר" icon={FaPhone}>
           <div className="grid gap-3 sm:grid-cols-2">
             <TextField
               id="contact-phone"
@@ -365,8 +361,7 @@ export default function ContentTab({ draft, update, replace }) {
               onChange={(v) => update('contact', 'email', v)}
             />
           </div>
-        </AccordionItem>
-      </Accordion>
-    </div>
+      </AccordionItem>
+    </Accordion>
   );
 }

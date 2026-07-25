@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { FaChartBar, FaCheck, FaSlidersH, FaSpinner, FaUndo } from 'react-icons/fa';
-import { themeVars } from '../theme';
 import { useWebFonts } from '../hooks/useWebFonts';
 import DistributionCard from './DistributionCard';
 import Login from './Login';
@@ -41,15 +40,11 @@ export default function AdminApp() {
   if (!authed) return <Login onSuccess={() => setAuthed(true)} />;
 
   return (
-    <div
-      dir="rtl"
-      className="min-h-dvh bg-neutral-950 font-body text-neutral-100"
-      style={themeVars(draft.theme)}
-    >
+    <div dir="rtl" className="min-h-dvh bg-adm-bg text-adm-ink">
       <div className="mx-auto w-full max-w-6xl space-y-4 px-4 py-6">
         <DistributionCard song={draft.song} />
 
-        <div className="flex items-center gap-1.5 border-b border-white/10">
+        <div className="flex items-center gap-1.5 border-b border-adm-line">
           {TABS.map(({ key, label, icon: Icon }) => (
             <button
               key={key}
@@ -58,8 +53,8 @@ export default function AdminApp() {
               aria-current={tab === key}
               className={`-mb-px inline-flex items-center gap-2 border-b-2 px-3.5 py-2.5 text-sm transition ${
                 tab === key
-                  ? 'border-accent-500 text-white'
-                  : 'border-transparent text-neutral-400 hover:text-neutral-200'
+                  ? 'border-adm-blue font-semibold text-adm-blue'
+                  : 'border-transparent text-adm-ink2 hover:text-adm-ink'
               }`}
             >
               <Icon className="text-xs" />
@@ -81,9 +76,9 @@ export default function AdminApp() {
       </div>
 
       {tab === 'content' && (
-        <div className="sticky bottom-0 border-t border-white/10 bg-neutral-950/90 backdrop-blur-xl">
+        <div className="sticky bottom-0 border-t border-adm-line bg-adm-card/95 backdrop-blur-xl">
           <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3">
-            <span className="text-xs text-neutral-400">
+            <span className="text-xs text-adm-ink2">
               {status === 'saved'
                 ? 'השינויים פורסמו'
                 : status === 'error'
@@ -98,7 +93,7 @@ export default function AdminApp() {
                 type="button"
                 onClick={revert}
                 disabled={!isDirty}
-                className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-xs text-neutral-300 transition hover:bg-white/10 disabled:opacity-30"
+                className="inline-flex items-center gap-2 rounded-xl border border-adm-line bg-white px-3 py-2 text-xs font-medium text-adm-ink2 transition hover:border-adm-blue hover:text-adm-blue disabled:opacity-30"
               >
                 <FaUndo />
                 ביטול שינויים
@@ -107,7 +102,7 @@ export default function AdminApp() {
                 type="button"
                 onClick={publish}
                 disabled={!isDirty || status === 'saving'}
-                className="inline-flex items-center gap-2 rounded-xl bg-accent-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-accent-400 disabled:opacity-40"
+                className="inline-flex items-center gap-2 rounded-xl bg-adm-blue px-4 py-2 text-xs font-semibold text-white shadow-[0_6px_18px_-6px_var(--color-adm-blue)] transition hover:bg-adm-blue-hover disabled:opacity-40 disabled:shadow-none"
               >
                 {status === 'saving' ? (
                   <FaSpinner className="animate-spin" />

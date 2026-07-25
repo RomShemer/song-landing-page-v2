@@ -17,11 +17,11 @@ export default function Preview({ content, isDirty }) {
   const scale = frameWidth / width;
 
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+    <div className="rounded-3xl border border-adm-line bg-adm-card p-4 shadow-[0_4px_20px_-8px_rgba(15,43,92,0.18)]">
       <header className="flex flex-wrap items-center justify-between gap-2">
         <div>
-          <h2 className="text-sm font-semibold text-white">תצוגה מקדימה</h2>
-          <p className="mt-0.5 text-[11px] text-neutral-500">
+          <h2 className="text-sm font-bold text-adm-ink">תצוגה מקדימה</h2>
+          <p className="mt-0.5 text-[11px] text-adm-muted">
             {isDirty ? 'כולל שינויים שלא פורסמו' : 'זהה לעמוד המפורסם'}
           </p>
         </div>
@@ -36,8 +36,8 @@ export default function Preview({ content, isDirty }) {
               title={label}
               className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs transition ${
                 device === key
-                  ? 'bg-accent-500 text-white'
-                  : 'border border-white/10 text-neutral-400 hover:bg-white/10'
+                  ? 'bg-adm-blue text-white'
+                  : 'border border-adm-line bg-white text-adm-ink2 hover:border-adm-blue hover:text-adm-blue'
               }`}
             >
               <Icon />
@@ -48,7 +48,7 @@ export default function Preview({ content, isDirty }) {
             onClick={() => setNonce((n) => n + 1)}
             title="רענון"
             aria-label="רענון תצוגה"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-xs text-neutral-400 transition hover:bg-white/10"
+            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-adm-line bg-white text-xs text-adm-ink2 transition hover:border-adm-blue hover:text-adm-blue"
           >
             <FaSyncAlt />
           </button>
@@ -67,8 +67,8 @@ export default function Preview({ content, isDirty }) {
             aria-pressed={mode === key}
             className={`rounded-lg px-2.5 py-1 text-[11px] transition ${
               mode === key
-                ? 'bg-white/15 text-white'
-                : 'border border-white/10 text-neutral-400 hover:bg-white/10'
+                ? 'bg-adm-teal-soft text-adm-teal ring-1 ring-adm-teal/30'
+                : 'border border-adm-line bg-white text-adm-ink2 hover:border-adm-teal hover:text-adm-teal'
             }`}
           >
             {label}
@@ -76,8 +76,11 @@ export default function Preview({ content, isDirty }) {
         ))}
       </div>
 
+      {/* dir=ltr so the scaled box grows from the left edge; inside an RTL
+          parent it would be anchored right and clip off-frame. */}
       <div
-        className="mt-3 overflow-hidden rounded-2xl border border-white/10 bg-neutral-950"
+        dir="ltr"
+        className="mt-3 overflow-hidden rounded-3xl border-4 border-adm-ink/10 bg-neutral-950 ring-1 ring-adm-line"
         style={{ width: frameWidth, height: height * scale }}
       >
         <div
@@ -87,6 +90,7 @@ export default function Preview({ content, isDirty }) {
             transform: `scale(${scale})`,
             transformOrigin: 'top left',
             overflowY: 'auto',
+            overflowX: 'hidden',
           }}
         >
           <App key={`${nonce}-${mode}`} content={content} viewMode={mode} />

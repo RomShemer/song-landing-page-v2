@@ -50,14 +50,14 @@ export default function EngagementChart({ data }) {
               x2={width - PAD.right}
               y1={y(t)}
               y2={y(t)}
-              stroke="rgba(255,255,255,0.07)"
+              stroke="#e3e9f6"
               strokeWidth="1"
             />
             <text
               x={PAD.left - 7}
               y={y(t) + 3.5}
               textAnchor="end"
-              className="fill-neutral-500 text-[10px] tabular-nums"
+              className="fill-adm-muted text-[10px] tabular-nums"
             >
               {Math.round(t)}
             </text>
@@ -80,7 +80,7 @@ export default function EngagementChart({ data }) {
                 y={PAD.top}
                 width={slot}
                 height={plotH}
-                fill={active ? 'rgba(255,255,255,0.04)' : 'transparent'}
+                fill={active ? '#f3f7ff' : 'transparent'}
               />
 
               {SERIES.map((s) => {
@@ -109,7 +109,7 @@ export default function EngagementChart({ data }) {
                   x={PAD.left + i * slot + slot / 2}
                   y={H - 9}
                   textAnchor="middle"
-                  className="fill-neutral-500 text-[10px] tabular-nums"
+                  className="fill-adm-muted text-[10px] tabular-nums"
                 >
                   {formatDay(day.date)}
                 </text>
@@ -120,8 +120,8 @@ export default function EngagementChart({ data }) {
       </svg>
 
       {hover !== null && totals[hover] > 0 && (
-        <div className="mt-2 rounded-xl border border-white/10 bg-neutral-900/95 p-2.5 text-xs">
-          <div className="mb-1 font-medium text-neutral-200">{data[hover].date}</div>
+        <div className="mt-2 rounded-xl border border-adm-line bg-white p-2.5 text-xs shadow-[0_6px_24px_-8px_rgba(15,43,92,0.3)]">
+          <div className="mb-1 font-semibold text-adm-ink">{data[hover].date}</div>
           <dl className="space-y-0.5">
             {SERIES.filter((s) => data[hover][s.key]).map((s) => (
               <div key={s.key} className="flex items-center gap-2">
@@ -129,8 +129,8 @@ export default function EngagementChart({ data }) {
                   className="h-2 w-2 shrink-0 rounded-full"
                   style={{ background: s.color }}
                 />
-                <dt className="flex-1 text-neutral-400">{s.label}</dt>
-                <dd className="tabular-nums text-neutral-100">{data[hover][s.key]}</dd>
+                <dt className="flex-1 text-adm-ink2">{s.label}</dt>
+                <dd className="font-semibold tabular-nums text-adm-ink">{data[hover][s.key]}</dd>
               </div>
             ))}
           </dl>
@@ -139,7 +139,7 @@ export default function EngagementChart({ data }) {
 
       <figcaption className="mt-3 flex flex-wrap gap-x-4 gap-y-1.5">
         {SERIES.map((s) => (
-          <span key={s.key} className="flex items-center gap-1.5 text-[11px] text-neutral-400">
+          <span key={s.key} className="flex items-center gap-1.5 text-[11px] text-adm-ink2">
             <span
               className="h-2.5 w-2.5 rounded-sm"
               style={{ background: s.color }}

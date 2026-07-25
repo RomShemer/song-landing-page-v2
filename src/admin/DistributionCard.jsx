@@ -27,18 +27,18 @@ export default function DistributionCard({ song, origin }) {
   const base = origin || window.location.origin;
 
   return (
-    <section className="rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-md sm:p-5">
+    <section className="rounded-3xl border border-adm-line bg-adm-card p-4 shadow-[0_4px_20px_-8px_rgba(15,43,92,0.18)] sm:p-5">
       <header className="flex flex-wrap items-baseline justify-between gap-2">
         <div>
-          <h1 className="text-lg font-bold text-white">
+          <h1 className="text-lg font-bold text-adm-ink">
             {song.title || 'ללא שם'}
             {song.artist && (
-              <span className="ms-2 text-sm font-normal text-neutral-400">
+              <span className="ms-2 text-sm font-normal text-adm-ink2">
                 {song.artist}
               </span>
             )}
           </h1>
-          <p className="mt-0.5 text-xs text-neutral-500">
+          <p className="mt-0.5 text-xs text-adm-muted">
             ניהול תוכן, עיצוב וקישורי הפצה
           </p>
         </div>
@@ -47,7 +47,7 @@ export default function DistributionCard({ song, origin }) {
           href={`${base}/song`}
           target="_blank"
           rel="noreferrer"
-          className="inline-flex items-center gap-2 rounded-xl border border-white/10 px-3 py-2 text-xs text-neutral-300 transition hover:bg-white/10 hover:text-white"
+          className="inline-flex items-center gap-2 rounded-xl border border-adm-line bg-white px-3 py-2 text-xs font-medium text-adm-ink2 transition hover:border-adm-blue hover:text-adm-blue"
         >
           <FaLink />
           צפייה בעמוד
@@ -63,16 +63,16 @@ export default function DistributionCard({ song, origin }) {
               key={key}
               type="button"
               onClick={() => setGenerated((prev) => ({ ...prev, [key]: true }))}
-              className="group flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.04] px-3 py-3 text-right transition hover:border-accent-500/50 hover:bg-white/[0.09]"
+              className="group flex items-center gap-3 rounded-xl border border-dashed border-adm-muted/50 bg-adm-bg/50 px-3 py-3 text-right transition hover:border-adm-blue hover:bg-adm-blue-soft"
             >
-              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-white/10 text-sm text-neutral-300 transition group-hover:bg-accent-500/25 group-hover:text-accent-200">
+              <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-adm-blue-soft text-sm text-adm-blue transition group-hover:bg-adm-blue group-hover:text-white">
                 <Icon />
               </span>
               <span className="min-w-0">
-                <span className="block text-sm font-medium text-neutral-100">
+                <span className="block text-sm font-semibold text-adm-ink">
                   יצירת {label}
                 </span>
-                <span className="block text-[11px] text-neutral-500">{description}</span>
+                <span className="block text-[11px] text-adm-ink2">{description}</span>
               </span>
             </button>
           )

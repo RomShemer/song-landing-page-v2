@@ -1,12 +1,12 @@
-// Validated against the dataviz palette validator for the dark surface #171717:
-// all five pass the lightness band, chroma floor, adjacent CVD separation
-// (worst ΔE 8.4), normal-vision floor (19.3) and 3:1 contrast.
+// Validated for the white admin surface: passes the lightness band, chroma
+// floor, adjacent CVD separation (worst ΔE 9.1) and normal-vision floor (19.6).
+// Three slots fall under 3:1 contrast, which the legend and table view cover.
 export const SERIES = [
-  { key: 'play_audio', label: 'האזנות', color: '#3987e5' },
-  { key: 'download_wav', label: 'WAV', color: '#d95926' },
-  { key: 'download_mp3', label: 'MP3', color: '#199e70' },
-  { key: 'download_pdf', label: 'קומוניקט', color: '#c98500' },
-  { key: 'download_photos', label: 'תמונות', color: '#d55181' },
+  { key: 'play_audio', label: 'האזנות', color: '#2a78d6' },
+  { key: 'download_wav', label: 'WAV', color: '#eb6834' },
+  { key: 'download_mp3', label: 'MP3', color: '#1baf7a' },
+  { key: 'download_pdf', label: 'קומוניקט', color: '#eda100' },
+  { key: 'download_photos', label: 'תמונות', color: '#e87ba4' },
 ];
 
 export function formatDay(iso) {

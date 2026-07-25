@@ -12,9 +12,9 @@ export default function CreditsEditor({ credits, onChange }) {
     onChange(next);
   };
 
-  const input = `w-full rounded-lg border border-white/10 bg-white/[0.04] px-2.5 py-1.5
-    text-sm text-neutral-100 placeholder:text-neutral-600
-    focus:border-accent-500/60 focus:outline-none`;
+  const input = `w-full rounded-lg border border-adm-line bg-adm-bg/60 px-2.5 py-1.5
+    text-sm text-adm-ink placeholder:text-adm-muted
+    focus:border-adm-blue focus:bg-white focus:outline-none`;
 
   return (
     <div className="space-y-2">
@@ -40,7 +40,7 @@ export default function CreditsEditor({ credits, onChange }) {
               onClick={() => move(i, -1)}
               disabled={i === 0}
               aria-label="הזזה למעלה"
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-[11px] text-neutral-400 transition hover:bg-white/10 hover:text-white disabled:opacity-30"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-adm-line bg-white text-[11px] text-adm-ink2 transition hover:border-adm-blue hover:text-adm-blue disabled:opacity-30"
             >
               <FaArrowUp />
             </button>
@@ -49,7 +49,7 @@ export default function CreditsEditor({ credits, onChange }) {
               onClick={() => move(i, 1)}
               disabled={i === credits.length - 1}
               aria-label="הזזה למטה"
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-[11px] text-neutral-400 transition hover:bg-white/10 hover:text-white disabled:opacity-30"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-adm-line bg-white text-[11px] text-adm-ink2 transition hover:border-adm-blue hover:text-adm-blue disabled:opacity-30"
             >
               <FaArrowDown />
             </button>
@@ -57,7 +57,7 @@ export default function CreditsEditor({ credits, onChange }) {
               type="button"
               onClick={() => onChange(credits.filter((_, idx) => idx !== i))}
               aria-label="מחיקה"
-              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 text-[11px] text-neutral-400 transition hover:bg-red-500/20 hover:text-red-300"
+              className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-adm-line bg-white text-[11px] text-adm-ink2 transition hover:border-red-300 hover:bg-red-50 hover:text-red-500"
             >
               <FaTrash />
             </button>
@@ -68,7 +68,7 @@ export default function CreditsEditor({ credits, onChange }) {
       <button
         type="button"
         onClick={() => onChange([...credits, { role: '', name: '' }])}
-        className="inline-flex items-center gap-2 rounded-lg border border-dashed border-white/20 px-3 py-2 text-xs text-neutral-400 transition hover:border-accent-500/50 hover:text-accent-300"
+        className="inline-flex items-center gap-2 rounded-lg border border-dashed border-adm-muted/50 px-3 py-2 text-xs text-adm-ink2 transition hover:border-adm-blue hover:text-adm-blue"
       >
         <FaPlus />
         הוספת קרדיט

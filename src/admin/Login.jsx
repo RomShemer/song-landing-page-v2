@@ -29,22 +29,22 @@ export default function Login({ onSuccess }) {
   };
 
   return (
-    <div className="flex min-h-dvh items-center justify-center p-4">
+    <div className="flex min-h-dvh items-center justify-center bg-adm-bg p-4">
       <form
         onSubmit={submit}
-        className="w-full max-w-sm rounded-2xl border border-white/10 bg-white/[0.05] p-6 backdrop-blur-md"
+        className="w-full max-w-sm rounded-3xl border border-adm-line bg-adm-card p-6 shadow-[0_10px_40px_-12px_rgba(15,43,92,0.28)]"
       >
         <div className="flex items-center gap-2.5">
-          <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-accent-500/20 text-accent-300">
+          <span className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-adm-blue-soft text-adm-blue">
             <FaLock />
           </span>
           <div>
-            <h1 className="text-base font-bold text-white">כניסת מנהל</h1>
-            <p className="text-[11px] text-neutral-500">ניהול תוכן ונתוני העמוד</p>
+            <h1 className="text-base font-bold text-adm-ink">כניסת מנהל</h1>
+            <p className="text-[11px] text-adm-muted">ניהול תוכן ונתוני העמוד</p>
           </div>
         </div>
 
-        <label htmlFor="admin-password" className="mt-5 block text-xs text-neutral-300">
+        <label htmlFor="admin-password" className="mt-5 block text-xs font-semibold text-adm-ink">
           סיסמה
         </label>
         <input
@@ -55,15 +55,15 @@ export default function Login({ onSuccess }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           dir="ltr"
-          className="mt-1.5 w-full rounded-xl border border-white/10 bg-white/[0.04] px-3 py-2.5 text-sm text-neutral-100 focus:border-accent-500/60 focus:outline-none"
+          className="mt-1.5 w-full rounded-xl border border-adm-line bg-adm-bg/60 px-3 py-2.5 text-sm text-adm-ink focus:border-adm-blue focus:bg-white focus:ring-2 focus:ring-adm-blue/15 focus:outline-none"
         />
 
-        {message && <p className="mt-2 text-xs text-red-400">{message}</p>}
+        {message && <p className="mt-2 text-xs text-red-500">{message}</p>}
 
         <button
           type="submit"
           disabled={state === 'busy' || !password}
-          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-accent-500 py-2.5 text-sm font-semibold text-white transition hover:bg-accent-400 disabled:opacity-40"
+          className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-adm-blue py-2.5 text-sm font-semibold text-white transition hover:bg-adm-blue-hover disabled:opacity-40"
         >
           {state === 'busy' && <FaSpinner className="animate-spin" />}
           כניסה

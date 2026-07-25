@@ -39,7 +39,7 @@ export default function MediaField({
           take(e.dataTransfer.files?.[0]);
         }}
         className={`mt-1.5 rounded-xl border border-dashed p-3 transition ${
-          dragging ? 'border-accent-500 bg-accent-500/10' : 'border-white/15 bg-white/[0.03]'
+          dragging ? 'border-adm-blue bg-adm-blue-soft' : 'border-adm-muted/40 bg-adm-bg/50'
         }`}
       >
         {value ? (
@@ -48,16 +48,16 @@ export default function MediaField({
               <img
                 src={value}
                 alt=""
-                className="h-14 w-14 shrink-0 rounded-lg border border-white/10 object-cover"
+                className="h-14 w-14 shrink-0 rounded-lg border border-adm-line object-cover"
               />
             ) : (
-              <span className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-xs text-neutral-400">
+              <span className="inline-flex h-14 w-14 shrink-0 items-center justify-center rounded-lg border border-adm-line bg-adm-blue-soft text-xs font-semibold text-adm-blue">
                 {preview}
               </span>
             )}
             <code
               dir="ltr"
-              className="min-w-0 flex-1 truncate font-mono text-[11px] text-neutral-400"
+              className="min-w-0 flex-1 truncate font-mono text-[11px] text-adm-ink2"
             >
               {pending || value}
             </code>
@@ -68,7 +68,7 @@ export default function MediaField({
                 onChange('');
               }}
               aria-label="הסרה"
-              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/10 text-xs text-neutral-400 transition hover:bg-red-500/20 hover:text-red-300"
+              className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-adm-line bg-white text-xs text-adm-ink2 transition hover:border-red-300 hover:bg-red-50 hover:text-red-500"
             >
               <FaTimes />
             </button>
@@ -77,7 +77,7 @@ export default function MediaField({
           <button
             type="button"
             onClick={() => inputRef.current?.click()}
-            className="flex w-full flex-col items-center gap-1.5 py-3 text-neutral-400 transition hover:text-neutral-200"
+            className="flex w-full flex-col items-center gap-1.5 py-3 text-adm-ink2 transition hover:text-adm-blue"
           >
             <FaUpload />
             <span className="text-xs">גרירת קובץ לכאן או לחיצה לבחירה</span>
@@ -101,12 +101,12 @@ export default function MediaField({
             onChange(e.target.value);
           }}
           placeholder="או הדבקת כתובת קובץ"
-          className="mt-2 w-full rounded-lg border border-white/10 bg-black/30 px-2.5 py-1.5 font-mono text-[11px] text-neutral-300 placeholder:text-neutral-600 focus:border-accent-500/60 focus:outline-none"
+          className="mt-2 w-full rounded-lg border border-adm-line bg-white px-2.5 py-1.5 font-mono text-[11px] text-adm-ink2 placeholder:text-adm-muted focus:border-adm-blue focus:outline-none"
         />
       </div>
 
       {pending && (
-        <p className="mt-1.5 text-[11px] text-amber-300/90">
+        <p className="mt-1.5 text-[11px] text-amber-600">
           הקובץ נבחר אך עדיין לא הועלה לשרת — ההעלאה תתחבר בשלב הבא.
         </p>
       )}
