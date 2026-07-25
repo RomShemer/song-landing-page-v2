@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import artistData from './artistData';
+import { useContent } from './content/useContent';
 
 import {
   FaTiktok,
@@ -38,7 +38,8 @@ export default function App() {
   const [galleryIndex, setGalleryIndex] = useState(0);
   const [showImagePreview, setShowImagePreview] = useState(false);
 
-  const { media, links, content, contact } = artistData;
+  const { content: doc } = useContent();
+  const { song, media, links, content, credits, downloads, contact } = doc;
 
   const toggle = (id) => {
     if (open !== id) {
@@ -56,8 +57,8 @@ export default function App() {
     >
       <div className="content">
 
-        <h1 className="title">רוצי</h1>
-        <div className="subtitle">דור שמר</div>
+        <h1 className="title">{song.title}</h1>
+        <div className="subtitle">{song.artist}</div>
 
         <div className="socials">
           {links.instagram && <a href={links.instagram} target="_blank" rel="noreferrer"  onClick={() => trackSocialClick('instagram')}><FaInstagram /></a>}
@@ -67,12 +68,12 @@ export default function App() {
           {links.spotify && <a href={links.spotify} target="_blank" rel="noreferrer" onClick={() => trackSocialClick('spotify')}><FaSpotify /></a>}
         </div>
 
-        {media.audio_file && (
+        {media.audioStreamUrl && (
           <div className="audio-wrapper">
             <div className="audio">
               <audio
                 controls
-                src={media.audio_file}
+                src={media.audioStreamUrl}
                 onPlay={() => trackAudioPlay('rutzi')}
               />
             </div>
@@ -95,7 +96,7 @@ export default function App() {
                   onClick={() =>
                     setGalleryIndex((prev) =>
                       prev === 0
-                        ? artistData.downloads.pressImages.length - 1
+                        ? downloads.pressImages.length - 1
                         : prev - 1
                     )
                   }
@@ -105,7 +106,7 @@ export default function App() {
                 </button>
                 <div className="gallery-image-wrapper">
                   <img
-                    src={artistData.downloads.pressImages[galleryIndex].src}
+                    src={downloads.pressImages[galleryIndex].src}
                     alt={`Gallery image ${galleryIndex + 1}`}
                     className="gallery-preview-img"
                     draggable={false}
@@ -127,7 +128,7 @@ export default function App() {
                   className="gallery-arrow right"
                   onClick={() =>
                     setGalleryIndex((prev) =>
-                      prev === artistData.downloads.pressImages.length - 1
+                      prev === downloads.pressImages.length - 1
                         ? 0
                         : prev + 1
                     )
@@ -146,10 +147,10 @@ export default function App() {
             isOpen={open === 'clip'}
             onClick={() => toggle('clip')}
           >
-            {media.video_url ? (
+            {media.videoUrl ? (
               <div className="video-wrapper">
                 <iframe
-                  src={media.video_url}
+                  src={media.videoUrl}
                   title="קליפ רשמי"
                   allowFullScreen
                 />
@@ -167,7 +168,7 @@ export default function App() {
           >
             <div
               className="pr-box"
-              dangerouslySetInnerHTML={{ __html: content.prText }}
+              dangerouslySetInnerHTML={{ __html: content.prHtml }}
             />
           </AccordionItem>
 
@@ -187,12 +188,9 @@ export default function App() {
             onClick={() => toggle('credits')}
           >
             <div className="credits-grid">
-              <Credit role="מילים" name="דור שמר, גילי אסרף" />
-              <Credit role="לחן" name="דור שמר, גילי אסרף" />
-              <Credit role="הפקה" name="גילי אסרף" />
-              <Credit role="מיקס" name="גילי אסרף" />
-              <Credit role="מאסטרינג" name="אוהד ניסים" />
-              <Credit role="וידאו" name="גל צורף" />
+              {credits.map((c, i) => (
+                <Credit key={i} role={c.role} name={c.name} />
+              ))}
             </div>
           </AccordionItem>
 
@@ -208,7 +206,7 @@ export default function App() {
                 icon={FaMusic}
                 title="הורדת MP3"
                 subtitle="לשמיעה והפצה"
-                href={artistData.downloads.mp3}
+                href={downloads.mp3Url}
                 onClick={() => trackSongDownload('mp3')}
                 restricted 
               />
@@ -217,7 +215,7 @@ export default function App() {
                 icon={FaMusic}
                 title="הורדת WAV לשידור"
                 subtitle="איכות מלאה"
-                href={artistData.downloads.wav}
+                href={downloads.wavUrl}
                 onClick={() => trackSongDownload('wav')}
                 restricted 
               />
@@ -226,7 +224,7 @@ export default function App() {
                 icon={FaFileAlt}
                 title="קומוניקט"
                 subtitle="לחץ להורדה"
-                href={artistData.downloads.press_pdf}
+                href={downloads.pressPdf}
                 onClick={() => trackMediaDownload('pressPDF')}
               />
 
@@ -245,7 +243,7 @@ export default function App() {
                 icon={FaDownload}
                 title="תמונות יח״צ"
                 subtitle="ZIP"
-                href={artistData.downloads.images_gallery}
+                href={downloads.imagesZip}
                 onClick={() => trackMediaDownload('images')}
               />
 
@@ -288,7 +286,9 @@ export default function App() {
           </AccordionItem>
 
 
-          <footer className="footer">© 2026 דור שמר</footer>
+          <footer className="footer">
+            © {song.releaseYear ?? new Date().getFullYear()} {song.artist}
+          </footer>
         </div>
       </div>
 
@@ -304,7 +304,7 @@ export default function App() {
             </button>
 
             <div className="gallery-grid">
-              {artistData.downloads.pressImages.map((img, i) => (
+              {downloads.pressImages.map((img, i) => (
                 <a
                   key={i}
                   href={img.src}
@@ -336,7 +336,7 @@ export default function App() {
             </button>
 
             <img
-              src={artistData.downloads.pressImages[galleryIndex].src}
+              src={downloads.pressImages[galleryIndex].src}
               alt={`Preview image ${galleryIndex + 1}`}
               className="image-preview-full"
               draggable={false}
