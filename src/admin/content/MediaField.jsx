@@ -1,10 +1,32 @@
 import { useRef, useState } from 'react';
+import { upload } from '@vercel/blob/client';
 import { FaTimes, FaUpload } from 'react-icons/fa';
 import { Label } from '../ui/Field';
 
-// Drag-and-drop shell for a single asset. Uploading needs Vercel Blob, which is
-// not wired yet, so a dropped file previews via a blob: URL and the field
-// accepts a pasted URL meanwhile.
+// The folder decides the size and type limits the server will allow, so it is
+// derived from the same `accept` the picker uses. Names must match FOLDERS in
+// api/blob/upload-token.js.
+function folderFor(accept = '') {
+  if (accept.includes('audio')) return 'audio';
+  if (accept.includes('pdf')) return 'documents';
+  if (accept.includes('zip')) return 'archives';
+  return 'images';
+}
+
+// Blob keys have to survive being pasted into a URL, and the files arrive with
+// Hebrew names and spaces.
+function safeName(name) {
+  const cleaned = name
+    .normalize('NFKD')
+    .replace(/[^\w.-]+/g, '-')
+    .replace(/^-+|-+$/g, '')
+    .toLowerCase();
+  return cleaned.length > 3 ? cleaned.slice(-80) : `file-${cleaned}`;
+}
+
+// Drag-and-drop shell for a single asset. The browser uploads straight to Vercel
+// Blob; a pasted URL still works, and if the upload route is unavailable the
+// field falls back to a local preview rather than losing the choice.
 export default function MediaField({
   label,
   hint,
@@ -17,11 +39,30 @@ export default function MediaField({
   const inputRef = useRef(null);
   const [dragging, setDragging] = useState(false);
   const [pending, setPending] = useState(null);
+  const [progress, setProgress] = useState(null);
+  const [failure, setFailure] = useState('');
 
-  const take = (file) => {
+  const take = async (file) => {
     if (!file) return;
     setPending(file.name);
-    onChange(URL.createObjectURL(file));
+    setFailure('');
+    setProgress(0);
+
+    try {
+      const blob = await upload(`${folderFor(accept)}/${safeName(file.name)}`, file, {
+        access: 'public',
+        contentType: file.type || undefined,
+        handleUploadUrl: '/api/blob/upload-token',
+        onUploadProgress: ({ percentage }) => setProgress(percentage),
+      });
+      setPending(null);
+      setProgress(null);
+      onChange(blob.url);
+    } catch (error) {
+      setProgress(null);
+      setFailure(error?.message || 'ההעלאה נכשלה');
+      onChange(URL.createObjectURL(file));
+    }
   };
 
   return (
@@ -108,9 +149,23 @@ export default function MediaField({
         {children && <div className="mt-2">{children}</div>}
       </div>
 
-      {pending && (
+      {progress !== null && (
+        <div className="mt-1.5">
+          <div className="h-1.5 overflow-hidden rounded-full bg-adm-bg">
+            <div
+              className="h-full rounded-full bg-adm-blue transition-[width] duration-200"
+              style={{ width: `${Math.max(3, progress)}%` }}
+            />
+          </div>
+          <p className="mt-1 text-[11px] text-adm-muted">
+            מעלה {pending} — {Math.round(progress)}%
+          </p>
+        </div>
+      )}
+
+      {failure && (
         <p className="mt-1.5 text-[11px] text-amber-600">
-          הקובץ נבחר אך עדיין לא הועלה לשרת — ההעלאה תתחבר בשלב הבא.
+          {failure} — הקובץ מוצג מקומית בלבד ולא יישמר בפרסום.
         </p>
       )}
     </div>
