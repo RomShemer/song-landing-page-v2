@@ -59,9 +59,12 @@ export default function MediaField({
       setProgress(null);
       onChange(blob.url);
     } catch (error) {
+      // Deliberately does not write anything: a blob: URL lives only in this tab,
+      // so publishing one would leave the page pointing at nothing. The stored
+      // value stays as it was until a real upload replaces it.
       setProgress(null);
+      setPending(null);
       setFailure(error?.message || 'ההעלאה נכשלה');
-      onChange(URL.createObjectURL(file));
     }
   };
 
@@ -165,7 +168,7 @@ export default function MediaField({
 
       {failure && (
         <p className="mt-1.5 text-[11px] text-amber-600">
-          {failure} — הקובץ מוצג מקומית בלבד ולא יישמר בפרסום.
+          ההעלאה נכשלה ({failure}) — הקובץ לא נשמר. אפשר להדביק כתובת קובץ למטה.
         </p>
       )}
     </div>

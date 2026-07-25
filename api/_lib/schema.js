@@ -93,6 +93,18 @@ const hexColor = (v, fallback) =>
   typeof v === 'string' && /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.trim())
     ? v.trim().toLowerCase()
     : fallback;
+// Only http(s) and same-origin paths may reach the page. This blocks two real
+// mistakes: a `blob:` URL from a failed upload, which exists only inside the tab
+// that made it and would leave the page with a dead source, and a `javascript:`
+// href, which would be an injection point in an <a> or an <img>.
+const url = (v, fallback = '') => {
+  // An absent field keeps the base value; an empty string is a deliberate clear.
+  if (typeof v !== 'string') return fallback;
+  const trimmed = v.trim();
+  if (!trimmed) return '';
+  if (!/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) return trimmed;
+  return /^https?:\/\//i.test(trimmed) ? trimmed : fallback;
+};
 const fontKey = (v, fallback) =>
   typeof v === 'string' && FONT_KEYS.has(v) ? v : fallback;
 const oneOf = (v, allowed, fallback) => (allowed.has(v) ? v : fallback);
@@ -165,18 +177,18 @@ export function normalizeContent(input, base = EMPTY_CONTENT) {
       },
     },
     media: {
-      coverImage: str(obj(i.media).coverImage, b.media.coverImage),
+      coverImage: url(obj(i.media).coverImage, b.media.coverImage),
       showCover: bool(obj(i.media).showCover, b.media.showCover),
-      backgroundImage: str(obj(i.media).backgroundImage, b.media.backgroundImage),
-      audioStreamUrl: str(obj(i.media).audioStreamUrl, b.media.audioStreamUrl),
-      videoUrl: str(obj(i.media).videoUrl, b.media.videoUrl),
+      backgroundImage: url(obj(i.media).backgroundImage, b.media.backgroundImage),
+      audioStreamUrl: url(obj(i.media).audioStreamUrl, b.media.audioStreamUrl),
+      videoUrl: url(obj(i.media).videoUrl, b.media.videoUrl),
     },
     links: {
-      instagram: str(obj(i.links).instagram, b.links.instagram),
-      tiktok: str(obj(i.links).tiktok, b.links.tiktok),
-      youtube: str(obj(i.links).youtube, b.links.youtube),
-      appleMusic: str(obj(i.links).appleMusic, b.links.appleMusic),
-      spotify: str(obj(i.links).spotify, b.links.spotify),
+      instagram: url(obj(i.links).instagram, b.links.instagram),
+      tiktok: url(obj(i.links).tiktok, b.links.tiktok),
+      youtube: url(obj(i.links).youtube, b.links.youtube),
+      appleMusic: url(obj(i.links).appleMusic, b.links.appleMusic),
+      spotify: url(obj(i.links).spotify, b.links.spotify),
     },
     content: {
       prText: str(obj(i.content).prText, b.content.prText),
@@ -187,17 +199,17 @@ export function normalizeContent(input, base = EMPTY_CONTENT) {
       .map((c) => ({ role: str(obj(c).role), name: str(obj(c).name) }))
       .filter((c) => c.role || c.name),
     downloads: {
-      mp3Url: str(obj(i.downloads).mp3Url, b.downloads.mp3Url),
-      wavUrl: str(obj(i.downloads).wavUrl, b.downloads.wavUrl),
+      mp3Url: url(obj(i.downloads).mp3Url, b.downloads.mp3Url),
+      wavUrl: url(obj(i.downloads).wavUrl, b.downloads.wavUrl),
       showMp3: bool(obj(i.downloads).showMp3, b.downloads.showMp3),
       showWav: bool(obj(i.downloads).showWav, b.downloads.showWav),
-      pressPdf: str(obj(i.downloads).pressPdf, b.downloads.pressPdf),
-      imagesZip: str(obj(i.downloads).imagesZip, b.downloads.imagesZip),
+      pressPdf: url(obj(i.downloads).pressPdf, b.downloads.pressPdf),
+      imagesZip: url(obj(i.downloads).imagesZip, b.downloads.imagesZip),
       pressImages: (obj(i.downloads).pressImages === undefined
         ? b.downloads.pressImages
         : arr(obj(i.downloads).pressImages)
       )
-        .map((img) => ({ src: str(obj(img).src), name: str(obj(img).name) }))
+        .map((img) => ({ src: url(obj(img).src), name: str(obj(img).name) }))
         .filter((img) => img.src),
       labels: labelSet(obj(i.downloads).labels, b.downloads.labels),
     },
