@@ -3,8 +3,8 @@ import { normalizeContent } from '@schema';
 import defaultContent from '../content/defaultContent';
 import { DRAFT_STORAGE_KEY as STORAGE_KEY } from './draftStorage';
 
-// Until /api/content exists the draft is persisted locally, so edits survive a
-// reload. publish() is the only place that needs to change once it does.
+// The draft is persisted locally as well as published, so unpublished edits
+// survive a reload and are never visible to anyone else.
 function loadStored() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
