@@ -1,17 +1,5 @@
 import { FaLock } from 'react-icons/fa';
 
-/**
- * One download affordance: icon on the reading edge (right, in RTL) with the
- * label beside it, as the original cards were laid out.
- *
- * Renders as an <a download> when a file is available and unlocked, as a
- * <button> when it opens something in-app (the gallery), and as an inert card
- * when the client has locked downloads.
- *
- * No card is visually emphasised: clicking one starts a download rather than
- * selecting anything, so a highlighted card would imply state that cannot exist.
- * Hover carries the affordance instead, matching the credits cards.
- */
 export default function DownloadCard({
   icon: Icon,
   title,
@@ -31,7 +19,6 @@ export default function DownloadCard({
 
   const body = (
     <>
-      {/* Accent wash sweeping down, and a rail on the reading edge. */}
       {!locked && (
         <>
           <span
@@ -56,8 +43,6 @@ export default function DownloadCard({
       </span>
 
       <span className="relative min-w-0 flex-1">
-        {/* Wraps rather than truncates: at two columns on a phone these labels
-            are wider than the card. */}
         <span className="block text-sm leading-snug font-medium text-neutral-100">
           {title}
         </span>
@@ -81,7 +66,6 @@ export default function DownloadCard({
     );
   }
 
-  // No href means the card triggers in-app behaviour, which is a button.
   if (!href) {
     return (
       <button type="button" onClick={onClick} className={`${base} ${interactive}`}>

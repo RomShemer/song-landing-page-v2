@@ -14,17 +14,8 @@ const MIME = {
   '.webp': 'image/webp',
 };
 
-/**
- * Serves ./local-media at /local-media during `vite dev` only.
- *
- * The point is that rights-sensitive masters never sit in public/: that folder
- * is copied verbatim into dist/ on build, so a file parked there would be
- * published the next time anyone deploys. `apply: 'serve'` means this plugin
- * does not exist during a build, which makes that mistake impossible.
- *
- * Range requests are honoured because browsers seek audio with them — without
- * that, dragging the progress bar on a large WAV fails.
- */
+// `apply: 'serve'` is load-bearing: it keeps the masters out of dist/, which is
+// why they live here rather than in public/. Do not remove it.
 export default function localMedia({ dir = 'local-media', route = '/local-media' } = {}) {
   const root = resolve(process.cwd(), dir);
 

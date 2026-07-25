@@ -2,16 +2,6 @@ import { FaFileAlt, FaFileArchive, FaImages, FaMusic } from 'react-icons/fa';
 import DownloadCard from '../DownloadCard';
 import { trackMediaDownload, trackSongDownload } from '../../utils/analytics';
 
-/**
- * The single place downloads are offered. Every string on a card comes from
- * downloads.labels so the client owns the wording — it was previously hardcoded
- * here and again in an above-the-fold block, which is how the two ended up
- * disagreeing.
- *
- * Hidden entirely by the caller in listen-only mode. Audio masters are gated by
- * flags.downloadsLocked, and each respects its own showWav / showMp3 switch so
- * one can be offered without deleting the other's URL.
- */
 export default function DownloadsSection({
   downloads,
   flags,

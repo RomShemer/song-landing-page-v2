@@ -5,10 +5,6 @@ import { FaTimes } from 'react-icons/fa';
 const FOCUSABLE =
   'a[href], button:not([disabled]), input, select, textarea, [tabindex]:not([tabindex="-1"])';
 
-/**
- * Portal modal: Escape and backdrop close it, body scroll is locked while it is
- * open, and focus is trapped inside so keyboard users can't tab out behind it.
- */
 export default function Modal({ open, onClose, label, className = '', children }) {
   const panelRef = useRef(null);
 

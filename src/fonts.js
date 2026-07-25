@@ -1,11 +1,6 @@
-/**
- * Font choices offered in the dashboard. All of them carry Hebrew glyphs —
- * a Latin-only face would render the page in a fallback and look broken.
- *
- * `system` is the default and reproduces how the page looked before: the old
- * App.css asked for Heebo but never loaded the webfont, so it always fell back
- * to the operating system's UI face.
- */
+// Every face here must carry Hebrew glyphs. `system` is the default because the
+// original CSS named Heebo but never loaded it, so the page always rendered in
+// the OS UI face.
 export const FONTS = [
   {
     key: 'system',
@@ -35,10 +30,6 @@ export function fontStack(key) {
   return font.stack || `'${font.family}', system-ui, sans-serif`;
 }
 
-/**
- * Google Fonts css2 URL for the given keys, or null when every choice is a
- * system stack and no network request is needed.
- */
 export function googleFontsHref(keys) {
   const families = [...new Set(keys)]
     .map((key) => BY_KEY.get(key))

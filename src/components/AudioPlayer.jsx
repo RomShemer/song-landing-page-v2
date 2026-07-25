@@ -2,11 +2,6 @@ import { FaPause, FaPlay, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
 import { formatTime, useAudioPlayer } from '../hooks/useAudioPlayer';
 import { trackAudioPlay } from '../utils/analytics';
 
-/**
- * Shared slider styling. The track and thumb colours come from CSS variables set
- * by the variant below, so one class string serves both the light and dark
- * player without duplicating the browser-specific pseudo-element selectors.
- */
 const RANGE = `h-6 cursor-pointer appearance-none bg-transparent
   [&::-webkit-slider-runnable-track]:h-1.5 [&::-webkit-slider-runnable-track]:rounded-full
   [&::-webkit-slider-runnable-track]:bg-[linear-gradient(to_right,var(--player-fill)_var(--progress),var(--player-track)_var(--progress))]
@@ -45,14 +40,6 @@ const VARIANTS = {
   },
 };
 
-/**
- * Single-row player laid out like the native control it replaces: play, elapsed
- * / total, progress, volume. The song title is deliberately not repeated — it is
- * already the largest thing on the page, directly above.
- *
- * Both sliders are range inputs rather than divs with click handlers, so
- * dragging, keyboard arrows and screen-reader semantics come for free.
- */
 export default function AudioPlayer({ src, title, variant = 'light', sticky = false }) {
   const {
     audioRef,
@@ -83,7 +70,6 @@ export default function AudioPlayer({ src, title, variant = 'light', sticky = fa
           : 'rounded-full border px-4 py-2.5'
       }`}
     >
-      {/* Hidden on purpose: the row below is the control surface. */}
       <audio ref={audioRef} src={src} preload="metadata" />
 
       <div className="flex items-center gap-3" dir="ltr">
@@ -131,9 +117,6 @@ export default function AudioPlayer({ src, title, variant = 'light', sticky = fa
                 {muted || volume === 0 ? <FaVolumeMute /> : <FaVolumeUp />}
               </button>
 
-              {/* Collapsed to nothing until hover or keyboard focus — width alone
-                  left the thumb visible as a stray dot, so opacity carries it.
-                  Hidden entirely on phones, where the hardware keys own volume. */}
               <input
                 type="range"
                 min={0}

@@ -1,8 +1,3 @@
-/**
- * Caps a long block's height and scrolls it internally, so a section like the
- * lyrics doesn't push the rest of the page out of reach. A mask fades the last
- * few lines to signal there is more below.
- */
 export default function ScrollArea({ maxHeight = '22rem', className = '', children }) {
   return (
     <div

@@ -11,14 +11,12 @@ export default function CreditsSection({ credits = [] }) {
             hover:-translate-y-0.5 hover:border-accent-500/50 hover:bg-white/[0.09]
             hover:shadow-[0_10px_28px_-12px_var(--color-accent-600)]"
         >
-          {/* Accent wash that sweeps in on hover. */}
           <span
             aria-hidden="true"
             className="pointer-events-none absolute inset-0 -translate-y-full bg-gradient-to-b
               from-accent-500/20 to-transparent transition-transform duration-500
               group-hover:translate-y-0"
           />
-          {/* Accent rail on the reading edge. */}
           <span
             aria-hidden="true"
             className="absolute inset-y-0 end-0 w-0.5 origin-top scale-y-0 bg-accent-500

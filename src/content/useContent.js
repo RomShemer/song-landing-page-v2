@@ -2,25 +2,8 @@ import { useEffect, useState } from 'react';
 import { normalizeContent } from '@schema';
 import defaultContent from './defaultContent';
 
-/**
- * Renders build-time defaults immediately, then swaps in the live document from
- * /api/content when it arrives. Fetch failures are non-fatal by design — the
- * page stays fully usable on defaults.
- *
- * @param {{ fresh?: boolean }} options `fresh` bypasses the CDN cache (admin).
- */
-/**
- * In production the audio URLs come from KV, pointing at Blob uploads. The
- * masters are gitignored, so locally they are supplied by env vars instead:
- *
- *   VITE_DEV_MP3_URL    → downloads.mp3Url  (also backs the player)
- *   VITE_DEV_WAV_URL    → downloads.wavUrl
- *   VITE_DEV_AUDIO_URL  → media.audioStreamUrl, for a dedicated stream asset
- *
- * Only fields the document leaves empty are filled, so a real document always
- * wins. Dev-only: import.meta.env.DEV is statically false in a build, so this
- * whole branch is dropped by the bundler.
- */
+// The masters are gitignored, so locally the audio URLs come from env vars:
+// VITE_DEV_MP3_URL, VITE_DEV_WAV_URL, VITE_DEV_AUDIO_URL. See docs/media-files.md.
 function withDevMedia(doc) {
   if (!import.meta.env.DEV) return doc;
 
@@ -57,7 +40,6 @@ export function useContent({ fresh = false } = {}) {
     })
       .then((res) => (res.ok ? res.json() : Promise.reject(new Error(res.status))))
       .then((doc) => {
-        // Live document wins, but any field it omits falls back to defaults.
         setContent(withDevMedia(normalizeContent(doc, defaultContent)));
         setIsLive(true);
       })

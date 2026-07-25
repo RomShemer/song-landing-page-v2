@@ -1,10 +1,3 @@
-/**
- * Single source of truth for the content document shape.
- *
- * Imported by the API routes directly and by the client through the `@schema`
- * Vite alias, so validation can never drift between the two sides.
- */
-
 // Kept in sync with src/fonts.js, which owns the labels and webfont metadata.
 const FONT_KEYS = new Set([
   'system',
@@ -72,19 +65,13 @@ const str = (v, fallback = '') => (typeof v === 'string' ? v : fallback);
 const bool = (v, fallback = false) => (typeof v === 'boolean' ? v : fallback);
 const num = (v, fallback = null) =>
   typeof v === 'number' && Number.isFinite(v) ? v : fallback;
-/** Only #rgb / #rrggbb survive — the value lands in a CSS custom property. */
 const hexColor = (v, fallback) =>
   typeof v === 'string' && /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.trim())
     ? v.trim().toLowerCase()
     : fallback;
-/**
- * Font keys are validated against the shared registry so an unknown value can
- * never reach the page as an arbitrary CSS font-family.
- */
 const fontKey = (v, fallback) =>
   typeof v === 'string' && FONT_KEYS.has(v) ? v : fallback;
 const oneOf = (v, allowed, fallback) => (allowed.has(v) ? v : fallback);
-/** Per-card wording, so the client owns every string the page shows. */
 const labelSet = (v, base) =>
   Object.fromEntries(
     Object.keys(base).map((key) => [
@@ -98,10 +85,6 @@ const labelSet = (v, base) =>
 const obj = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
 const arr = (v) => (Array.isArray(v) ? v : []);
 
-/**
- * Coerce arbitrary input into a valid content document: every key present,
- * unknown keys dropped, wrong types replaced by the default. Never throws.
- */
 export function normalizeContent(input, base = EMPTY_CONTENT) {
   const i = obj(input);
   const b = base;

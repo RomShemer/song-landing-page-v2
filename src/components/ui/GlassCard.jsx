@@ -1,7 +1,3 @@
-/**
- * The single glass surface every card on the page is built from:
- * translucent fill, backdrop blur, hairline border, soft depth.
- */
 export default function GlassCard({ as: Tag = 'div', className = '', children, ...rest }) {
   return (
     <Tag

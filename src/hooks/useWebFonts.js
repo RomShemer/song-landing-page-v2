@@ -3,11 +3,6 @@ import { googleFontsHref } from '../fonts';
 
 const LINK_ID = 'dynamic-webfonts';
 
-/**
- * Loads only the faces the client actually selected. index.html deliberately
- * ships no font link: hardcoding one meant every visitor downloaded a face the
- * page might not even use.
- */
 export function useWebFonts(keys) {
   const href = googleFontsHref(keys.filter(Boolean));
 

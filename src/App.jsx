@@ -37,15 +37,8 @@ export default function App() {
 
   useWebFonts([theme.titleFont, theme.bodyFont]);
 
-  // Listen-only links go to press who should hear the track but receive no
-  // files — masters, press PDF and photo sets are all withheld.
   const showDownloads = viewMode === 'full';
 
-  // The whole point of a listen-only link is that it still plays, so the MP3
-  // backs the player even there — withholding it would leave nothing to hear.
-  // Hiding the URL would not protect it anyway (it is in the DOM either way);
-  // set media.audioStreamUrl to a dedicated low-bitrate asset when the master
-  // must not be reachable at all.
   const streamUrl = media.audioStreamUrl || downloads.mp3Url;
 
   return (

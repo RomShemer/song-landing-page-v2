@@ -1,6 +1,3 @@
-/**
- * Round glass button with a touch-friendly 44px minimum target.
- */
 export default function IconButton({
   className = '',
   size = 'md',

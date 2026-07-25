@@ -3,10 +3,6 @@ import { FaChevronDown } from 'react-icons/fa';
 
 const AccordionContext = createContext(null);
 
-/**
- * Single-open accordion. The container owns the open id (replacing the page-level
- * useState the old App.jsx carried) and reports opens for analytics.
- */
 export function Accordion({ onOpen, className = '', children }) {
   const [openId, setOpenId] = useState(null);
 

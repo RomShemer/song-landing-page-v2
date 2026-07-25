@@ -1,12 +1,6 @@
-/**
- * The accent colour is client-configurable, so it cannot live in the Tailwind
- * theme block as a literal. Tailwind's accent utilities compile to
- * `var(--color-accent-N)` lookups, which means overriding those variables at
- * runtime re-tints every one of them — no per-component wiring needed.
- *
- * Only the base hue is stored; the ramp is derived with color-mix so the client
- * picks one colour rather than five.
- */
+// Tailwind's accent utilities compile to var(--color-accent-N), so overriding
+// those variables at runtime re-tints all of them. Do not move these into the
+// @theme block as literals — that would make the colour uneditable.
 import { fontStack } from './fonts';
 
 export function accentVars(accent) {
@@ -22,10 +16,6 @@ export function accentVars(accent) {
   };
 }
 
-/**
- * Title and body faces are separate variables so a display font can carry the
- * song title without hurting the readability of a long press release.
- */
 export function fontVars({ titleFont, bodyFont } = {}) {
   return {
     '--font-title': fontStack(titleFont),
@@ -33,7 +23,6 @@ export function fontVars({ titleFont, bodyFont } = {}) {
   };
 }
 
-/** Every CSS variable the content document controls, ready for a style prop. */
 export function themeVars(theme = {}) {
   return { ...accentVars(theme.accent), ...fontVars(theme) };
 }

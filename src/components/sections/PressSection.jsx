@@ -1,13 +1,5 @@
 import ScrollArea from '../ui/ScrollArea';
 
-/**
- * The press release is authored as HTML in the CMS, so it is injected. Styling
- * is done with descendant variants rather than pulling in the typography plugin
- * for a single field.
- *
- * Height-capped like the lyrics: it is the longest block on the page, and left
- * uncapped it pushed the sections below it several screens down.
- */
 export default function PressSection({ html }) {
   if (!html) return null;
 

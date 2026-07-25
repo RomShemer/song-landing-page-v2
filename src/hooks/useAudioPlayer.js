@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-/** Seconds → m:ss, with a dash while duration is still unknown. */
 export function formatTime(seconds) {
   if (!Number.isFinite(seconds) || seconds < 0) return '0:00';
   const total = Math.floor(seconds);
@@ -9,13 +8,6 @@ export function formatTime(seconds) {
   return `${mins}:${String(secs).padStart(2, '0')}`;
 }
 
-/**
- * Drives a hidden <audio> element for the custom player UI.
- *
- * @param {{ src: string, onFirstPlay?: () => void }} options
- *   onFirstPlay fires once per mount, latched via a ref, so pause→play does
- *   not inflate the play counter.
- */
 export function useAudioPlayer({ src, onFirstPlay } = {}) {
   const audioRef = useRef(null);
   const firstPlayFired = useRef(false);
@@ -27,9 +19,6 @@ export function useAudioPlayer({ src, onFirstPlay } = {}) {
   const [volume, setVolumeState] = useState(1);
   const [muted, setMutedState] = useState(false);
 
-  // A new source makes the previous track's progress meaningless. Adjusted
-  // during render rather than in an effect so there is no frame showing the
-  // old position against the new track.
   const [loadedSrc, setLoadedSrc] = useState(src);
   if (loadedSrc !== src) {
     setLoadedSrc(src);
@@ -55,7 +44,6 @@ export function useAudioPlayer({ src, onFirstPlay } = {}) {
       setError(true);
       setIsPlaying(false);
     };
-    // Mirror changes made outside the UI (media keys, OS mixer).
     const onVolume = () => {
       setVolumeState(el.volume);
       setMutedState(el.muted);
@@ -97,7 +85,6 @@ export function useAudioPlayer({ src, onFirstPlay } = {}) {
     }
   }, [onFirstPlay]);
 
-  /** @param {number} seconds absolute position, clamped to the track */
   const seek = useCallback((seconds) => {
     const el = audioRef.current;
     if (!el || !Number.isFinite(el.duration)) return;
@@ -106,13 +93,11 @@ export function useAudioPlayer({ src, onFirstPlay } = {}) {
     setCurrentTime(next);
   }, []);
 
-  /** @param {number} delta seconds relative to the current position */
   const skip = useCallback(
     (delta) => seek((audioRef.current?.currentTime ?? 0) + delta),
     [seek]
   );
 
-  /** @param {number} next 0..1 — setting a level also unmutes, as users expect */
   const setVolume = useCallback((next) => {
     const el = audioRef.current;
     if (!el) return;
@@ -124,7 +109,6 @@ export function useAudioPlayer({ src, onFirstPlay } = {}) {
   const toggleMute = useCallback(() => {
     const el = audioRef.current;
     if (!el) return;
-    // Coming back from a level of 0 would stay silent, so restore a usable one.
     if (el.muted || el.volume === 0) {
       el.muted = false;
       if (el.volume === 0) el.volume = 1;

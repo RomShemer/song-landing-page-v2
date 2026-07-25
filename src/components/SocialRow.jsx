@@ -7,9 +7,6 @@ import {
 } from 'react-icons/fa';
 import { trackSocialClick } from '../utils/analytics';
 
-// The row sits in an RTL container, so the first entry renders furthest right.
-// Listed here back-to-front to read, on screen, left-to-right as:
-// Spotify · Apple Music · YouTube · TikTok · Instagram
 const NETWORKS = [
   { key: 'instagram', icon: FaInstagram, label: 'Instagram' },
   { key: 'tiktok', icon: FaTiktok, label: 'TikTok' },

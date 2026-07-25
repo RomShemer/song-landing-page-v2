@@ -1,10 +1,5 @@
 import { normalizeContent } from '@schema';
 
-/**
- * Build-time content, rendered on first paint so the page never shows a spinner
- * and still works if KV / the API is unreachable. `useContent` merges the live
- * document from /api/content over this once it lands.
- */
 const defaultContent = normalizeContent({
   schemaVersion: 1,
   song: {
@@ -13,20 +8,12 @@ const defaultContent = normalizeContent({
     releaseYear: 2026,
   },
   theme: {
-    // Warm gold, picked to sit with the existing artwork. Fully client-editable
-    // in the dashboard — nothing downstream hardcodes a colour.
     accent: '#d99a4e',
-    // 'system' reproduces the original look: the old CSS named Heebo but never
-    // loaded it, so the page always rendered in the OS UI face.
     titleFont: 'system',
     bodyFont: 'system',
-    // 'light' | 'dark' — the player is the one surface that reads better as a
-    // solid card than as glass, so it gets its own switch.
     playerStyle: 'light',
   },
   media: {
-    // No cover by default: the release photo carries the page as the background,
-    // and the client can upload a square cover and switch it on when there is one.
     coverImage: '',
     showCover: false,
     backgroundImage: '/media/photos/press-official.jpg',
@@ -171,8 +158,6 @@ const defaultContent = normalizeContent({
     showWav: true,
     pressPdf: '/media/press-release.pdf',
     imagesZip: '/media/press-photos.zip',
-    // Every string shown on a download card. Editable in the dashboard, so the
-    // wording lives here and nowhere else — it used to be duplicated in JSX.
     labels: {
       wav: { title: 'הורדת WAV לשידור', subtitle: 'איכות מלאה' },
       mp3: { title: 'הורדת MP3', subtitle: 'להאזנה והפצה' },

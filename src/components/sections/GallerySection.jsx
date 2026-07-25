@@ -3,19 +3,6 @@ import { FaChevronLeft, FaChevronRight, FaExpand } from 'react-icons/fa';
 import IconButton from '../ui/IconButton';
 import Modal from '../ui/Modal';
 
-/**
- * Press-photo carousel.
- *
- * The frame takes its height from the photo rather than imposing one, capped at
- * 70vh. `object-cover` in a fixed frame was cropping these shots; switching to a
- * fixed tall frame stopped the cropping but letterboxed the square ones with
- * ~230px of black. Sizing to the image avoids both, at the cost of the carousel
- * changing height between portrait and square press shots — the right trade for
- * a press kit, where seeing the whole frame is the point.
- *
- * Arrows overlay the image instead of sitting beside it, which on a phone gives
- * the photo the full width of the card rather than losing ~90px to controls.
- */
 export default function GallerySection({ images = [] }) {
   const [index, setIndex] = useState(0);
   const [preview, setPreview] = useState(false);
@@ -41,10 +28,6 @@ export default function GallerySection({ images = [] }) {
           className="max-h-[70vh] w-auto max-w-full object-contain"
         />
 
-        {/* The whole photo opens the fullscreen view. The hint bar only appears
-            while the pointer is over the photo itself — the arrows sit above
-            this layer, so hovering or clicking one leaves it hidden without
-            needing any state to coordinate them. */}
         <button
           type="button"
           onClick={() => setPreview(true)}
@@ -65,7 +48,6 @@ export default function GallerySection({ images = [] }) {
 
         {many && (
           <>
-            {/* Right steps backwards, matching the reading direction. */}
             <IconButton
               onClick={() => step(-1)}
               aria-label="התמונה הקודמת"
