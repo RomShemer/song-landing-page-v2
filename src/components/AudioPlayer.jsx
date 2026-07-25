@@ -1,6 +1,6 @@
 import { FaPause, FaPlay, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
 import { formatTime, useAudioPlayer } from '../hooks/useAudioPlayer';
-import { trackAudioPlay } from '../utils/analytics';
+import { trackAudioPlay, trackListenSeconds } from '../utils/analytics';
 
 const RANGE = `h-6 cursor-pointer appearance-none bg-transparent
   [&::-webkit-slider-runnable-track]:h-1.5 [&::-webkit-slider-runnable-track]:rounded-full
@@ -40,7 +40,7 @@ const VARIANTS = {
   },
 };
 
-export default function AudioPlayer({ src, title, variant = 'light', sticky = false }) {
+export default function AudioPlayer({ src, variant = 'light', sticky = false }) {
   const {
     audioRef,
     isPlaying,
@@ -53,7 +53,11 @@ export default function AudioPlayer({ src, title, variant = 'light', sticky = fa
     seek,
     setVolume,
     toggleMute,
-  } = useAudioPlayer({ src, onFirstPlay: () => trackAudioPlay(title || 'track') });
+  } = useAudioPlayer({
+    src,
+    onFirstPlay: trackAudioPlay,
+    onListened: trackListenSeconds,
+  });
 
   if (!src) return null;
 

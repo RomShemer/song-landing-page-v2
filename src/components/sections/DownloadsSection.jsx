@@ -55,15 +55,13 @@ export default function DownloadsSection({
         />
       )}
 
+      {/* Opening the picker is not a download; each photo taken from it is. */}
       {downloads.pressImages?.length > 0 && (
         <DownloadCard
           icon={FaImages}
           title={label('gallery').title}
           subtitle={label('gallery').subtitle}
-          onClick={() => {
-            trackMediaDownload('gallery_open');
-            onOpenGallery();
-          }}
+          onClick={onOpenGallery}
         />
       )}
 

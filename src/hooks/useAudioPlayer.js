@@ -8,9 +8,11 @@ export function formatTime(seconds) {
   return `${mins}:${String(secs).padStart(2, '0')}`;
 }
 
-export function useAudioPlayer({ src, onFirstPlay } = {}) {
+export function useAudioPlayer({ src, onFirstPlay, onListened } = {}) {
   const audioRef = useRef(null);
   const firstPlayFired = useRef(false);
+  const listened = useRef(0);
+  const playingSince = useRef(0);
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -28,19 +30,59 @@ export function useAudioPlayer({ src, onFirstPlay } = {}) {
     setError(false);
   }
 
+  // Wall-clock time actually spent playing, so pauses and seeks are not counted
+  // as listening. Reported once when the visitor leaves rather than on every
+  // pause, so one visit produces one measured listen — which means `onListened`
+  // must be a stable reference or the effect below flushes early.
+  const stopClock = useCallback(() => {
+    if (!playingSince.current) return;
+    listened.current += (Date.now() - playingSince.current) / 1000;
+    playingSince.current = 0;
+  }, []);
+
+  const report = useCallback(() => {
+    stopClock();
+    const total = listened.current;
+    listened.current = 0;
+    if (total >= 1) onListened?.(total);
+  }, [stopClock, onListened]);
+
+  useEffect(() => {
+    const onHide = () => report();
+    window.addEventListener('pagehide', onHide);
+    return () => {
+      window.removeEventListener('pagehide', onHide);
+      report();
+    };
+  }, [report, src]);
+
   useEffect(() => {
     const el = audioRef.current;
     if (!el) return;
 
     const onLoaded = () => setDuration(Number.isFinite(el.duration) ? el.duration : 0);
     const onTime = () => setCurrentTime(el.currentTime);
-    const onPlay = () => setIsPlaying(true);
-    const onPause = () => setIsPlaying(false);
+    const onPlay = () => {
+      playingSince.current = Date.now();
+      // Reported from the media event, not from the button, so a play started
+      // any other way — keyboard, OS media keys, autoplay — is counted too.
+      if (!firstPlayFired.current) {
+        firstPlayFired.current = true;
+        onFirstPlay?.();
+      }
+      setIsPlaying(true);
+    };
+    const onPause = () => {
+      stopClock();
+      setIsPlaying(false);
+    };
     const onEnded = () => {
+      stopClock();
       setIsPlaying(false);
       setCurrentTime(0);
     };
     const onError = () => {
+      stopClock();
       setError(true);
       setIsPlaying(false);
     };
@@ -68,22 +110,18 @@ export function useAudioPlayer({ src, onFirstPlay } = {}) {
       el.removeEventListener('error', onError);
       el.removeEventListener('volumechange', onVolume);
     };
-  }, [src]);
+  }, [src, stopClock, onFirstPlay]);
 
   const toggle = useCallback(() => {
     const el = audioRef.current;
     if (!el) return;
 
     if (el.paused) {
-      if (!firstPlayFired.current) {
-        firstPlayFired.current = true;
-        onFirstPlay?.();
-      }
       el.play().catch(() => setError(true));
     } else {
       el.pause();
     }
-  }, [onFirstPlay]);
+  }, []);
 
   const seek = useCallback((seconds) => {
     const el = audioRef.current;

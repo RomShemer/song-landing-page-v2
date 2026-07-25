@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   FaAward,
   FaDownload,
@@ -26,7 +26,7 @@ import { useContent } from './content/useContent';
 import { useViewMode } from './hooks/useViewMode';
 import { useWebFonts } from './hooks/useWebFonts';
 import { themeFontKeys, themeVars } from './theme';
-import { trackAccordionOpen, trackMediaDownload } from './utils/analytics';
+import { trackAccordionOpen, trackMediaDownload, trackPageView } from './utils/analytics';
 
 export default function App({ content: override, viewMode: viewModeOverride }) {
   const live = useContent({ skip: Boolean(override) });
@@ -38,6 +38,14 @@ export default function App({ content: override, viewMode: viewModeOverride }) {
   const { song, theme, media, links, content, credits, downloads, contact, flags } = doc;
 
   useWebFonts(themeFontKeys(theme));
+
+  // Which link the visitor arrived on is the interesting half of a page view,
+  // so the mode travels with it. The admin preview passes its own content and
+  // is not a visit.
+  const isPreview = Boolean(override);
+  useEffect(() => {
+    if (!isPreview) trackPageView(viewMode);
+  }, [isPreview, viewMode]);
 
   const showDownloads = viewMode === 'full';
 
@@ -77,12 +85,7 @@ export default function App({ content: override, viewMode: viewModeOverride }) {
         </div>
 
         <div data-section="player">
-          <AudioPlayer
-            src={streamUrl}
-            title={song.title}
-            variant={theme.playerStyle}
-            sticky
-          />
+          <AudioPlayer src={streamUrl} variant={theme.playerStyle} sticky />
         </div>
 
         <Accordion onOpen={trackAccordionOpen}>
