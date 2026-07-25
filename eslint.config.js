@@ -23,7 +23,18 @@ export default defineConfig([
       },
     },
     rules: {
-      'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
+      // Capitalised names are components/renderable props (`icon: Icon`,
+      // `as: Tag`) which the base rule cannot see being used inside JSX.
+      // The vars pattern alone missed them because they arrive as parameters.
+      'no-unused-vars': [
+        'error',
+        { varsIgnorePattern: '^[A-Z_]', argsIgnorePattern: '^[A-Z_]|^_' },
+      ],
     },
+  },
+  {
+    // Serverless functions and build tooling run on the server, not the browser.
+    files: ['api/**/*.js', 'vite-plugins/**/*.js', 'vite.config.js'],
+    languageOptions: { globals: { ...globals.node } },
   },
 ])

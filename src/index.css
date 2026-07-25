@@ -1,68 +1,191 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+@import 'tailwindcss';
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
+/* ===== Design tokens ===== */
+@theme {
+  /* Overridden at runtime from the theme's per-element font settings. */
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  --font-title: var(--font-sans);
+  --font-subtitle: var(--font-sans);
+  --font-sections: var(--font-sans);
+  --font-body: var(--font-sans);
 
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-}
+  /* Accent ramp. These are only the fallbacks: the client picks the base hue in
+     the admin dashboard and src/theme.js overrides these variables at runtime,
+     which re-tints every accent utility at once. */
+  --color-accent-100: color-mix(in oklab, #d99a4e 25%, white);
+  --color-accent-200: color-mix(in oklab, #d99a4e 45%, white);
+  --color-accent-300: color-mix(in oklab, #d99a4e 68%, white);
+  --color-accent-400: color-mix(in oklab, #d99a4e 86%, white);
+  --color-accent-500: #d99a4e;
+  --color-accent-600: color-mix(in oklab, #d99a4e 82%, black);
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
+  /* Glassmorphism surfaces */
+  --color-glass: color-mix(in oklab, white 8%, transparent);
+  --color-glass-strong: color-mix(in oklab, white 14%, transparent);
+  --color-hairline: color-mix(in oklab, white 10%, transparent);
 
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
-}
+  --radius-card: 1rem;
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  /* Admin dashboard: a light surface of its own, independent of the public
+     page's dark theme and of the client-chosen accent. */
+  --color-adm-bg: #eef2fb;
+  --color-adm-card: #ffffff;
+  --color-adm-line: #e3e9f6;
+  --color-adm-ink: #0f2b5c;
+  --color-adm-ink2: #55658a;
+  --color-adm-muted: #93a2bf;
+  --color-adm-blue: #1f6feb;
+  --color-adm-blue-hover: #1a5fd0;
+  --color-adm-blue-soft: #e9f1ff;
+  --color-adm-teal: #0fae9e;
+  --color-adm-teal-soft: #e2f7f4;
 }
 
-@media (prefers-color-scheme: light) {
+@keyframes preview-flash {
+  0% {
+    outline-color: var(--color-adm-blue);
+    background-color: color-mix(in oklab, var(--color-adm-blue) 22%, transparent);
+  }
+  70% {
+    outline-color: var(--color-adm-blue);
+    background-color: color-mix(in oklab, var(--color-adm-blue) 10%, transparent);
+  }
+  100% {
+    outline-color: transparent;
+    background-color: transparent;
+  }
+}
+
+/* Applied briefly to the block a just-edited field controls, so the eye is
+   pulled to where the change landed in the preview. */
+.page-root {
+  container-type: inline-size;
+  font-size: var(--body-size, 0.9375rem);
+}
+
+.page-title {
+  font-size: var(--title-size, clamp(3.5rem, 9cqw, 8rem));
+  font-weight: var(--title-weight, 200);
+  letter-spacing: var(--title-spacing, 0.5em);
+  padding-left: var(--title-spacing, 0.5em);
+  text-transform: var(--title-transform, none);
+  text-align: var(--title-align, center);
+  line-height: 1.05;
+  margin-top: 15px;
+  margin-bottom: 25px;
+}
+
+.page-subtitle {
+  font-family: var(--font-subtitle);
+  font-size: var(--subtitle-size, 1.125rem);
+  font-weight: var(--subtitle-weight, 500);
+  letter-spacing: var(--subtitle-spacing, 0);
+  padding-left: var(--subtitle-spacing, 0);
+  text-align: var(--title-align, center);
+}
+
+.section-title {
+  font-family: var(--font-sections);
+  font-size: var(--section-size, 1rem);
+  font-weight: var(--section-weight, 500);
+}
+
+.preview-screen {
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.preview-screen::-webkit-scrollbar {
+  display: none;
+}
+
+.preview-flash {
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+  border-radius: 1rem;
+  animation: preview-flash 1500ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .page-root {
+  container-type: inline-size;
+  font-size: var(--body-size, 0.9375rem);
+}
+
+.page-title {
+  font-size: var(--title-size, clamp(3.5rem, 9cqw, 8rem));
+  font-weight: var(--title-weight, 200);
+  letter-spacing: var(--title-spacing, 0.5em);
+  padding-left: var(--title-spacing, 0.5em);
+  text-transform: var(--title-transform, none);
+  text-align: var(--title-align, center);
+  line-height: 1.05;
+  margin-top: 15px;
+  margin-bottom: 25px;
+}
+
+.page-subtitle {
+  font-family: var(--font-subtitle);
+  font-size: var(--subtitle-size, 1.125rem);
+  font-weight: var(--subtitle-weight, 500);
+  letter-spacing: var(--subtitle-spacing, 0);
+  padding-left: var(--subtitle-spacing, 0);
+  text-align: var(--title-align, center);
+}
+
+.section-title {
+  font-family: var(--font-sections);
+  font-size: var(--section-size, 1rem);
+  font-weight: var(--section-weight, 500);
+}
+
+.preview-screen {
+  overscroll-behavior: contain;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.preview-screen::-webkit-scrollbar {
+  display: none;
+}
+
+.preview-flash {
+    animation-duration: 1ms;
+  }
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    @apply bg-neutral-950 font-sans text-neutral-100 antialiased;
+    margin: 0;
+    min-width: 320px;
+  }
+
+  /* Never let the sticky player sit under the iOS home indicator. */
   :root {
-    color: #213547;
-    background-color: #ffffff;
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
   }
-  a:hover {
-    color: #747bff;
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent-400;
   }
-  button {
-    background-color: #f9f9f9;
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }

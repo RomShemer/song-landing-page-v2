@@ -1,427 +1,173 @@
-import { useState } from 'react';
-import artistData from './artistData';
-
+import { useEffect, useState } from 'react';
 import {
-  FaTiktok,
-  FaYoutube,
-  FaInstagram,
-  FaSpotify,
-  FaApple,
-  FaPhone,
-  FaEnvelope,
-  FaChevronDown,
-  FaVideo,
-  FaFileAlt,
-  FaMusic,
   FaAward,
   FaDownload,
+  FaFileAlt,
   FaImages,
-  FaChevronLeft,
-  FaChevronRight 
+  FaMusic,
+  FaPhone,
+  FaVideo,
 } from 'react-icons/fa';
 
-import {
-  trackSongDownload,
-  trackMediaDownload,
-  trackAudioPlay,
-  trackSocialClick,
-  trackAccordionOpen,
-  trackContactClick
-} from './utils/analytics';
+import { Accordion, AccordionItem } from './components/ui/Accordion';
+import Modal from './components/ui/Modal';
+import AudioPlayer from './components/AudioPlayer';
+import Hero from './components/Hero';
+import SocialRow from './components/SocialRow';
+import ClipSection from './components/sections/ClipSection';
+import ContactSection from './components/sections/ContactSection';
+import CreditsSection from './components/sections/CreditsSection';
+import DownloadsSection from './components/sections/DownloadsSection';
+import GallerySection from './components/sections/GallerySection';
+import LyricsSection from './components/sections/LyricsSection';
+import PressSection from './components/sections/PressSection';
 
+import { useContent } from './content/useContent';
+import { useViewMode } from './hooks/useViewMode';
+import { useWebFonts } from './hooks/useWebFonts';
+import { themeFontKeys, themeVars } from './theme';
+import { trackAccordionOpen, trackMediaDownload, trackPageView } from './utils/analytics';
 
-import './App.css';
+export default function App({ content: override, viewMode: viewModeOverride }) {
+  const live = useContent({ skip: Boolean(override) });
+  const doc = override ?? live.content;
+  const urlViewMode = useViewMode();
+  const viewMode = viewModeOverride ?? urlViewMode;
+  const [galleryOpen, setGalleryOpen] = useState(false);
 
-export default function App() {
-  const [open, setOpen] = useState(null);
-  const [showGallery, setShowGallery] = useState(false);
-  const [galleryIndex, setGalleryIndex] = useState(0);
-  const [showImagePreview, setShowImagePreview] = useState(false);
+  const { song, theme, media, links, content, credits, downloads, contact, flags } = doc;
 
-  const { media, links, content, contact } = artistData;
+  useWebFonts(themeFontKeys(theme));
 
-  const toggle = (id) => {
-    if (open !== id) {
-      trackAccordionOpen(id);
-    }
-    setOpen(open === id ? null : id);
-  };
+  // Which link the visitor arrived on is the interesting half of a page view,
+  // so the mode travels with it. The admin preview passes its own content and
+  // is not a visit.
+  const isPreview = Boolean(override);
+  useEffect(() => {
+    if (!isPreview) trackPageView(viewMode);
+  }, [isPreview, viewMode]);
 
+  const showDownloads = viewMode === 'full';
+
+  const streamUrl = media.audioStreamUrl || downloads.mp3Url;
 
   return (
     <div
-      className="page"
       dir="rtl"
-      style={{ backgroundImage: `url(${media.backgroundImage})` }}
+      className="page-root relative min-h-dvh overflow-x-hidden font-body"
+      style={themeVars(theme)}
     >
-      <div className="content">
-
-        <h1 className="title">רוצי</h1>
-        <div className="subtitle">דור שמר</div>
-
-        <div className="socials">
-          {links.instagram && <a href={links.instagram} target="_blank" rel="noreferrer"  onClick={() => trackSocialClick('instagram')}><FaInstagram /></a>}
-          {links.tiktok && <a href={links.tiktok} target="_blank" rel="noreferrer" onClick={() => trackSocialClick('tiktok')}><FaTiktok /></a>}
-          {links.youtube && <a href={links.youtube} target="_blank" rel="noreferrer" onClick={() => trackSocialClick('youtube')}><FaYoutube /></a>}
-          {links.appleMusic && <a href={links.appleMusic} target="_blank" rel="noreferrer" onClick={() => trackSocialClick('appleMusic')}><FaApple /></a>}
-          {links.spotify && <a href={links.spotify} target="_blank" rel="noreferrer" onClick={() => trackSocialClick('spotify')}><FaSpotify /></a>}
-        </div>
-
-        {media.audio_file && (
-          <div className="audio-wrapper">
-            <div className="audio">
-              <audio
-                controls
-                src={media.audio_file}
-                onPlay={() => trackAudioPlay('rutzi')}
-              />
-            </div>
-          </div>
-        )}
-
-        <div className="accordion">
-          <AccordionItem
-            title="גלריית תמונות"
-            icon={FaImages}
-            isOpen={open === 'gallery'}
-            onClick={() => toggle('gallery')}
-          >
-            <div className="pr-box-gallery" >
-              <div className="inline-gallery">
-
-                <button
-                  type="button"
-                  className="gallery-arrow left"
-                  onClick={() =>
-                    setGalleryIndex((prev) =>
-                      prev === 0
-                        ? artistData.downloads.pressImages.length - 1
-                        : prev - 1
-                    )
-                  }
-                  aria-label="Previous image"
-                >
-                  <FaChevronRight />
-                </button>
-                <div className="gallery-image-wrapper">
-                  <img
-                    src={artistData.downloads.pressImages[galleryIndex].src}
-                    alt={`Gallery image ${galleryIndex + 1}`}
-                    className="gallery-preview-img"
-                    draggable={false}
-
-                  />
-
-                  <button
-                    type="button"
-                    className="gallery-hover-hint"
-                    onContextMenu={(e) => e.preventDefault()}
-                    onClick={() => setShowImagePreview(true)}
-                  >
-                    ⛶ לחיצה לצפייה במסך מלא
-                  </button>
-                </div>
-  
-                <button
-                  type="button"
-                  className="gallery-arrow right"
-                  onClick={() =>
-                    setGalleryIndex((prev) =>
-                      prev === artistData.downloads.pressImages.length - 1
-                        ? 0
-                        : prev + 1
-                    )
-                  }
-                  aria-label="Next image"
-                >
-                  <FaChevronLeft />
-                </button>
-                </div>
-              </div>
-          </AccordionItem>
-          
-          <AccordionItem
-            title="קליפ רשמי"
-            icon={FaVideo}
-            isOpen={open === 'clip'}
-            onClick={() => toggle('clip')}
-          >
-            {media.video_url ? (
-              <div className="video-wrapper">
-                <iframe
-                  src={media.video_url}
-                  title="קליפ רשמי"
-                  allowFullScreen
-                />
-              </div>
-            ) : (
-              <div className="coming-soon">הקליפ יעלה בקרוב 🎬</div>
-            )}
-          </AccordionItem>
-
-          <AccordionItem
-            title="קומוניקט"
-            icon={FaFileAlt}
-            isOpen={open === 'pr'}
-            onClick={() => toggle('pr')}
-          >
-            <div
-              className="pr-box"
-              dangerouslySetInnerHTML={{ __html: content.prText }}
-            />
-          </AccordionItem>
-
-          <AccordionItem
-            title="מילים"
-            icon={FaMusic}
-            isOpen={open === 'lyrics'}
-            onClick={() => toggle('lyrics')}
-          >
-            <div className="lyrics-box">{content.lyrics}</div>
-          </AccordionItem>
-
-          <AccordionItem
-            title="קרדיטים"
-            icon={FaAward}
-            isOpen={open === 'credits'}
-            onClick={() => toggle('credits')}
-          >
-            <div className="credits-grid">
-              <Credit role="מילים" name="דור שמר, גילי אסרף" />
-              <Credit role="לחן" name="דור שמר, גילי אסרף" />
-              <Credit role="הפקה" name="גילי אסרף" />
-              <Credit role="מיקס" name="גילי אסרף" />
-              <Credit role="מאסטרינג" name="אוהד ניסים" />
-              <Credit role="וידאו" name="גל צורף" />
-            </div>
-          </AccordionItem>
-
-          <AccordionItem
-            title="תיקיית הורדות"
-            icon={FaDownload}
-            isOpen={open === 'downloads'}
-            onClick={() => toggle('downloads')}
-          >
-            <div className="downloads-grid">
-
-              <DownloadCard
-                icon={FaMusic}
-                title="הורדת MP3"
-                subtitle="לשמיעה והפצה"
-                href={artistData.downloads.mp3}
-                onClick={() => trackSongDownload('mp3')}
-                restricted 
-              />
-
-              <DownloadCard
-                icon={FaMusic}
-                title="הורדת WAV לשידור"
-                subtitle="איכות מלאה"
-                href={artistData.downloads.wav}
-                onClick={() => trackSongDownload('wav')}
-                restricted 
-              />
-
-              <DownloadCard
-                icon={FaFileAlt}
-                title="קומוניקט"
-                subtitle="לחץ להורדה"
-                href={artistData.downloads.press_pdf}
-                onClick={() => trackMediaDownload('pressPDF')}
-              />
-
-              <DownloadCard
-                icon={FaDownload}
-                title="גלריית תמונות יח״צ"
-                subtitle="סט תמונות"
-                onClick={(e) => {
-                  e.preventDefault();
-                  trackMediaDownload('gallery_open');
-                  setShowGallery(true);
-                }}
-              />
-
-              <DownloadCard
-                icon={FaDownload}
-                title="תמונות יח״צ"
-                subtitle="ZIP"
-                href={artistData.downloads.images_gallery}
-                onClick={() => trackMediaDownload('images')}
-              />
-
-            </div>
-          </AccordionItem>
-
-          <AccordionItem
-            title="יצירת קשר"
-            icon={FaPhone}
-            isOpen={open === 'contact'}
-            onClick={() => toggle('contact')}
-          >
-            <div className="contact-box">
-              <div className="contact-row">
-
-                {contact.phone && (
-                  <a
-                    href={`tel:${contact.phone}`}
-                    className="contact-item"
-                    onClick={() => trackContactClick('phone')}
-                  >
-                    <FaPhone size={18} />
-                    {contact.phone}
-                  </a>
-                )}
-
-                {contact.email && (
-                  <a
-                    href={`mailto:${contact.email}`}
-                    className="contact-item"
-                    onClick={() => trackContactClick('email')}
-                  >
-                    <FaEnvelope size={18} />
-                    {contact.email}
-                  </a>
-                )}
-
-              </div>
-            </div>
-          </AccordionItem>
-
-
-          <footer className="footer">© 2026 דור שמר</footer>
-        </div>
-      </div>
-
-      {/* ===== Gallery Modal – שכבה נפרדת מעל הכול ===== */}
-      {showGallery && (
-        <div className="gallery-modal" onClick={() => setShowGallery(false)}>
-          <div className="gallery-content" onClick={(e) => e.stopPropagation()}>
-            <button
-              className="gallery-close"
-              onClick={() => setShowGallery(false)}
-            >
-              ✕
-            </button>
-
-            <div className="gallery-grid">
-              {artistData.downloads.pressImages.map((img, i) => (
-                <a
-                  key={i}
-                  href={img.src}
-                  download={img.name}
-                >
-                  <img src={img.src} alt={img.name} />
-                </a>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {showImagePreview && (
+      {media.backgroundImage && (
         <div
-          className="image-preview-modal"
-          onClick={() => setShowImagePreview(false)}
-        >
-          <div
-            className="image-preview-content"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <button
-              className="gallery-close"
-              onClick={() => setShowImagePreview(false)}
-              aria-label="Close image preview"
-            >
-              ✕
-            </button>
-
-            <img
-              src={artistData.downloads.pressImages[galleryIndex].src}
-              alt={`Preview image ${galleryIndex + 1}`}
-              className="image-preview-full"
-              draggable={false}
-              onContextMenu={(e) => e.preventDefault()}
-            />
-          </div>
-        </div>
+          aria-hidden="true"
+          className="pointer-events-none fixed inset-0 -z-20 bg-cover bg-center opacity-25"
+          style={{ backgroundImage: `url(${media.backgroundImage})` }}
+        />
       )}
-    </div>
-  );
-}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none fixed inset-0 -z-10 bg-neutral-950/80"
+      />
 
-/* ===== Components ===== */
-
-function AccordionItem({ title, icon: Icon, isOpen, onClick, children }) {
-  return (
-    <div className="accordion-item">
-      <div className="accordion-header" onClick={onClick}>
-        <div className="accordion-icon"><Icon /></div>
-
-        <div className="accordion-title">
-          <span>{title}</span>
-        </div>
-
-        <div className="accordion-actions">
-          <FaChevronDown
-            className={`chevron ${isOpen ? 'open' : ''}`}
+      <main className="mx-auto flex w-full max-w-xl flex-col gap-5 px-4 pb-8">
+        <div data-section="hero">
+          <Hero
+            title={song.title}
+            artist={song.artist}
+            coverImage={media.coverImage}
+            showCover={media.showCover}
+            glowImage={media.backgroundImage}
           />
         </div>
-      </div>
 
-      {isOpen && (
-        <div className="accordion-content">
-          <div className="accordion-content-inner">
-            {children}
+        <div data-section="socials">
+          <SocialRow links={links} />
+        </div>
+
+        <div data-section="player">
+          <AudioPlayer src={streamUrl} variant={theme.playerStyle} sticky />
+        </div>
+
+        <Accordion onOpen={trackAccordionOpen}>
+          {downloads.pressImages?.length > 0 && (
+            <AccordionItem id="gallery" title="גלריית תמונות" icon={FaImages}>
+              <GallerySection images={downloads.pressImages} />
+            </AccordionItem>
+          )}
+
+          <AccordionItem id="clip" title="קליפ רשמי" icon={FaVideo}>
+            <ClipSection videoUrl={media.videoUrl} />
+          </AccordionItem>
+
+          {content.prHtml && (
+            <AccordionItem id="pr" title="קומוניקט" icon={FaFileAlt}>
+              <PressSection html={content.prHtml} />
+            </AccordionItem>
+          )}
+
+          {content.lyrics && (
+            <AccordionItem id="lyrics" title="מילים" icon={FaMusic}>
+              <LyricsSection lyrics={content.lyrics} />
+            </AccordionItem>
+          )}
+
+          {credits.length > 0 && (
+            <AccordionItem id="credits" title="קרדיטים" icon={FaAward}>
+              <CreditsSection credits={credits} />
+            </AccordionItem>
+          )}
+
+          {showDownloads && (
+            <AccordionItem id="downloads" title="תיקיית הורדות" icon={FaDownload}>
+              <DownloadsSection
+                downloads={downloads}
+                flags={flags}
+                artist={song.artist}
+                title={song.title}
+                onOpenGallery={() => setGalleryOpen(true)}
+              />
+            </AccordionItem>
+          )}
+
+          <AccordionItem id="contact" title="יצירת קשר" icon={FaPhone}>
+            <ContactSection contact={contact} />
+          </AccordionItem>
+        </Accordion>
+
+        <footer data-section="footer" className="pt-2 text-center text-xs text-neutral-600">
+          © {song.releaseYear ?? new Date().getFullYear()} {song.artist}
+        </footer>
+      </main>
+
+      <Modal
+        open={galleryOpen}
+        onClose={() => setGalleryOpen(false)}
+        label="הורדת תמונות יח״צ"
+      >
+        <div className="rounded-2xl border border-white/10 bg-neutral-900/90 p-4 pt-14 backdrop-blur-md">
+          <div className="grid max-h-[75vh] grid-cols-2 gap-3 overflow-y-auto sm:grid-cols-3">
+            {downloads.pressImages.map((img) => (
+              <a
+                key={img.src}
+                href={img.src}
+                download={img.name}
+                onClick={() => trackMediaDownload('gallery_image')}
+                className="group relative overflow-hidden rounded-2xl border border-white/10"
+              >
+                <img
+                  src={img.src}
+                  alt={img.name}
+                  loading="lazy"
+                  className="aspect-square w-full object-cover transition group-hover:scale-105"
+                />
+                <span className="absolute inset-x-0 bottom-0 bg-black/60 py-1 text-center text-[11px] text-neutral-200">
+                  להורדה
+                </span>
+              </a>
+            ))}
           </div>
         </div>
-      )}
-    </div>
-  );
-}
-
-
-function DownloadCard({ title, subtitle, icon: Icon, href, onClick, restricted }) {
-  const isDemo = true;
-
-  const handleClick = (e) => {
-
-    if (!href) {
-      e.preventDefault();
-    }
-    
-    if (isDemo && restricted) {
-      e.preventDefault();
-      alert(
-        "This demo version does not allow file downloads.\nFor rights protection."
-      );
-      return;
-    }
-
-    onClick?.(e);
-  };
-
-  return (
-    <a
-      href={href || '#'}
-      onClick={handleClick}
-      download={!isDemo && !!href}
-      className="download-card"
-    >
-      <div className="download-icon"><Icon /></div>
-      <div className="download-text">
-        <div className="download-title">{title}</div>
-        <div className="download-subtitle">{subtitle}</div>
-      </div>
-    </a>
-  );
-}
-
-
-function Credit({ role, name }) {
-  return (
-    <div className="credit-card">
-      <div className="credit-role">{role}</div>
-      <div className="credit-name">{name}</div>
+      </Modal>
     </div>
   );
 }

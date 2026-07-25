@@ -1,0 +1,79 @@
+import { FaFileAlt, FaFileArchive, FaImages, FaMusic } from 'react-icons/fa';
+import DownloadCard from '../DownloadCard';
+import { trackMediaDownload, trackSongDownload } from '../../utils/analytics';
+
+export default function DownloadsSection({
+  downloads,
+  flags,
+  onOpenGallery,
+  artist = '',
+  title = '',
+}) {
+  const locked = Boolean(flags?.downloadsLocked);
+  const slug = `${artist} - ${title}`.trim();
+  const label = (key) => downloads.labels?.[key] || {};
+
+  return (
+    <div className="grid grid-cols-2 gap-2.5">
+      {locked && (
+        <p className="col-span-2 rounded-xl border border-amber-400/25 bg-amber-400/10 px-3 py-2.5 text-xs leading-relaxed text-amber-200">
+          {flags?.lockedMessage || 'ההורדות אינן זמינות כרגע.'}
+        </p>
+      )}
+
+      {downloads.mp3Url && downloads.showMp3 && (
+        <DownloadCard
+          icon={FaMusic}
+          title={label('mp3').title}
+          subtitle={label('mp3').subtitle}
+          href={downloads.mp3Url}
+          fileName={slug ? `${slug}.mp3` : undefined}
+          onClick={() => trackSongDownload('mp3')}
+          locked={locked}
+        />
+      )}
+
+      {downloads.wavUrl && downloads.showWav && (
+        <DownloadCard
+          icon={FaMusic}
+          title={label('wav').title}
+          subtitle={label('wav').subtitle}
+          href={downloads.wavUrl}
+          fileName={slug ? `${slug}.wav` : undefined}
+          onClick={() => trackSongDownload('wav')}
+          locked={locked}
+        />
+      )}
+
+      {downloads.pressPdf && (
+        <DownloadCard
+          icon={FaFileAlt}
+          title={label('pressPdf').title}
+          subtitle={label('pressPdf').subtitle}
+          href={downloads.pressPdf}
+          onClick={() => trackMediaDownload('pressPDF')}
+        />
+      )}
+
+      {/* Opening the picker is not a download; each photo taken from it is. */}
+      {downloads.pressImages?.length > 0 && (
+        <DownloadCard
+          icon={FaImages}
+          title={label('gallery').title}
+          subtitle={label('gallery').subtitle}
+          onClick={onOpenGallery}
+        />
+      )}
+
+      {downloads.imagesZip && (
+        <DownloadCard
+          icon={FaFileArchive}
+          title={label('imagesZip').title}
+          subtitle={label('imagesZip').subtitle}
+          href={downloads.imagesZip}
+          onClick={() => trackMediaDownload('images')}
+        />
+      )}
+    </div>
+  );
+}

@@ -1,0 +1,272 @@
+import { useState } from 'react';
+import { FaAlignCenter, FaFont, FaHeading, FaParagraph, FaUser } from 'react-icons/fa';
+import { FONTS, FONT_CATEGORIES, fontWeights } from '../../fonts';
+import { RangeField, SelectField } from '../ui/Field';
+
+const fontGroups = FONT_CATEGORIES.map((c) => ({
+  label: c.label,
+  options: FONTS.filter((f) => f.category === c.key).map((f) => ({
+    value: f.key,
+    label: f.label,
+  })),
+})).filter((g) => g.options.length);
+
+const WEIGHT_NAMES = {
+  100: 'דק מאוד',
+  200: 'דק',
+  300: 'קל',
+  400: 'רגיל',
+  500: 'בינוני',
+  600: 'חצי מודגש',
+  700: 'מודגש',
+  800: 'כבד',
+  900: 'שחור',
+};
+
+function weightOptions(fontKey) {
+  return fontWeights(fontKey).map((w) => ({
+    value: String(w),
+    label: `${w} · ${WEIGHT_NAMES[w] || ''}`.trim(),
+  }));
+}
+
+const TABS = [
+  { key: 'title', label: 'כותרת השיר', icon: FaHeading, affects: 'שם השיר בראש העמוד' },
+  { key: 'subtitle', label: 'שם האמן/ית', icon: FaUser, affects: 'השורה מתחת לכותרת' },
+  {
+    key: 'sections',
+    label: 'כותרות מקטעים',
+    icon: FaAlignCenter,
+    affects: 'גלריה, קליפ, קומוניקט, מילים, קרדיטים, הורדות ויצירת קשר',
+  },
+  {
+    key: 'body',
+    label: 'טקסט רץ',
+    icon: FaParagraph,
+    affects: 'תוכן הקומוניקט, מילות השיר והקרדיטים',
+  },
+];
+
+function FontRow({ id, group, value, onChange }) {
+  return (
+    <SelectField
+      id={`${id}-font`}
+      label="גופן"
+      hint={`הגופן של ${group}`}
+      value={value}
+      onChange={onChange}
+      groups={fontGroups}
+    />
+  );
+}
+
+export default function TypographyEditor({ theme, update }) {
+  const [tab, setTab] = useState('title');
+  const active = TABS.find((t) => t.key === tab);
+  const patch = (key) => (values) => update('theme', key, { ...theme[key], ...values });
+
+  const setTitle = patch('title');
+  const setSubtitle = patch('subtitle');
+  const setSections = patch('sections');
+  const setBody = patch('body');
+
+  return (
+    <div>
+      <div
+        role="tablist"
+        aria-label="רכיבי טיפוגרפיה"
+        className="flex flex-wrap gap-1.5 rounded-xl bg-adm-bg/70 p-1"
+      >
+        {TABS.map(({ key, label, icon: Icon }) => (
+          <button
+            key={key}
+            type="button"
+            role="tab"
+            aria-selected={tab === key}
+            onClick={() => setTab(key)}
+            className={`inline-flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2.5 py-2 text-[11px] font-medium transition ${
+              tab === key
+                ? 'bg-white text-adm-blue shadow-sm'
+                : 'text-adm-ink2 hover:text-adm-ink'
+            }`}
+          >
+            <Icon className="text-[10px]" />
+            {label}
+          </button>
+        ))}
+      </div>
+
+      <p className="mt-2.5 flex items-start gap-1.5 text-[11px] leading-relaxed text-adm-muted">
+        <FaFont className="mt-0.5 shrink-0" aria-hidden="true" />
+        משפיע על: {active.affects}
+      </p>
+
+      <div className="mt-3 space-y-3">
+        {tab === 'title' && (
+          <>
+            <FontRow
+              id="title"
+              group="כותרת השיר"
+              value={theme.title.font}
+              onChange={(v) => setTitle({ font: v })}
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <SelectField
+                id="title-weight"
+                label="עובי"
+                value={String(theme.title.weight)}
+                onChange={(v) => setTitle({ weight: Number(v) })}
+                options={weightOptions(theme.title.font)}
+              />
+              <SelectField
+                id="title-align"
+                label="יישור"
+                value={theme.title.align}
+                onChange={(v) => setTitle({ align: v })}
+                options={[
+                  { value: 'center', label: 'מרכז' },
+                  { value: 'start', label: 'לימין' },
+                ]}
+              />
+            </div>
+            <RangeField
+              id="title-spacing"
+              label="מרווח בין אותיות"
+              value={theme.title.letterSpacing}
+              onChange={(v) => setTitle({ letterSpacing: v })}
+              min={0}
+              max={1}
+              step={0.05}
+              format={(v) => `${v}em`}
+            />
+            <RangeField
+              id="title-fluid"
+              label="גודל ביחס לרוחב העמוד"
+              hint="הכותרת גדלה עם רוחב המסך, בין המינימום למקסימום"
+              value={theme.title.sizeFluid}
+              onChange={(v) => setTitle({ sizeFluid: v })}
+              min={2}
+              max={20}
+              step={0.5}
+              format={(v) => `${v}cqw`}
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <RangeField
+                id="title-min"
+                label="גודל מינימלי"
+                value={theme.title.sizeMin}
+                onChange={(v) => setTitle({ sizeMin: v })}
+                min={1.5}
+                max={8}
+                step={0.25}
+                format={(v) => `${v}rem`}
+              />
+              <RangeField
+                id="title-max"
+                label="גודל מקסימלי"
+                value={theme.title.sizeMax}
+                onChange={(v) => setTitle({ sizeMax: Math.max(v, theme.title.sizeMin) })}
+                min={2}
+                max={16}
+                step={0.25}
+                format={(v) => `${v}rem`}
+              />
+            </div>
+          </>
+        )}
+
+        {tab === 'subtitle' && (
+          <>
+            <FontRow
+              id="subtitle"
+              group="שם האמן/ית"
+              value={theme.subtitle.font}
+              onChange={(v) => setSubtitle({ font: v })}
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <SelectField
+                id="subtitle-weight"
+                label="עובי"
+                value={String(theme.subtitle.weight)}
+                onChange={(v) => setSubtitle({ weight: Number(v) })}
+                options={weightOptions(theme.subtitle.font)}
+              />
+              <RangeField
+                id="subtitle-size"
+                label="גודל"
+                value={theme.subtitle.size}
+                onChange={(v) => setSubtitle({ size: v })}
+                min={0.75}
+                max={3}
+                step={0.0625}
+                format={(v) => `${v}rem`}
+              />
+            </div>
+            <RangeField
+              id="subtitle-spacing"
+              label="מרווח בין אותיות"
+              value={theme.subtitle.letterSpacing}
+              onChange={(v) => setSubtitle({ letterSpacing: v })}
+              min={0}
+              max={1}
+              step={0.05}
+              format={(v) => `${v}em`}
+            />
+          </>
+        )}
+
+        {tab === 'sections' && (
+          <>
+            <FontRow
+              id="sections"
+              group="כותרות המקטעים"
+              value={theme.sections.font}
+              onChange={(v) => setSections({ font: v })}
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <SelectField
+                id="sections-weight"
+                label="עובי"
+                value={String(theme.sections.weight)}
+                onChange={(v) => setSections({ weight: Number(v) })}
+                options={weightOptions(theme.sections.font)}
+              />
+              <RangeField
+                id="sections-size"
+                label="גודל"
+                value={theme.sections.size}
+                onChange={(v) => setSections({ size: v })}
+                min={0.8}
+                max={1.6}
+                step={0.0625}
+                format={(v) => `${v}rem`}
+              />
+            </div>
+          </>
+        )}
+
+        {tab === 'body' && (
+          <>
+            <FontRow
+              id="body"
+              group="הטקסט הרץ"
+              value={theme.body.font}
+              onChange={(v) => setBody({ font: v })}
+            />
+            <RangeField
+              id="body-size"
+              label="גודל בסיס"
+              hint="שאר הגדלים בעמוד נגזרים ממנו"
+              value={theme.body.size}
+              onChange={(v) => setBody({ size: v })}
+              min={0.75}
+              max={1.5}
+              step={0.0625}
+              format={(v) => `${v}rem`}
+            />
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
