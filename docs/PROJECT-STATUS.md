@@ -1,6 +1,6 @@
 # EPK Project — Plan, Status and Notes
 
-Last updated: 2026-07-25 · Branch `feat/epk-upgrade` · 33 commits · `main` untouched
+Last updated: 2026-07-25 · Branch `feat/epk-upgrade` · 41 commits · `main` untouched
 
 Turning a single-page song site into a two-part press kit: a public release page
 for radio and press, and a private dashboard where the artist controls content,
@@ -16,28 +16,36 @@ design and analytics.
 | 1 | Public page — Tailwind rewrite, player, sections | **Done** |
 | 1.9 | Design feedback rounds (7 rounds) | **Done** |
 | 3 | Admin dashboard **UI** | **Done** |
-| 2 | Backend — KV, Blob, auth, tracking | **Not started** |
+| 2 | Backend — KV, Blob, auth, tracking | **Done** |
 | 4 | Deploy, perf/a11y pass, cleanup | **Not started** |
 
 Phases 2 and 3 were deliberately swapped: the dashboard was built first so its
 design could be reviewed before wiring a backend to it.
 
-**What works right now:** the whole public page, and the whole dashboard as an
-interface. Edits persist to `localStorage` and survive a reload.
+**What works right now:** the whole thing, locally. Publishing, login, tracking,
+statistics and uploads all run against the real routes under `npm run dev` — a
+dev-only Vite plugin (`vite-plugins/dev-api.js`) runs the `api/` handlers inside
+the dev server, so the Vercel CLI is not needed to exercise them.
 
-**What does not work yet:** publishing, file uploads, real analytics numbers, and
-login *enforcement* — the login screen exists and works, but the gate currently
-opens on its own because there is no auth service to check against, so `/admin` is
-effectively unprotected. All four need Phase 2. Each is one `fetch` call away — the UI already
-calls the endpoints and degrades honestly when they 404.
+**What is left:** Phase 4 — creating the stores and setting the env vars in
+Vercel, deploying, and the perf/a11y pass. Until a KV store is linked, the API
+keeps content and counters in process memory: everything behaves correctly and
+nothing survives a restart, which is deliberate.
+
+**The two secrets** `ADMIN_PASSWORD` and `ADMIN_SESSION_SECRET` are set in
+`.env.local` for development only (see `.env.example`). Production values are
+yours to set in the Vercel dashboard. With either missing the dashboard opens
+unauthenticated rather than showing a login form that cannot succeed — so they
+are what makes `/admin` private, and 4.1 is not done until they are set.
 
 ---
 
 ## Architecture
 
 **Stack.** Vite 7 + React 19, plain JS. Tailwind v4. Runtime dependencies are
-still only `react`, `react-dom`, `react-icons` — no router, no chart library, no
-component library, no state library.
+`react`, `react-dom`, `react-icons` and `@vercel/blob` — no router, no chart
+library, no component library, no state library, and no KV or auth client: the
+API talks to KV over its REST endpoint and signs its own cookie.
 
 **Routing.** A pathname switch in `src/routes.js`, not react-router: there are two
 destinations. `/` and `/song` render the landing page; `/admin` is `React.lazy`'d so
@@ -65,7 +73,9 @@ flags     downloadsLocked, lockedMessage
 
 **Content loading.** `src/content/defaultContent.js` renders on first paint, then
 `useContent()` fetches `/api/content` and merges it over the top. No spinner, and
-the page stays fully usable if the API is unreachable.
+the page stays fully usable if the API is unreachable. `GET` answers **404**, not
+an empty document, when nothing has been published — a blank document would merge
+its empty strings over those defaults and wipe the page.
 
 **Theming.** The client's choices become CSS custom properties on the page root
 (`src/theme.js`). Tailwind's accent utilities compile to `var(--color-accent-N)`
@@ -79,11 +89,16 @@ per-component wiring.
 | | gzipped |
 |---|---|
 | Public page JS | ~86 kB |
-| Public CSS | ~9 kB |
-| Admin chunk (separate) | ~17 kB |
+| Public CSS | ~10 kB |
+| Admin chunk (separate) | ~45 kB |
 
 The 2.2 MB `background.jpg` Vite used to bundle on every build is gone — it was
 imported by the deleted `App.css`.
+
+The admin chunk grew from 17 kB when uploads landed: `@vercel/blob`'s browser
+client is ~28 kB gzipped, and it brings automatic multipart uploads, which is
+what makes a 100 MB master over hotel wifi survive. It is lazy-loaded behind the
+password, and the public bundle is untouched.
 
 ---
 
@@ -134,14 +149,12 @@ imported by the deleted `App.css`.
 page's dark palette and of the client's accent.
 
 **Login screen** (`src/admin/Login.jsx`) — password field, error states for a wrong
-password and for rate limiting, and it hides the dashboard entirely until the
-session check passes. **It is built but not enforcing.** `AdminApp` asks
-`/api/auth/session`, and because that endpoint does not exist yet the `.catch`
-opens the gate rather than locking you out of your own unfinished dashboard. So in
-normal use you never see it. Stub the endpoint to `{authenticated: false}` and it
-appears and works — verified: wrong password shows an error, correct password opens
-the dashboard. Nothing is actually protected until Phase 2 (2.3) ships
-`/api/auth/*` and the `ADMIN_PASSWORD` env var.
+password and for rate limiting, and it hides the dashboard until
+`/api/auth/session` confirms a valid cookie. It enforces as of 2.3, with one
+deliberate exception: if the endpoint reports `configured: false`, meaning the env
+vars are unset, the gate opens rather than presenting a form no password can
+satisfy. A logout button sits at the end of the tab bar, shown only when a session
+is configured.
 
 **Top — distribution card.** Song identity plus two "generate link" buttons. Each
 reveals its URL with a copy button (confirms with a check) and an open-in-new-tab
@@ -175,19 +188,25 @@ Tooltips explain every section and every icon-only action.
 
 ---
 
-## Phase 2 — Backend · Not started
+## Phase 2 — Backend · Done
 
-Design is settled; nothing is written. Needs `@vercel/kv`, `@vercel/blob`, `vitest`.
+Every route is a Web-standard `Request → Response` handler declared
+`runtime: 'edge'`, which is also what lets the dev plugin run them unchanged.
 
-| # | Task |
-|---|---|
-| 2.1 | `api/_lib/`: kv, http helpers, date bucketing, event allowlist |
-| 2.2 | `GET /api/content` (edge, CDN-cached, falls back to defaults) |
-| 2.3 | Session crypto + `/api/auth/{login,session,logout}` + vitest for the signing — **this is what makes the existing login screen actually gate anything** |
-| 2.4 | `PUT /api/content` (auth, validates through `normalizeContent`) |
-| 2.5 | `POST /api/track` (edge) + rewire `src/utils/analytics.js` |
-| 2.6 | `GET /api/stats` (auth, zero-filled series) |
-| 2.7 | `POST /api/blob/upload-token` (auth) |
+| # | Task | Notes |
+|---|---|---|
+| 2.1 | `api/_lib/`: kv, http, day bucketing, event allowlist, session, ratelimit | 31 vitest cases |
+| 2.2 | `GET /api/content` | edge, `s-maxage=60` + SWR, `?fresh=1` bypasses |
+| 2.3 | `/api/auth/{login,session,logout}` | signed cookie, 8 attempts / 15 min |
+| 2.4 | `PUT /api/content` | authed, through `normalizeContent`, versioned + backup |
+| 2.5 | `POST /api/track` + `src/utils/analytics.js` rewired | plus the listen-time event the player never sent |
+| 2.6 | `GET /api/stats` | authed, one pipeline, zero-filled |
+| 2.7 | `POST /api/blob/upload-token` + real uploads in `MediaField` | folder decides the limits |
+
+`@vercel/kv` was **not** installed. KV's REST endpoint is nine commands and a
+bearer token, so `api/_lib/kv.js` calls it directly: no dependency, identical
+behaviour on edge, and room for the in-memory fallback that makes dev work
+offline. Only `@vercel/blob` (real signing work) and `vitest` were added.
 
 ### KV schema
 
@@ -219,11 +238,18 @@ Browser → Vercel Blob **directly**, with the function only minting a scoped to
 A serverless request body caps at 4.5 MB and a broadcast WAV is 40–120 MB, so a
 server passthrough cannot work.
 
-### One event the player must start sending
+### The listen-time event, now sent
 
-The listen-duration chart needs elapsed time reported on pause/end, not just the
-first play — `useAudioPlayer` currently reports only `play_audio`. The chart is
-built against `totals.listen_buckets` and shows zeros until that lands.
+`useAudioPlayer` accumulates wall-clock time actually spent playing — pauses and
+seeks do not inflate it — and reports it **once, when the visitor leaves**, over
+`sendBeacon` so it survives the tab closing. Reporting on every pause would have
+counted one visit as several listens and made the chart's "X האזנות נמדדו"
+caption a lie. `play_audio` also moved from the toggle button to the media
+element's `play` event, so a play started by the keyboard or the OS media keys
+counts.
+
+Consequence to know: `onListened` must be a stable reference. It is a module-level
+function today; an inline arrow would re-run the effect and flush early.
 
 ---
 
@@ -231,9 +257,14 @@ built against `totals.listen_buckets` and shows zeros until that lands.
 
 | # | Task |
 |---|---|
-| 4.1 | Vercel deploy, seed KV, security headers, decommission Netlify |
+| 4.1 | Create the KV and Blob stores, set `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET`, deploy, upload the masters through `/admin`, decommission Netlify |
 | 4.2 | Perf and a11y pass, Lighthouse mobile ≥ 90 |
 | 4.3 | Cleanup, README |
+
+Nothing in 4.1 is a code change — it is dashboard configuration. Linking the two
+stores injects `KV_REST_API_URL`, `KV_REST_API_TOKEN` and
+`BLOB_READ_WRITE_TOKEN` automatically; `vercel env pull .env.local` brings them
+down for local work against the real stores.
 
 ---
 
@@ -273,6 +304,21 @@ Two different problems with two different answers — see `docs/media-files.md`.
 - **`normalizeContent` reads the old flat `titleFont`/`bodyFont` keys** as a
   fallback, so a document saved before the per-element typography split keeps its
   fonts.
+- **`apply: 'serve'` in `vite-plugins/dev-api.js`** for the same reason as the
+  media plugin: on Vercel those files are the functions, and the plugin must not
+  exist at build time.
+- **The upload folder names in `MediaField.jsx` mirror `FOLDERS` in
+  `api/blob/upload-token.js`.** The folder is what selects the size and content-type
+  limits, and an unknown one is refused, so a rename in one place breaks uploads.
+- **`api/_lib/` is shared code, not routes** — Vercel excludes underscore-prefixed
+  files, the dev plugin skips them explicitly, and the client imports `schema.js`
+  from there through `@schema`.
+- **Tracking is disabled on `/admin` and on `?preview=1`** inside
+  `src/utils/analytics.js`. The dashboard renders the real page in its preview;
+  without that check every edit session would inflate the artist's numbers.
+- **A missing `ADMIN_SESSION_SECRET` must lock, not unlock**, in `api/_lib/auth.js`
+  — `isAdmin` returns false. The *client* gate opens in that state, which is a
+  usability choice about a form that cannot succeed; the server never does.
 
 ### Bugs found and fixed along the way
 
@@ -296,15 +342,25 @@ Worth listing because several were mine, and a few predated this work:
 - Every `theme` edit flashed the hero, including edits that changed something else.
 - Download cards were described **twice** in two components with two different
   wordings — the mismatch that got spotted.
+- `src/utils/analytics.js` sent every event to `window.gtag`, which **has not
+  existed since 0.1 removed GA4** — so nothing was being measured at all.
+- Opening the photo picker counted as a photo download.
+- `play_audio` fired only from the player's own button, so a play started any other
+  way was invisible.
 
 ### Conventions
 
 - **Comments only where the code can't explain itself**, or to flag something
-  future-facing. Reasoning goes in the commit message. Six survive in `src/` +
-  `api/`, each marking something a reader could plausibly "tidy up" and break.
+  future-facing. Reasoning goes in the commit message. Each one marks something a
+  reader could plausibly "tidy up" and break.
 - One commit per task; every commit states what was verified.
-- `npx eslint .` is clean. Verification is by driving the real app in a browser
-  (Playwright) and reading computed styles and geometry, not by assuming.
+- `npx eslint .` is clean and `npm test` (vitest) passes. Verification is by
+  driving the real app in a browser (Playwright) and by exercising the real
+  endpoints, not by assuming — the endpoint checks above were run against the dev
+  server, including the 401/405/400/429 paths, not only the happy ones.
+- **Pure logic is unit-tested; I/O is verified by driving it.** The tests cover the
+  signing, the day maths, the event allowlist and the KV command layer — the parts
+  where being wrong is silent. Everything else was checked end to end.
 
 ### Chart colours are validated, not chosen by eye
 
@@ -324,3 +380,16 @@ white, which is why the legend and the table view exist.
 - Cover art is off by default (`media.showCover: false`) with the release photo as
   the background. Flip it once there's square artwork.
 - Accent default is `#d99a4e` (warm gold), chosen to suit the current artwork.
+- **A publish can take up to 60s to appear** on the public page: `GET /api/content`
+  is CDN-cached for a minute. The dashboard's own preview and `?fresh=1` are
+  immediate. Shortening it costs cache hits on every visit; leave it unless it
+  annoys you during a launch.
+- **Rate limits key on `x-forwarded-for`**, which Vercel always sets. Locally there
+  is no such header, so every caller shares one bucket named `unknown` — eight
+  wrong dev logins locks the whole machine out for 15 minutes. Restarting the dev
+  server clears it, along with the rest of the in-memory store.
+- **`npm audit` reports 10 vulnerabilities**, all in the dev toolchain (vite,
+  rollup, eslint's minimatch/js-yaml chain). None reach the built site. Predates
+  this phase.
+- Backups are written (`content:backup:<version>`, 30 days) but nothing reads them
+  yet — restoring is a `SET` away if a bad publish ever needs undoing.
