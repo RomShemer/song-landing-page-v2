@@ -131,7 +131,7 @@ export default function App({ content: override, viewMode: viewModeOverride }) {
           </AccordionItem>
         </Accordion>
 
-        <footer className="pt-2 text-center text-xs text-neutral-600">
+        <footer data-section="footer" className="pt-2 text-center text-xs text-neutral-600">
           © {song.releaseYear ?? new Date().getFullYear()} {song.artist}
         </footer>
       </main>
