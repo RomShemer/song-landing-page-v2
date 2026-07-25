@@ -24,6 +24,8 @@ export function useAudioPlayer({ src, onFirstPlay } = {}) {
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [error, setError] = useState(false);
+  const [volume, setVolumeState] = useState(1);
+  const [muted, setMutedState] = useState(false);
 
   // A new source makes the previous track's progress meaningless. Adjusted
   // during render rather than in an effect so there is no frame showing the
@@ -53,6 +55,11 @@ export function useAudioPlayer({ src, onFirstPlay } = {}) {
       setError(true);
       setIsPlaying(false);
     };
+    // Mirror changes made outside the UI (media keys, OS mixer).
+    const onVolume = () => {
+      setVolumeState(el.volume);
+      setMutedState(el.muted);
+    };
 
     el.addEventListener('loadedmetadata', onLoaded);
     el.addEventListener('durationchange', onLoaded);
@@ -61,6 +68,7 @@ export function useAudioPlayer({ src, onFirstPlay } = {}) {
     el.addEventListener('pause', onPause);
     el.addEventListener('ended', onEnded);
     el.addEventListener('error', onError);
+    el.addEventListener('volumechange', onVolume);
 
     return () => {
       el.removeEventListener('loadedmetadata', onLoaded);
@@ -70,6 +78,7 @@ export function useAudioPlayer({ src, onFirstPlay } = {}) {
       el.removeEventListener('pause', onPause);
       el.removeEventListener('ended', onEnded);
       el.removeEventListener('error', onError);
+      el.removeEventListener('volumechange', onVolume);
     };
   }, [src]);
 
@@ -103,5 +112,39 @@ export function useAudioPlayer({ src, onFirstPlay } = {}) {
     [seek]
   );
 
-  return { audioRef, isPlaying, currentTime, duration, error, toggle, seek, skip };
+  /** @param {number} next 0..1 — setting a level also unmutes, as users expect */
+  const setVolume = useCallback((next) => {
+    const el = audioRef.current;
+    if (!el) return;
+    const clamped = Math.min(Math.max(next, 0), 1);
+    el.volume = clamped;
+    el.muted = clamped === 0;
+  }, []);
+
+  const toggleMute = useCallback(() => {
+    const el = audioRef.current;
+    if (!el) return;
+    // Coming back from a level of 0 would stay silent, so restore a usable one.
+    if (el.muted || el.volume === 0) {
+      el.muted = false;
+      if (el.volume === 0) el.volume = 1;
+    } else {
+      el.muted = true;
+    }
+  }, []);
+
+  return {
+    audioRef,
+    isPlaying,
+    currentTime,
+    duration,
+    error,
+    volume,
+    muted,
+    toggle,
+    seek,
+    skip,
+    setVolume,
+    toggleMute,
+  };
 }

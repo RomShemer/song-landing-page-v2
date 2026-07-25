@@ -78,7 +78,7 @@ export default function App() {
 
         <SocialRow links={links} />
 
-        <AudioPlayer src={streamUrl} title={song.title} artist={song.artist} sticky />
+        <AudioPlayer src={streamUrl} title={song.title} sticky />
 
         <PrimaryActions
           downloads={downloads}
