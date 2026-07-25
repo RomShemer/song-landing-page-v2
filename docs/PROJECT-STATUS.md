@@ -25,8 +25,10 @@ design could be reviewed before wiring a backend to it.
 **What works right now:** the whole public page, and the whole dashboard as an
 interface. Edits persist to `localStorage` and survive a reload.
 
-**What does not work yet:** publishing, file uploads, login, and real analytics
-numbers. All four need Phase 2. Each is one `fetch` call away — the UI already
+**What does not work yet:** publishing, file uploads, real analytics numbers, and
+login *enforcement* — the login screen exists and works, but the gate currently
+opens on its own because there is no auth service to check against, so `/admin` is
+effectively unprotected. All four need Phase 2. Each is one `fetch` call away — the UI already
 calls the endpoints and degrades honestly when they 404.
 
 ---
@@ -131,6 +133,16 @@ imported by the deleted `App.css`.
 `/admin`, light theme in blue and green, deliberately independent of the public
 page's dark palette and of the client's accent.
 
+**Login screen** (`src/admin/Login.jsx`) — password field, error states for a wrong
+password and for rate limiting, and it hides the dashboard entirely until the
+session check passes. **It is built but not enforcing.** `AdminApp` asks
+`/api/auth/session`, and because that endpoint does not exist yet the `.catch`
+opens the gate rather than locking you out of your own unfinished dashboard. So in
+normal use you never see it. Stub the endpoint to `{authenticated: false}` and it
+appears and works — verified: wrong password shows an error, correct password opens
+the dashboard. Nothing is actually protected until Phase 2 (2.3) ships
+`/api/auth/*` and the `ADMIN_PASSWORD` env var.
+
 **Top — distribution card.** Song identity plus two "generate link" buttons. Each
 reveals its URL with a copy button (confirms with a check) and an open-in-new-tab
 shortcut. Full link and `?listen_only=true`.
@@ -171,7 +183,7 @@ Design is settled; nothing is written. Needs `@vercel/kv`, `@vercel/blob`, `vite
 |---|---|
 | 2.1 | `api/_lib/`: kv, http helpers, date bucketing, event allowlist |
 | 2.2 | `GET /api/content` (edge, CDN-cached, falls back to defaults) |
-| 2.3 | Session crypto + `/api/auth/{login,session,logout}` + vitest for the signing |
+| 2.3 | Session crypto + `/api/auth/{login,session,logout}` + vitest for the signing — **this is what makes the existing login screen actually gate anything** |
 | 2.4 | `PUT /api/content` (auth, validates through `normalizeContent`) |
 | 2.5 | `POST /api/track` (edge) + rewire `src/utils/analytics.js` |
 | 2.6 | `GET /api/stats` (auth, zero-filled series) |
