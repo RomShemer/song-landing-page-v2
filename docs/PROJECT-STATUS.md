@@ -1,6 +1,6 @@
 # EPK Project — Plan, Status and Notes
 
-Last updated: 2026-07-25 · Branch `feat/epk-upgrade` · 41 commits · `main` untouched
+Last updated: 2026-07-25 · Branch `feat/epk-upgrade` · 44 commits · `main` untouched
 
 Turning a single-page song site into a two-part press kit: a public release page
 for radio and press, and a private dashboard where the artist controls content,
@@ -17,7 +17,7 @@ design and analytics.
 | 1.9 | Design feedback rounds (7 rounds) | **Done** |
 | 3 | Admin dashboard **UI** | **Done** |
 | 2 | Backend — KV, Blob, auth, tracking | **Done** |
-| 4 | Deploy, perf/a11y pass, cleanup | **Not started** |
+| 4 | Deploy, perf/a11y pass, cleanup | **4.2 + 4.3 done; deploy is yours** |
 
 Phases 2 and 3 were deliberately swapped: the dashboard was built first so its
 design could be reviewed before wiring a backend to it.
@@ -27,8 +27,8 @@ statistics and uploads all run against the real routes under `npm run dev` — a
 dev-only Vite plugin (`vite-plugins/dev-api.js`) runs the `api/` handlers inside
 the dev server, so the Vercel CLI is not needed to exercise them.
 
-**What is left:** Phase 4 — creating the stores and setting the env vars in
-Vercel, deploying, and the perf/a11y pass. Until a KV store is linked, the API
+**What is left:** only the deploy itself — creating the two stores and setting
+the env vars in Vercel (4.1). Until a KV store is linked, the API
 keeps content and counters in process memory: everything behaves correctly and
 nothing survives a restart, which is deliberate.
 
@@ -73,9 +73,10 @@ flags     downloadsLocked, lockedMessage
 
 **Content loading.** `src/content/defaultContent.js` renders on first paint, then
 `useContent()` fetches `/api/content` and merges it over the top. No spinner, and
-the page stays fully usable if the API is unreachable. `GET` answers **404**, not
+the page stays fully usable if the API is unreachable. `GET` answers **204**, not
 an empty document, when nothing has been published — a blank document would merge
-its empty strings over those defaults and wipe the page.
+its empty strings over those defaults and wipe the page, and a 404 would put a
+console error in front of every visitor to a fresh deploy.
 
 **Theming.** The client's choices become CSS custom properties on the page root
 (`src/theme.js`). Tailwind's accent utilities compile to `var(--color-accent-N)`
@@ -119,7 +120,7 @@ password, and the public bundle is untouched.
 | # | Task | Notes |
 |---|---|---|
 | 1.2 | Tailwind v4 + design tokens | `src/index.css` was Vite's default and **never imported** by anything |
-| 1.3 | UI primitives | GlassCard, IconButton, Modal, Accordion, ScrollArea |
+| 1.3 | UI primitives | IconButton, Modal, Accordion, ScrollArea (GlassCard was written and never used; deleted in 4.3) |
 | 1.4 | Hero + SocialRow | Ambient glow derived from the artwork itself |
 | 1.5 | Custom audio player | Play/pause, seekable bar, duration, volume |
 | 1.6 | Seven sections rewritten | Gallery, clip, press release, lyrics, credits, downloads, contact |
@@ -241,30 +242,78 @@ server passthrough cannot work.
 ### The listen-time event, now sent
 
 `useAudioPlayer` accumulates wall-clock time actually spent playing — pauses and
-seeks do not inflate it — and reports it **once, when the visitor leaves**, over
-`sendBeacon` so it survives the tab closing. Reporting on every pause would have
-counted one visit as several listens and made the chart's "X האזנות נמדדו"
-caption a lie. `play_audio` also moved from the toggle button to the media
-element's `play` event, so a play started by the keyboard or the OS media keys
-counts.
+seeks do not inflate it — and reports it over `sendBeacon` **whenever the page
+stops being watched**: `visibilitychange` to hidden as well as `pagehide`.
+
+It reported only on `pagehide` at first, which was wrong in the most ordinary
+way possible: that event does not fire on a tab switch, so listening on `/song`
+and then flipping to `/admin` in another tab reported nothing at all — which is
+exactly how anyone checks their own numbers, and how it was caught. Flushing on
+hidden means a visitor who tabs away and comes back produces two shorter
+measured listens instead of one long one; the seconds still add up for the
+average, and losing the report entirely was far worse. Reporting on every
+*pause* would have been worse again.
+
+`play_audio` also moved from the toggle button to the media element's `play`
+event, so a play started by the keyboard or the OS media keys counts.
 
 Consequence to know: `onListened` must be a stable reference. It is a module-level
 function today; an inline arrow would re-run the effect and flush early.
 
 ---
 
-## Phase 4 — Ship · Not started
+## Phase 4 — Ship · 4.2 and 4.3 done, 4.1 is yours
 
-| # | Task |
-|---|---|
-| 4.1 | Create the KV and Blob stores, set `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET`, deploy, upload the masters through `/admin`, decommission Netlify |
-| 4.2 | Perf and a11y pass, Lighthouse mobile ≥ 90 |
-| 4.3 | Cleanup, README |
+| # | Task | Status |
+|---|---|---|
+| 4.1 | Create the KV and Blob stores, set `ADMIN_PASSWORD` / `ADMIN_SESSION_SECRET`, deploy, upload the masters through `/admin`, decommission Netlify | **With you** |
+| 4.2 | Perf and a11y pass, Lighthouse mobile ≥ 90 | **Done** — 97 / 100 / 100 / 100 |
+| 4.3 | Cleanup, README | **Done** |
 
 Nothing in 4.1 is a code change — it is dashboard configuration. Linking the two
 stores injects `KV_REST_API_URL`, `KV_REST_API_TOKEN` and
 `BLOB_READ_WRITE_TOKEN` automatically; `vercel env pull .env.local` brings them
 down for local work against the real stores.
+
+### 4.2 — what was measured and what was done
+
+Production build, mobile, simulated throttling. Baseline **97 / 100 / 96 / 91**
+with FCP 1.4s, LCP 2.6s, TBT 0ms, CLS 0. After: **97 / 100 / 100 / 100**.
+
+- **SEO 91 → 100.** `/robots.txt` was answered by the SPA rewrite with
+  `index.html`, so a crawler read 31 lines of HTML as directives. A real one now
+  ships and disallows `/admin`.
+- **Best practices 96 → 100.** An unpublished document answered `404`, which put a
+  red console error in front of every visitor for the normal state of a fresh
+  deploy. It answers `204` now.
+- **Security headers** (listed under 4.1, but they are code): HSTS two years with
+  `includeSubDomains`, `X-Frame-Options: SAMEORIGIN`. The only iframe in the
+  project is our own YouTube embed.
+- **Accessibility beyond the automated 100**, by keyboard: every control reachable
+  with a visible 2px ring, tab order in reading order, accordions with
+  `aria-expanded` and a real `aria-controls` target, the downloads modal trapping
+  focus and closing on Escape, the seek slider carrying `aria-valuetext`
+  ("0:00 מתוך 2:37"), the volume slider expanding on `focus-within` and answering
+  arrow keys, one `main`, one `h1`, `prefers-reduced-motion` honoured. Nothing to
+  fix.
+
+Measured and deliberately **not** done: the admin's utility classes in the public
+stylesheet are 2.6 kB of 57 kB raw, so splitting the CSS is not worth the risk;
+43 kB of the 86 kB JS is "unused" at first paint, which is what an SPA looks like;
+and no CSP, because a correct one has to account for Google Fonts and inline style
+attributes and a wrong one breaks the page silently.
+
+### The one perf item left, and it belongs to 4.1
+
+The LCP element is the hero's ambient glow, a CSS background built from
+`press-official.jpg`, and Lighthouse offers 88 KiB for serving it as WebP/AVIF.
+There is no image tooling in this repo and none was added for a one-off
+conversion, because the assets are about to be replaced anyway: **when you upload
+the real press images in 4.1, resize them first.** `press-03.jpg` is 6.3 MB and
+`press-01/02` are 2.3 MB each — the gallery displays the same file it offers for
+download, so a 6 MB photo is 6 MB on screen. Around 2000px on the long edge at
+quality 80 is plenty for both uses. `public/media` is 26 MB today, which is 26 MB
+in every deploy.
 
 ---
 
@@ -373,8 +422,10 @@ white, which is why the legend and the table view exist.
 
 ### Open questions / small things
 
-- `downloads.labels.pressPdf.subtitle` currently reads `'PDF לחץ להורדת'`, which
-  scans oddly — probably meant `'לחץ להורדה'`. Left as set.
+- `downloads.labels.pressPdf.subtitle` read `'PDF לחץ להורדת'`, which scans oddly.
+  Changed in 4.3 to `'קובץ PDF'`, matching its siblings, which are short noun
+  phrases ('איכות מלאה', 'סט תמונות', 'ZIP') rather than instructions. It is
+  default content, so it is editable in the dashboard if you want different words.
 - The desktop preview renders small inline because a 1440×900 viewport has to fit
   the column; the expand button is the answer.
 - Cover art is off by default (`media.showCover: false`) with the release photo as

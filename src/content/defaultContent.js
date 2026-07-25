@@ -172,7 +172,7 @@ const defaultContent = normalizeContent({
     labels: {
       wav: { title: 'הורדת WAV לשידור', subtitle: 'איכות מלאה' },
       mp3: { title: 'הורדת MP3', subtitle: 'להאזנה והפצה' },
-      pressPdf: { title: 'קומוניקט', subtitle: 'PDF לחץ להורדת' },
+      pressPdf: { title: 'קומוניקט', subtitle: 'קובץ PDF' },
       gallery: { title: 'גלריית תמונות יח״צ', subtitle: 'סט תמונות' },
       imagesZip: { title: 'כל התמונות', subtitle: 'ZIP' },
     },
