@@ -19,8 +19,11 @@ import {
   TextField,
   Toggle,
 } from '../ui/Field';
+import DeleteButton from '../ui/DeleteButton';
 import CreditsEditor from './CreditsEditor';
+import DownloadsEditor from './DownloadsEditor';
 import MediaField from './MediaField';
+import PressEditor from './PressEditor';
 
 const fontOptions = FONTS.map((f) => ({ value: f.key, label: f.label }));
 
@@ -30,14 +33,6 @@ const SOCIALS = [
   ['youtube', 'YouTube'],
   ['tiktok', 'TikTok'],
   ['instagram', 'Instagram'],
-];
-
-const DOWNLOAD_LABELS = [
-  ['wav', 'כרטיס WAV'],
-  ['mp3', 'כרטיס MP3'],
-  ['pressPdf', 'כרטיס קומוניקט'],
-  ['gallery', 'כרטיס גלריית תמונות'],
-  ['imagesZip', 'כרטיס ZIP'],
 ];
 
 export default function ContentTab({ draft, update, replace }) {
@@ -50,7 +45,7 @@ export default function ContentTab({ draft, update, replace }) {
     });
 
   return (
-    <Accordion variant="light" defaultOpenId="general">
+    <Accordion variant="light" defaultOpenId="general" id="content-editor">
       <AccordionItem
         id="general"
         title="הגדרות כלליות"
@@ -164,7 +159,7 @@ export default function ContentTab({ draft, update, replace }) {
               />
             ))}
           </div>
-        </AccordionItem>
+      </AccordionItem>
 
       <AccordionItem id="gallery" title="גלריית תמונות" icon={FaImages}>
           <div className="space-y-3">
@@ -184,8 +179,9 @@ export default function ContentTab({ draft, update, replace }) {
                     )
                   }
                 />
-                <button
-                  type="button"
+                <DeleteButton
+                  className="mt-6"
+                  label={`מחיקת תמונה ${i + 1}`}
                   onClick={() =>
                     update(
                       'downloads',
@@ -193,10 +189,7 @@ export default function ContentTab({ draft, update, replace }) {
                       downloads.pressImages.filter((_, idx) => idx !== i)
                     )
                   }
-                  className="mt-6 h-9 rounded-lg border border-adm-line bg-white px-3 text-xs text-adm-ink2 transition hover:border-red-300 hover:bg-red-50 hover:text-red-500"
-                >
-                  מחיקה
-                </button>
+                />
               </div>
             ))}
             <button
@@ -211,8 +204,24 @@ export default function ContentTab({ draft, update, replace }) {
             >
               הוספת תמונה
             </button>
+
+            <div className="grid gap-3 border-t border-adm-line pt-3 sm:grid-cols-2">
+              <TextField
+                id="label-gallery-title"
+                label="כותרת כרטיס הגלריה"
+                hint="הכרטיס שפותח את חלון בחירת התמונות"
+                value={downloads.labels.gallery?.title}
+                onChange={(v) => setLabel('gallery', 'title', v)}
+              />
+              <TextField
+                id="label-gallery-sub"
+                label="שורת משנה"
+                value={downloads.labels.gallery?.subtitle}
+                onChange={(v) => setLabel('gallery', 'subtitle', v)}
+              />
+            </div>
           </div>
-        </AccordionItem>
+      </AccordionItem>
 
       <AccordionItem id="clip" title="קליפ רשמי" icon={FaVideo}>
           <TextField
@@ -223,19 +232,11 @@ export default function ContentTab({ draft, update, replace }) {
             value={media.videoUrl}
             onChange={(v) => update('media', 'videoUrl', v)}
           />
-        </AccordionItem>
+      </AccordionItem>
 
       <AccordionItem id="pr" title="קומוניקט" icon={FaFileAlt}>
-          <TextArea
-            id="content-pr"
-            label="תוכן הקומוניקט"
-            hint="נתמכים תגי HTML: <strong> להדגשה, <br> לשורה חדשה, <blockquote> לציטוט"
-            rows={14}
-            mono
-            value={content.prHtml}
-            onChange={(v) => update('content', 'prHtml', v)}
-          />
-        </AccordionItem>
+        <PressEditor content={content} update={update} />
+      </AccordionItem>
 
       <AccordionItem id="lyrics" title="מילים" icon={FaMusic}>
           <TextArea
@@ -246,103 +247,15 @@ export default function ContentTab({ draft, update, replace }) {
             value={content.lyrics}
             onChange={(v) => update('content', 'lyrics', v)}
           />
-        </AccordionItem>
+      </AccordionItem>
 
       <AccordionItem id="credits" title="קרדיטים" icon={FaAward}>
           <CreditsEditor credits={credits} onChange={(v) => replace('credits', v)} />
-        </AccordionItem>
+      </AccordionItem>
 
       <AccordionItem id="downloads" title="תיקיית הורדות" icon={FaDownload}>
-          <div className="space-y-4">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <Toggle
-                id="dl-show-wav"
-                label="הצגת קובץ WAV"
-                value={downloads.showWav}
-                onChange={(v) => update('downloads', 'showWav', v)}
-              />
-              <Toggle
-                id="dl-show-mp3"
-                label="הצגת קובץ MP3"
-                value={downloads.showMp3}
-                onChange={(v) => update('downloads', 'showMp3', v)}
-              />
-            </div>
-
-            <div className="grid gap-3 sm:grid-cols-2">
-              <MediaField
-                label="קובץ WAV"
-                hint="איכות שידור"
-                accept="audio/wav,audio/x-wav"
-                preview="WAV"
-                value={downloads.wavUrl}
-                onChange={(v) => update('downloads', 'wavUrl', v)}
-              />
-              <MediaField
-                label="קובץ MP3"
-                accept="audio/mpeg"
-                preview="MP3"
-                value={downloads.mp3Url}
-                onChange={(v) => update('downloads', 'mp3Url', v)}
-              />
-              <MediaField
-                label="קומוניקט PDF"
-                accept="application/pdf"
-                preview="PDF"
-                value={downloads.pressPdf}
-                onChange={(v) => update('downloads', 'pressPdf', v)}
-              />
-              <MediaField
-                label="ארכיון תמונות"
-                accept=".zip"
-                preview="ZIP"
-                value={downloads.imagesZip}
-                onChange={(v) => update('downloads', 'imagesZip', v)}
-              />
-            </div>
-
-            <div>
-              <h3 className="text-xs font-bold text-adm-ink">
-                כתוביות הכרטיסים
-              </h3>
-              <div className="mt-2 space-y-2">
-                {DOWNLOAD_LABELS.map(([key, name]) => (
-                  <div key={key} className="grid gap-2 sm:grid-cols-2">
-                    <TextField
-                      id={`label-${key}-title`}
-                      label={name}
-                      value={downloads.labels[key]?.title}
-                      onChange={(v) => setLabel(key, 'title', v)}
-                    />
-                    <TextField
-                      id={`label-${key}-sub`}
-                      label="שורת משנה"
-                      value={downloads.labels[key]?.subtitle}
-                      onChange={(v) => setLabel(key, 'subtitle', v)}
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <div className="space-y-3 border-t border-adm-line pt-3">
-              <Toggle
-                id="flags-locked"
-                label="נעילת הורדות"
-                hint="הכרטיסים יוצגו חסומים עם הודעת הגנת זכויות"
-                value={flags.downloadsLocked}
-                onChange={(v) => update('flags', 'downloadsLocked', v)}
-              />
-              <TextArea
-                id="flags-locked-msg"
-                label="הודעת נעילה"
-                rows={2}
-                value={flags.lockedMessage}
-                onChange={(v) => update('flags', 'lockedMessage', v)}
-              />
-            </div>
-          </div>
-        </AccordionItem>
+        <DownloadsEditor downloads={downloads} flags={flags} update={update} />
+      </AccordionItem>
 
       <AccordionItem id="contact" title="יצירת קשר" icon={FaPhone}>
           <div className="grid gap-3 sm:grid-cols-2">

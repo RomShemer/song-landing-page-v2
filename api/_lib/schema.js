@@ -38,7 +38,7 @@ export const EMPTY_CONTENT = {
     appleMusic: '',
     spotify: '',
   },
-  content: { prHtml: '', lyrics: '' },
+  content: { prText: '', prHtml: '', lyrics: '' },
   credits: [],
   downloads: {
     mp3Url: '',
@@ -117,6 +117,7 @@ export function normalizeContent(input, base = EMPTY_CONTENT) {
       spotify: str(obj(i.links).spotify, b.links.spotify),
     },
     content: {
+      prText: str(obj(i.content).prText, b.content.prText),
       prHtml: str(obj(i.content).prHtml, b.content.prHtml),
       lyrics: str(obj(i.content).lyrics, b.content.lyrics),
     },

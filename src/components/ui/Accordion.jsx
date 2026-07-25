@@ -27,6 +27,7 @@ export function Accordion({
   defaultOpenId = null,
   variant = 'dark',
   className = '',
+  id: containerId,
   children,
 }) {
   const [openId, setOpenId] = useState(defaultOpenId);
@@ -38,7 +39,9 @@ export function Accordion({
 
   return (
     <AccordionContext.Provider value={{ openId, toggle, variant }}>
-      <div className={`flex flex-col gap-3 ${className}`}>{children}</div>
+      <div id={containerId} className={`flex flex-col gap-3 ${className}`}>
+        {children}
+      </div>
     </AccordionContext.Provider>
   );
 }
