@@ -47,11 +47,19 @@ export function useAudioPlayer({ src, onFirstPlay, onListened } = {}) {
     if (total >= 1) onListened?.(total);
   }, [stopClock, onListened]);
 
+  // Flushed whenever the page stops being watched, not only when it unloads:
+  // `pagehide` does not fire on a tab switch or on a phone being locked, and a
+  // visitor who listens and then switches tabs is the common case. The cost is
+  // that coming back and listening again reports a second, shorter listen; the
+  // seconds still add up, and losing the report entirely was much worse.
   useEffect(() => {
     const onHide = () => report();
+    const onVisibility = () => document.visibilityState === 'hidden' && report();
     window.addEventListener('pagehide', onHide);
+    document.addEventListener('visibilitychange', onVisibility);
     return () => {
       window.removeEventListener('pagehide', onHide);
+      document.removeEventListener('visibilitychange', onVisibility);
       report();
     };
   }, [report, src]);
