@@ -26,12 +26,13 @@ function withDevMedia(doc) {
   };
 }
 
-export function useContent({ fresh = false } = {}) {
+export function useContent({ fresh = false, skip = false } = {}) {
   const [content, setContent] = useState(() => withDevMedia(defaultContent));
   const [isLive, setIsLive] = useState(false);
   const [error, setError] = useState(null);
 
   useEffect(() => {
+    if (skip) return;
     const controller = new AbortController();
 
     fetch(fresh ? '/api/content?fresh=1' : '/api/content', {
@@ -48,7 +49,7 @@ export function useContent({ fresh = false } = {}) {
       });
 
     return () => controller.abort();
-  }, [fresh]);
+  }, [fresh, skip]);
 
   return { content, isLive, error, setContent };
 }

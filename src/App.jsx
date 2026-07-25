@@ -28,9 +28,11 @@ import { useWebFonts } from './hooks/useWebFonts';
 import { themeVars } from './theme';
 import { trackAccordionOpen, trackMediaDownload } from './utils/analytics';
 
-export default function App() {
-  const { content: doc } = useContent();
-  const viewMode = useViewMode();
+export default function App({ content: override, viewMode: viewModeOverride }) {
+  const live = useContent({ skip: Boolean(override) });
+  const doc = override ?? live.content;
+  const urlViewMode = useViewMode();
+  const viewMode = viewModeOverride ?? urlViewMode;
   const [galleryOpen, setGalleryOpen] = useState(false);
 
   const { song, theme, media, links, content, credits, downloads, contact, flags } = doc;
