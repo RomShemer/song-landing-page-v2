@@ -2,7 +2,10 @@
 
 /* ===== Design tokens ===== */
 @theme {
-  --font-sans: 'Heebo', system-ui, -apple-system, sans-serif;
+  /* Overridden at runtime from theme.titleFont / theme.bodyFont. */
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
+  --font-title: var(--font-sans);
+  --font-body: var(--font-sans);
 
   /* Accent ramp. These are only the fallbacks: the client picks the base hue in
      the admin dashboard and src/theme.js overrides these variables at runtime,

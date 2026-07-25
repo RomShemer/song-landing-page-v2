@@ -33,7 +33,7 @@ export default function GallerySection({ images = [] }) {
             decoding="async"
             draggable={false}
             onContextMenu={(e) => e.preventDefault()}
-            className="aspect-[4/5] w-full rounded-xl border border-white/10 object-cover sm:aspect-[3/2]"
+            className="aspect-[3/4] w-full rounded-xl border border-white/10 object-cover sm:aspect-[4/3]"
           />
 
           <button

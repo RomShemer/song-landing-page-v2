@@ -33,7 +33,7 @@ export default function Hero({ title, artist, coverImage, showCover, glowImage }
         />
       )}
 
-      <h1 className="text-4xl leading-tight font-black tracking-tight text-white sm:text-5xl">
+      <h1 className="font-title text-4xl leading-tight font-black tracking-tight text-white sm:text-5xl">
         {title}
       </h1>
       <p className="mt-2 text-lg font-medium text-neutral-400">{artist}</p>

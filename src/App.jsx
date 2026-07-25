@@ -25,7 +25,8 @@ import PressSection from './components/sections/PressSection';
 
 import { useContent } from './content/useContent';
 import { useViewMode } from './hooks/useViewMode';
-import { accentVars } from './theme';
+import { useWebFonts } from './hooks/useWebFonts';
+import { themeVars } from './theme';
 import { trackAccordionOpen, trackMediaDownload } from './utils/analytics';
 
 export default function App() {
@@ -34,6 +35,8 @@ export default function App() {
   const [galleryOpen, setGalleryOpen] = useState(false);
 
   const { song, theme, media, links, content, credits, downloads, contact, flags } = doc;
+
+  useWebFonts([theme.titleFont, theme.bodyFont]);
 
   // Listen-only links go to press who should hear the track but receive no
   // files — masters, press PDF and photo sets are all withheld.
@@ -49,8 +52,8 @@ export default function App() {
   return (
     <div
       dir="rtl"
-      className="relative min-h-dvh overflow-x-hidden"
-      style={accentVars(theme.accent)}
+      className="relative min-h-dvh overflow-x-hidden font-body"
+      style={themeVars(theme)}
     >
       {media.backgroundImage && (
         <div

@@ -5,12 +5,25 @@
  * Vite alias, so validation can never drift between the two sides.
  */
 
+// Kept in sync with src/fonts.js, which owns the labels and webfont metadata.
+const FONT_KEYS = new Set([
+  'system',
+  'heebo',
+  'assistant',
+  'rubik',
+  'alef',
+  'secular-one',
+  'suez-one',
+  'karantina',
+  'amatic',
+]);
+
 export const SCHEMA_VERSION = 1;
 
 export const EMPTY_CONTENT = {
   schemaVersion: SCHEMA_VERSION,
   song: { title: '', artist: '', releaseYear: null },
-  theme: { accent: '#d99a4e' },
+  theme: { accent: '#d99a4e', titleFont: 'system', bodyFont: 'system' },
   media: {
     coverImage: '',
     backgroundImage: '',
@@ -50,6 +63,12 @@ const hexColor = (v, fallback) =>
   typeof v === 'string' && /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.trim())
     ? v.trim().toLowerCase()
     : fallback;
+/**
+ * Font keys are validated against the shared registry so an unknown value can
+ * never reach the page as an arbitrary CSS font-family.
+ */
+const fontKey = (v, fallback) =>
+  typeof v === 'string' && FONT_KEYS.has(v) ? v : fallback;
 const obj = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
 const arr = (v) => (Array.isArray(v) ? v : []);
 
@@ -70,6 +89,8 @@ export function normalizeContent(input, base = EMPTY_CONTENT) {
     },
     theme: {
       accent: hexColor(obj(i.theme).accent, b.theme.accent),
+      titleFont: fontKey(obj(i.theme).titleFont, b.theme.titleFont),
+      bodyFont: fontKey(obj(i.theme).bodyFont, b.theme.bodyFont),
     },
     media: {
       coverImage: str(obj(i.media).coverImage, b.media.coverImage),

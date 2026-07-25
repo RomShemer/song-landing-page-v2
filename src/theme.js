@@ -7,6 +7,8 @@
  * Only the base hue is stored; the ramp is derived with color-mix so the client
  * picks one colour rather than five.
  */
+import { fontStack } from './fonts';
+
 export function accentVars(accent) {
   if (!accent) return {};
 
@@ -18,4 +20,20 @@ export function accentVars(accent) {
     '--color-accent-500': accent,
     '--color-accent-600': `color-mix(in oklab, ${accent} 82%, black)`,
   };
+}
+
+/**
+ * Title and body faces are separate variables so a display font can carry the
+ * song title without hurting the readability of a long press release.
+ */
+export function fontVars({ titleFont, bodyFont } = {}) {
+  return {
+    '--font-title': fontStack(titleFont),
+    '--font-body': fontStack(bodyFont),
+  };
+}
+
+/** Every CSS variable the content document controls, ready for a style prop. */
+export function themeVars(theme = {}) {
+  return { ...accentVars(theme.accent), ...fontVars(theme) };
 }

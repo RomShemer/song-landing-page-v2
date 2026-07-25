@@ -16,6 +16,10 @@ const defaultContent = normalizeContent({
     // Warm gold, picked to sit with the existing artwork. Fully client-editable
     // in the dashboard — nothing downstream hardcodes a colour.
     accent: '#d99a4e',
+    // 'system' reproduces the original look: the old CSS named Heebo but never
+    // loaded it, so the page always rendered in the OS UI face.
+    titleFont: 'system',
+    bodyFont: 'system',
   },
   media: {
     // No cover by default: the release photo carries the page as the background,
