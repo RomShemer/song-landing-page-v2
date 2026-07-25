@@ -41,7 +41,7 @@ export default function AdminApp() {
 
   return (
     <div dir="rtl" className="min-h-dvh bg-adm-bg text-adm-ink">
-      <div className="mx-auto w-full max-w-6xl space-y-4 px-4 py-6">
+      <div className="mx-auto w-full max-w-6xl space-y-4 px-4 pt-6 pb-24">
         <DistributionCard song={draft.song} />
 
         <div className="flex items-center gap-1.5 border-b border-adm-line">

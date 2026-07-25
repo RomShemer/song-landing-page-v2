@@ -62,22 +62,28 @@ export default function App({ content: override, viewMode: viewModeOverride }) {
       />
 
       <main className="mx-auto flex w-full max-w-xl flex-col gap-5 px-4 pb-8">
-        <Hero
-          title={song.title}
-          artist={song.artist}
-          coverImage={media.coverImage}
-          showCover={media.showCover}
-          glowImage={media.backgroundImage}
-        />
+        <div data-section="hero">
+          <Hero
+            title={song.title}
+            artist={song.artist}
+            coverImage={media.coverImage}
+            showCover={media.showCover}
+            glowImage={media.backgroundImage}
+          />
+        </div>
 
-        <SocialRow links={links} />
+        <div data-section="socials">
+          <SocialRow links={links} />
+        </div>
 
-        <AudioPlayer
-          src={streamUrl}
-          title={song.title}
-          variant={theme.playerStyle}
-          sticky
-        />
+        <div data-section="player">
+          <AudioPlayer
+            src={streamUrl}
+            title={song.title}
+            variant={theme.playerStyle}
+            sticky
+          />
+        </div>
 
         <Accordion onOpen={trackAccordionOpen}>
           {downloads.pressImages?.length > 0 && (

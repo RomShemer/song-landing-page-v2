@@ -1,5 +1,6 @@
 import { FaArrowDown, FaArrowUp, FaPlus } from 'react-icons/fa';
 import DeleteButton from '../ui/DeleteButton';
+import TipButton from '../ui/TipButton';
 
 const ROLES = [
   'מילים',
@@ -56,24 +57,18 @@ export default function CreditsEditor({ credits, onChange }) {
             className={input}
           />
           <div className="flex shrink-0 gap-1">
-            <button
-              type="button"
+            <TipButton
+              tip="העלאה שורה אחת למעלה"
+              icon={FaArrowUp}
               onClick={() => move(i, -1)}
               disabled={i === 0}
-              aria-label="הזזה למעלה"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-adm-line bg-white text-[11px] text-adm-ink2 transition hover:border-adm-blue hover:text-adm-blue disabled:opacity-30"
-            >
-              <FaArrowUp />
-            </button>
-            <button
-              type="button"
+            />
+            <TipButton
+              tip="הורדה שורה אחת למטה"
+              icon={FaArrowDown}
               onClick={() => move(i, 1)}
               disabled={i === credits.length - 1}
-              aria-label="הזזה למטה"
-              className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-adm-line bg-white text-[11px] text-adm-ink2 transition hover:border-adm-blue hover:text-adm-blue disabled:opacity-30"
-            >
-              <FaArrowDown />
-            </button>
+            />
             <DeleteButton
               onClick={() => onChange(credits.filter((_, idx) => idx !== i))}
               label={`מחיקת ${credit.role || 'קרדיט'}`}

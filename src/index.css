@@ -39,6 +39,54 @@
   --color-adm-teal-soft: #e2f7f4;
 }
 
+@keyframes preview-flash {
+  0% {
+    outline-color: var(--color-adm-blue);
+    background-color: color-mix(in oklab, var(--color-adm-blue) 22%, transparent);
+  }
+  70% {
+    outline-color: var(--color-adm-blue);
+    background-color: color-mix(in oklab, var(--color-adm-blue) 10%, transparent);
+  }
+  100% {
+    outline-color: transparent;
+    background-color: transparent;
+  }
+}
+
+/* Applied briefly to the block a just-edited field controls, so the eye is
+   pulled to where the change landed in the preview. */
+.preview-screen {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.preview-screen::-webkit-scrollbar {
+  display: none;
+}
+
+.preview-flash {
+  outline: 2px solid transparent;
+  outline-offset: 3px;
+  border-radius: 1rem;
+  animation: preview-flash 1500ms ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .preview-screen {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.preview-screen::-webkit-scrollbar {
+  display: none;
+}
+
+.preview-flash {
+    animation-duration: 1ms;
+  }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

@@ -1,5 +1,6 @@
 import { createContext, useContext, useId, useState } from 'react';
 import { FaChevronDown } from 'react-icons/fa';
+import InfoTip from '../../admin/ui/InfoTip';
 
 const AccordionContext = createContext(null);
 
@@ -46,19 +47,24 @@ export function Accordion({
   );
 }
 
-export function AccordionItem({ id, title, hint, icon: Icon, children }) {
+export function AccordionItem({ id, title, hint, tip, icon: Icon, children }) {
   const { openId, toggle, variant } = useContext(AccordionContext);
   const panelId = `${useId()}-panel`;
+  const tipId = `${panelId}-tip`;
   const isOpen = openId === id;
   const v = VARIANTS[variant] || VARIANTS.dark;
 
   return (
-    <div className={`overflow-hidden rounded-2xl border transition-colors ${v.shell}`}>
+    <div
+      data-section={id}
+      className={`overflow-hidden rounded-2xl border transition-colors ${v.shell}`}
+    >
       <button
         type="button"
         onClick={() => toggle(id)}
         aria-expanded={isOpen}
         aria-controls={panelId}
+        aria-describedby={tip ? tipId : undefined}
         className={`flex w-full items-center gap-3 px-4 py-4 transition ${v.header}`}
       >
         {Icon && (
@@ -69,7 +75,10 @@ export function AccordionItem({ id, title, hint, icon: Icon, children }) {
           </span>
         )}
         <span className="min-w-0 flex-1">
-          <span className={`block text-base font-medium ${v.title}`}>{title}</span>
+          <span className={`flex items-center gap-1.5 text-base font-medium ${v.title}`}>
+            {title}
+            {tip && <InfoTip id={tipId} text={tip} />}
+          </span>
           {hint && <span className="block text-[11px] text-adm-muted">{hint}</span>}
         </span>
         <FaChevronDown

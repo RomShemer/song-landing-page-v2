@@ -1,61 +1,125 @@
-import { useState } from 'react';
-import { FaDesktop, FaMobileAlt, FaSyncAlt } from 'react-icons/fa';
+import { useEffect, useRef, useState } from 'react';
+import {
+  FaCompress,
+  FaDesktop,
+  FaExpand,
+  FaExternalLinkAlt,
+  FaMobileAlt,
+  FaSyncAlt,
+} from 'react-icons/fa';
 import App from '../../App';
+import InfoTip from '../ui/InfoTip';
+import TipButton from '../ui/TipButton';
+import DeviceFrame from './DeviceFrame';
+import { DEVICES } from './devices';
+import { changedSections } from './changedSections';
 
-const DEVICES = {
-  mobile: { width: 390, height: 780, icon: FaMobileAlt, label: 'נייד' },
-  desktop: { width: 1280, height: 800, icon: FaDesktop, label: 'שולחני' },
-};
+const ICONS = { mobile: FaMobileAlt, desktop: FaDesktop };
+const FLASH_MS = 1500;
+
+function useChangeFlash(content, rootRef) {
+  const previous = useRef(content);
+
+  useEffect(() => {
+    const sections = changedSections(previous.current, content);
+    previous.current = content;
+    if (!sections.length || !rootRef.current) return;
+
+    const nodes = sections
+      .map((key) => rootRef.current.querySelector(`[data-section="${key}"]`))
+      .filter(Boolean);
+
+    nodes.forEach((node) => {
+      node.classList.remove('preview-flash');
+      // Force a reflow so re-adding the class restarts the animation on a
+      // second edit to the same section.
+      void node.offsetWidth;
+      node.classList.add('preview-flash');
+    });
+
+    if (nodes[0]) {
+      nodes[0].scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    }
+
+    const timer = setTimeout(
+      () => nodes.forEach((node) => node.classList.remove('preview-flash')),
+      FLASH_MS
+    );
+    return () => clearTimeout(timer);
+  }, [content, rootRef]);
+}
 
 export default function Preview({ content, isDirty }) {
   const [device, setDevice] = useState('mobile');
   const [mode, setMode] = useState('full');
+  const [expanded, setExpanded] = useState(false);
   const [nonce, setNonce] = useState(0);
+  const rootRef = useRef(null);
 
-  const { width, height } = DEVICES[device];
-  const frameWidth = device === 'mobile' ? 320 : 420;
-  const scale = frameWidth / width;
+  useChangeFlash(content, rootRef);
 
-  return (
-    <div className="rounded-3xl border border-adm-line bg-adm-card p-4 shadow-[0_4px_20px_-8px_rgba(15,43,92,0.18)]">
-      <header className="flex flex-wrap items-center justify-between gap-2">
-        <div>
-          <h2 className="text-sm font-bold text-adm-ink">תצוגה מקדימה</h2>
-          <p className="mt-0.5 text-[11px] text-adm-muted">
-            {isDirty ? 'כולל שינויים שלא פורסמו' : 'זהה לעמוד המפורסם'}
-          </p>
-        </div>
+  useEffect(() => {
+    if (!expanded) return;
+    const onKey = (e) => e.key === 'Escape' && setExpanded(false);
+    document.addEventListener('keydown', onKey);
+    const { overflow } = document.body.style;
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.removeEventListener('keydown', onKey);
+      document.body.style.overflow = overflow;
+    };
+  }, [expanded]);
 
-        <div className="flex items-center gap-1.5">
-          {Object.entries(DEVICES).map(([key, { icon: Icon, label }]) => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => setDevice(key)}
-              aria-pressed={device === key}
-              title={label}
-              className={`inline-flex h-8 w-8 items-center justify-center rounded-lg text-xs transition ${
-                device === key
-                  ? 'bg-adm-blue text-white'
-                  : 'border border-adm-line bg-white text-adm-ink2 hover:border-adm-blue hover:text-adm-blue'
-              }`}
-            >
-              <Icon />
-            </button>
-          ))}
-          <button
-            type="button"
-            onClick={() => setNonce((n) => n + 1)}
-            title="רענון"
-            aria-label="רענון תצוגה"
-            className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-adm-line bg-white text-xs text-adm-ink2 transition hover:border-adm-blue hover:text-adm-blue"
-          >
-            <FaSyncAlt />
-          </button>
-        </div>
-      </header>
+  const { width } = DEVICES[device];
+  const inline = device === 'mobile' ? 300 : 460;
+  const scale = expanded
+    ? Math.min((window.innerWidth - 160) / width, device === 'mobile' ? 0.85 : 0.62)
+    : inline / width;
 
-      <div className="mt-3 flex gap-1.5">
+  const previewUrl = `/song?preview=1${mode === 'listen_only' ? '&listen_only=true' : ''}`;
+
+  const page = (
+    <div ref={rootRef} className="contents">
+      <App key={`${nonce}-${mode}`} content={content} viewMode={mode} />
+    </div>
+  );
+
+  const controls = (
+    <>
+      <div className="flex items-center gap-1.5">
+        <TipButton
+          tip="תצוגת נייד — iPhone"
+          icon={ICONS.mobile}
+          onClick={() => setDevice('mobile')}
+          pressed={device === 'mobile'}
+          tone={device === 'mobile' ? 'active' : 'plain'}
+        />
+        <TipButton
+          tip="תצוגת מסך שולחני"
+          icon={ICONS.desktop}
+          onClick={() => setDevice('desktop')}
+          pressed={device === 'desktop'}
+          tone={device === 'desktop' ? 'active' : 'plain'}
+        />
+        <TipButton
+          tip="רענון התצוגה מחדש"
+          icon={FaSyncAlt}
+          onClick={() => setNonce((n) => n + 1)}
+        />
+        <TipButton
+          tip={expanded ? 'יציאה מתצוגה מוגדלת' : 'הגדלת התצוגה על כל המסך'}
+          icon={expanded ? FaCompress : FaExpand}
+          onClick={() => setExpanded((v) => !v)}
+        />
+        <TipButton
+          tip="פתיחת התצוגה בכרטיסייה חדשה"
+          icon={FaExternalLinkAlt}
+          href={previewUrl}
+          tone="teal"
+        />
+      </div>
+
+      <div className="flex gap-1.5">
         {[
           ['full', 'הפצה מלאה'],
           ['listen_only', 'האזנה בלבד'],
@@ -75,26 +139,45 @@ export default function Preview({ content, isDirty }) {
           </button>
         ))}
       </div>
+    </>
+  );
 
-      {/* dir=ltr so the scaled box grows from the left edge; inside an RTL
-          parent it would be anchored right and clip off-frame. */}
-      <div
-        dir="ltr"
-        className="mt-3 overflow-hidden rounded-3xl border-4 border-adm-ink/10 bg-neutral-950 ring-1 ring-adm-line"
-        style={{ width: frameWidth, height: height * scale }}
-      >
-        <div
-          style={{
-            width,
-            height,
-            transform: `scale(${scale})`,
-            transformOrigin: 'top left',
-            overflowY: 'auto',
-            overflowX: 'hidden',
-          }}
-        >
-          <App key={`${nonce}-${mode}`} content={content} viewMode={mode} />
+  if (expanded) {
+    return (
+      <div className="fixed inset-0 z-50 flex flex-col bg-adm-bg/95 backdrop-blur-sm">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-adm-line bg-adm-card px-4 py-3">
+          <h2 className="text-sm font-bold text-adm-ink">תצוגה מקדימה</h2>
+          {controls}
         </div>
+        <div className="flex flex-1 items-start justify-center overflow-auto p-6 pb-28">
+          <DeviceFrame device={device} scale={scale}>
+            {page}
+          </DeviceFrame>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-3xl border border-adm-line bg-adm-card p-4 shadow-[0_4px_20px_-8px_rgba(15,43,92,0.18)]">
+      <header className="flex flex-wrap items-center justify-between gap-2">
+        <div>
+          <h2 className="flex items-center gap-1.5 text-sm font-bold text-adm-ink">
+            תצוגה מקדימה
+            <InfoTip text="מציגה את העמוד האמיתי עם השינויים שטרם פורסמו. כל עריכה מהבהבת לרגע במקום שבו היא משפיעה." />
+          </h2>
+          <p className="mt-0.5 text-[11px] text-adm-muted">
+            {isDirty ? 'כולל שינויים שלא פורסמו' : 'זהה לעמוד המפורסם'}
+          </p>
+        </div>
+      </header>
+
+      <div className="mt-3 flex flex-wrap items-center justify-between gap-2">{controls}</div>
+
+      <div className="mt-4 flex justify-center">
+        <DeviceFrame device={device} scale={scale}>
+          {page}
+        </DeviceFrame>
       </div>
     </div>
   );

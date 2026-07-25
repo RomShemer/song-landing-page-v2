@@ -8,6 +8,7 @@ import {
   FaPlay,
   FaTable,
 } from 'react-icons/fa';
+import InfoTip from '../ui/InfoTip';
 import EngagementChart from './EngagementChart';
 import { SERIES, formatDuration } from './series';
 
@@ -17,7 +18,7 @@ const RANGES = [
   [90, '90 ימים'],
 ];
 
-function StatTile({ icon: Icon, label, value, hint }) {
+function StatTile({ icon: Icon, label, value, hint, tip }) {
   return (
     <div className="rounded-2xl border border-adm-line bg-adm-card p-3.5 shadow-[0_2px_12px_-6px_rgba(15,43,92,0.18)]">
       <div className="flex items-center gap-2 text-[11px] font-medium text-adm-ink2">
@@ -25,6 +26,7 @@ function StatTile({ icon: Icon, label, value, hint }) {
           <Icon />
         </span>
         {label}
+        {tip && <InfoTip text={tip} />}
       </div>
       <div className="mt-2 text-2xl font-bold tabular-nums text-adm-ink">{value}</div>
       {hint && <div className="mt-0.5 text-[11px] text-adm-muted">{hint}</div>}
@@ -79,7 +81,10 @@ export default function AnalyticsTab() {
       )}
 
       <div className="flex items-center justify-between gap-2">
-        <h2 className="text-sm font-bold text-adm-ink">מדידת מעורבות</h2>
+        <h2 className="flex items-center gap-1.5 text-sm font-bold text-adm-ink">
+          מדידת מעורבות
+          <InfoTip text="הנתונים נאספים בשרת שלנו ולא בכלי חיצוני, כך שחוסמי פרסומות אינם מסתירים אותם." />
+        </h2>
         <div className="flex gap-1.5">
           {RANGES.map(([value, label]) => (
             <button
@@ -103,6 +108,7 @@ export default function AnalyticsTab() {
         <StatTile
           icon={FaEye}
           label="צפיות בעמוד"
+          tip="מספר הפעמים שהעמוד נטען. מפוצל בין קישור ההפצה המלא לקישור האזנה בלבד."
           value={totals.page_view ?? 0}
           hint={`מלא ${totals['page_view:full'] ?? 0} · האזנה בלבד ${
             totals['page_view:listen_only'] ?? 0
@@ -111,12 +117,14 @@ export default function AnalyticsTab() {
         <StatTile
           icon={FaPlay}
           label="האזנות"
+          tip="לחיצות על כפתור הנגינה. נספרת אחת לכל מבקר, כך שעצירה והפעלה חוזרת אינה מנפחת את המספר."
           value={totals.play_audio ?? 0}
           hint="לחיצות על נגן"
         />
         <StatTile
           icon={FaClock}
           label="זמן האזנה מצטבר"
+          tip="סך הזמן שבו השיר התנגן בפועל, ולא רק נלחץ. מאפשר להבדיל בין האזנה אמיתית לדגימה קצרה."
           value={formatDuration(totals.listen_seconds ?? 0)}
           hint={`ממוצע ${formatDuration(
             totals.play_audio ? (totals.listen_seconds ?? 0) / totals.play_audio : 0
@@ -125,17 +133,20 @@ export default function AnalyticsTab() {
         <StatTile
           icon={FaHeadphones}
           label="הורדות WAV"
+          tip="הורדות קובץ המאסטר באיכות שידור — האינדיקציה החזקה ביותר לעניין מצד רדיו."
           value={totals.download_wav ?? 0}
           hint="איכות שידור"
         />
         <StatTile
           icon={FaHeadphones}
           label="הורדות MP3"
+          tip="הורדות הקובץ הקל, בדרך כלל להאזנה מהירה או להפצה פנימית."
           value={totals.download_mp3 ?? 0}
         />
         <StatTile
           icon={FaFileAlt}
           label="קומוניקט ותמונות"
+          tip="הורדות חומרי היח״צ: קובץ הקומוניקט וסט התמונות."
           value={(totals.download_pdf ?? 0) + (totals.download_photos ?? 0)}
           hint={`PDF ${totals.download_pdf ?? 0} · תמונות ${totals.download_photos ?? 0}`}
         />
@@ -144,8 +155,9 @@ export default function AnalyticsTab() {
       <section className="rounded-3xl border border-adm-line bg-adm-card p-4 shadow-[0_4px_20px_-8px_rgba(15,43,92,0.18)]">
         <div className="flex flex-wrap items-baseline justify-between gap-2">
           <div>
-            <h3 className="text-sm font-bold text-adm-ink">
+            <h3 className="flex items-center gap-1.5 text-sm font-bold text-adm-ink">
               האזנות והורדות לפי יום
+              <InfoTip text="כל עמודה היא יום, מחולקת לפי סוג הפעולה. מעבר עם העכבר מציג פירוט, וכפתור הטבלה מציג את אותם נתונים כמספרים." />
             </h3>
             <p className="mt-0.5 text-[11px] text-adm-muted">
               {days} הימים האחרונים
@@ -199,6 +211,7 @@ export default function AnalyticsTab() {
         <h3 className="flex items-center gap-2 text-sm font-bold text-adm-ink">
           <FaImages className="text-adm-teal" />
           פירוט מעורבות
+          <InfoTip text="אילו חלקים בעמוד נפתחו בפועל — מלמד מה מעניין את העיתונאים ומה נשאר סגור." />
         </h3>
         <dl className="mt-3 space-y-1.5 text-xs">
           {[

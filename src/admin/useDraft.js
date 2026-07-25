@@ -1,8 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { normalizeContent } from '@schema';
 import defaultContent from '../content/defaultContent';
-
-const STORAGE_KEY = 'epk-admin-draft';
+import { DRAFT_STORAGE_KEY as STORAGE_KEY } from './draftStorage';
 
 // Until /api/content exists the draft is persisted locally, so edits survive a
 // reload. publish() is the only place that needs to change once it does.

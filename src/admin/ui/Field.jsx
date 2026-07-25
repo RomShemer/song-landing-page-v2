@@ -1,8 +1,18 @@
-export function Label({ htmlFor, children, hint }) {
+// reserveHint keeps the hint line's height when a field has no hint, so inputs
+// stay on one baseline beside a neighbour that does.
+export function Label({ htmlFor, children, hint, reserveHint = false }) {
   return (
     <label htmlFor={htmlFor} className="block">
       <span className="block text-xs font-semibold text-adm-ink">{children}</span>
-      {hint && <span className="mt-0.5 block text-[11px] text-adm-muted">{hint}</span>}
+      {hint ? (
+        <span className="mt-0.5 block text-[11px] text-adm-muted">{hint}</span>
+      ) : (
+        reserveHint && (
+          <span aria-hidden="true" className="mt-0.5 block text-[11px] invisible">
+            &nbsp;
+          </span>
+        )
+      )}
     </label>
   );
 }
@@ -11,10 +21,10 @@ const inputClass = `mt-1.5 w-full rounded-xl border border-adm-line bg-adm-bg/60
   text-sm text-adm-ink placeholder:text-adm-muted
   focus:border-adm-blue focus:bg-white focus:ring-2 focus:ring-adm-blue/15 focus:outline-none`;
 
-export function TextField({ label, hint, value, onChange, id, dir, ...rest }) {
+export function TextField({ label, hint, reserveHint, value, onChange, id, dir, ...rest }) {
   return (
     <div>
-      <Label htmlFor={id} hint={hint}>
+      <Label htmlFor={id} hint={hint} reserveHint={reserveHint}>
         {label}
       </Label>
       <input

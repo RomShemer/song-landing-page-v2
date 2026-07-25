@@ -22,18 +22,11 @@ import {
 import DeleteButton from '../ui/DeleteButton';
 import CreditsEditor from './CreditsEditor';
 import DownloadsEditor from './DownloadsEditor';
+import LinksEditor from './LinksEditor';
 import MediaField from './MediaField';
 import PressEditor from './PressEditor';
 
 const fontOptions = FONTS.map((f) => ({ value: f.key, label: f.label }));
-
-const SOCIALS = [
-  ['spotify', 'Spotify'],
-  ['appleMusic', 'Apple Music'],
-  ['youtube', 'YouTube'],
-  ['tiktok', 'TikTok'],
-  ['instagram', 'Instagram'],
-];
 
 export default function ContentTab({ draft, update, replace }) {
   const { song, theme, media, links, content, credits, downloads, contact, flags } = draft;
@@ -50,6 +43,7 @@ export default function ContentTab({ draft, update, replace }) {
         id="general"
         title="הגדרות כלליות"
         hint="חל על כל העמוד — שם, עיצוב, רקע ונגן"
+        tip="שם השיר, צבע מוביל, גופנים, רקע ועיצוב הנגן — כל מה שחל על העמוד כולו."
         icon={FaPalette}
       >
         <div className="grid gap-3 sm:grid-cols-2">
@@ -145,26 +139,16 @@ export default function ContentTab({ draft, update, replace }) {
         </div>
       </AccordionItem>
 
-      <AccordionItem id="socials" title="קישורי סטרימינג ורשתות" icon={FaShareAlt}>
-          <div className="grid gap-3 sm:grid-cols-2">
-            {SOCIALS.map(([key, label]) => (
-              <TextField
-                key={key}
-                id={`link-${key}`}
-                label={label}
-                dir="ltr"
-                placeholder="https://"
-                value={links[key]}
-                onChange={(v) => update('links', key, v)}
-              />
-            ))}
-          </div>
+      <AccordionItem id="socials" title="קישורי סטרימינג ורשתות"
+        tip="הקישורים שמאחורי אייקוני הפלטפורמות מתחת לשם השיר. שדה ריק מסתיר את האייקון." icon={FaShareAlt}>
+        <LinksEditor links={links} onChange={(key, value) => update('links', key, value)} />
       </AccordionItem>
 
-      <AccordionItem id="gallery" title="גלריית תמונות" icon={FaImages}>
+      <AccordionItem id="gallery" title="גלריית תמונות"
+        tip="תמונות היח״צ בקרוסלה ובחלון ההורדה. מוצגות במלואן, בלי חיתוך." icon={FaImages}>
           <div className="space-y-3">
             {downloads.pressImages.map((img, i) => (
-              <div key={i} className="grid gap-2 sm:grid-cols-[1fr_auto]">
+              <div key={i} className="grid grid-cols-[1fr_auto] items-center gap-2">
                 <MediaField
                   label={`תמונה ${i + 1}`}
                   accept="image/*"
@@ -180,7 +164,6 @@ export default function ContentTab({ draft, update, replace }) {
                   }
                 />
                 <DeleteButton
-                  className="mt-6"
                   label={`מחיקת תמונה ${i + 1}`}
                   onClick={() =>
                     update(
@@ -216,6 +199,7 @@ export default function ContentTab({ draft, update, replace }) {
               <TextField
                 id="label-gallery-sub"
                 label="שורת משנה"
+                reserveHint
                 value={downloads.labels.gallery?.subtitle}
                 onChange={(v) => setLabel('gallery', 'subtitle', v)}
               />
@@ -223,7 +207,8 @@ export default function ContentTab({ draft, update, replace }) {
           </div>
       </AccordionItem>
 
-      <AccordionItem id="clip" title="קליפ רשמי" icon={FaVideo}>
+      <AccordionItem id="clip" title="קליפ רשמי"
+        tip="סרטון YouTube מוטמע. בפורמט embed. אם ריק — יוצג ״הקליפ יעלה בקרוב״." icon={FaVideo}>
           <TextField
             id="media-video"
             label="כתובת הטמעה של YouTube"
@@ -234,11 +219,13 @@ export default function ContentTab({ draft, update, replace }) {
           />
       </AccordionItem>
 
-      <AccordionItem id="pr" title="קומוניקט" icon={FaFileAlt}>
+      <AccordionItem id="pr" title="קומוניקט"
+        tip="הקומוניקט לעיתונאים. נכתב כטקסט חופשי וה-HTML נוצר ממנו אוטומטית." icon={FaFileAlt}>
         <PressEditor content={content} update={update} />
       </AccordionItem>
 
-      <AccordionItem id="lyrics" title="מילים" icon={FaMusic}>
+      <AccordionItem id="lyrics" title="מילים"
+        tip="מילות השיר. מוצגות בגלילה פנימית כדי לא להאריך את העמוד." icon={FaMusic}>
           <TextArea
             id="content-lyrics"
             label="מילות השיר"
@@ -249,15 +236,18 @@ export default function ContentTab({ draft, update, replace }) {
           />
       </AccordionItem>
 
-      <AccordionItem id="credits" title="קרדיטים" icon={FaAward}>
+      <AccordionItem id="credits" title="קרדיטים"
+        tip="רשימת היוצרים. סוג הקרדיט מימין והשם לידו. אפשר להוסיף, למחוק ולשנות סדר." icon={FaAward}>
           <CreditsEditor credits={credits} onChange={(v) => replace('credits', v)} />
       </AccordionItem>
 
-      <AccordionItem id="downloads" title="תיקיית הורדות" icon={FaDownload}>
+      <AccordionItem id="downloads" title="תיקיית הורדות"
+        tip="הקבצים שאנשי הרדיו והעיתונות מורידים. לכל קובץ כותרת, שורת משנה ומתג הצגה." icon={FaDownload}>
         <DownloadsEditor downloads={downloads} flags={flags} update={update} />
       </AccordionItem>
 
-      <AccordionItem id="contact" title="יצירת קשר" icon={FaPhone}>
+      <AccordionItem id="contact" title="יצירת קשר"
+        tip="טלפון ואימייל בתחתית העמוד. שדה ריק מסתיר את הכפתור." icon={FaPhone}>
           <div className="grid gap-3 sm:grid-cols-2">
             <TextField
               id="contact-phone"
