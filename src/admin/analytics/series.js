@@ -20,3 +20,13 @@ export function formatDuration(seconds) {
   const s = Math.round(seconds % 60);
   return `${m}:${String(s).padStart(2, '0')}`;
 }
+
+// Ordinal ramp, validated for the white surface: monotone lightness, adjacent
+// gaps >= 0.06, light end at 2.11:1, single hue.
+export const DURATION_BUCKETS = [
+  { key: '0-10', label: 'עד 10 שנ׳', color: '#86b6ef' },
+  { key: '10-30', label: '10–30 שנ׳', color: '#5598e7' },
+  { key: '30-60', label: '30–60 שנ׳', color: '#2a78d6' },
+  { key: '60-120', label: '1–2 דק׳', color: '#1c5cab' },
+  { key: '120+', label: 'מעל 2 דק׳', color: '#104281' },
+];

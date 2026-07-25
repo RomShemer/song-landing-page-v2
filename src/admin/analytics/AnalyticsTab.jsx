@@ -10,6 +10,7 @@ import {
 } from 'react-icons/fa';
 import InfoTip from '../ui/InfoTip';
 import EngagementChart from './EngagementChart';
+import ListenDurationChart from './ListenDurationChart';
 import { SERIES, formatDuration } from './series';
 
 const RANGES = [
@@ -204,6 +205,27 @@ export default function AnalyticsTab() {
           ) : (
             <EngagementChart data={series} />
           )}
+        </div>
+      </section>
+
+      <section className="rounded-3xl border border-adm-line bg-adm-card p-4 shadow-[0_4px_20px_-8px_rgba(15,43,92,0.18)]">
+        <div className="flex flex-wrap items-baseline justify-between gap-2">
+          <h3 className="flex items-center gap-1.5 text-sm font-bold text-adm-ink">
+            <FaClock className="text-adm-teal" />
+            כמה זמן הקשיבו
+            <InfoTip text="חלוקת ההאזנות לפי משך ההשמעה בפועל. הצפייה בעמודות הארוכות בתחתית מלמדת כמה מהמאזינים שמעו את השיר עד סופו." />
+          </h3>
+          <span className="text-[11px] text-adm-muted">
+            ממוצע {formatDuration(
+              totals.play_audio ? (totals.listen_seconds ?? 0) / totals.play_audio : 0
+            )}
+          </span>
+        </div>
+        <div className="mt-4">
+          <ListenDurationChart
+            buckets={totals.listen_buckets}
+            totalPlays={totals.play_audio ?? 0}
+          />
         </div>
       </section>
 

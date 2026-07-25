@@ -57,6 +57,7 @@
 /* Applied briefly to the block a just-edited field controls, so the eye is
    pulled to where the change landed in the preview. */
 .preview-screen {
+  overscroll-behavior: contain;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
@@ -74,6 +75,7 @@
 
 @media (prefers-reduced-motion: reduce) {
   .preview-screen {
+  overscroll-behavior: contain;
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
