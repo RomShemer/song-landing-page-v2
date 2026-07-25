@@ -13,6 +13,7 @@ import { Accordion, AccordionItem } from './components/ui/Accordion';
 import Modal from './components/ui/Modal';
 import AudioPlayer from './components/AudioPlayer';
 import Hero from './components/Hero';
+import PrimaryActions from './components/PrimaryActions';
 import SocialRow from './components/SocialRow';
 import ClipSection from './components/sections/ClipSection';
 import ContactSection from './components/sections/ContactSection';
@@ -37,10 +38,12 @@ export default function App() {
   // files — masters, press PDF and photo sets are all withheld.
   const showDownloads = viewMode === 'full';
 
-  // MP3 doubles as the stream when no dedicated streaming URL is set, but only
-  // where downloads are permitted — otherwise the file URL would leak into a
-  // link that promises no downloads.
-  const streamUrl = media.audioStreamUrl || (showDownloads ? downloads.mp3Url : '');
+  // The whole point of a listen-only link is that it still plays, so the MP3
+  // backs the player even there — withholding it would leave nothing to hear.
+  // Hiding the URL would not protect it anyway (it is in the DOM either way);
+  // set media.audioStreamUrl to a dedicated low-bitrate asset when the master
+  // must not be reachable at all.
+  const streamUrl = media.audioStreamUrl || downloads.mp3Url;
 
   return (
     <div dir="rtl" className="relative min-h-dvh overflow-x-hidden">
@@ -62,6 +65,15 @@ export default function App() {
         <SocialRow links={links} />
 
         <AudioPlayer src={streamUrl} title={song.title} artist={song.artist} sticky />
+
+        <PrimaryActions
+          links={links}
+          downloads={downloads}
+          flags={flags}
+          showDownloads={showDownloads}
+          artist={song.artist}
+          title={song.title}
+        />
 
         <Accordion onOpen={trackAccordionOpen}>
           {downloads.pressImages?.length > 0 && (
