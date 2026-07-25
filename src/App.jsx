@@ -46,7 +46,7 @@ export default function App({ content: override, viewMode: viewModeOverride }) {
   return (
     <div
       dir="rtl"
-      className="relative min-h-dvh overflow-x-hidden font-body"
+      className="page-root relative min-h-dvh overflow-x-hidden font-body"
       style={themeVars(theme)}
     >
       {media.backgroundImage && (

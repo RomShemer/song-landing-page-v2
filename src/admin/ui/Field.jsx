@@ -76,10 +76,10 @@ export function TextArea({ label, hint, value, onChange, id, rows = 6, mono = fa
   );
 }
 
-export function SelectField({ label, hint, value, onChange, id, options }) {
+export function SelectField({ label, hint, reserveHint, value, onChange, id, options, groups }) {
   return (
     <div>
-      <Label htmlFor={id} hint={hint}>
+      <Label htmlFor={id} hint={hint} reserveHint={reserveHint}>
         {label}
       </Label>
       <select
@@ -88,12 +88,56 @@ export function SelectField({ label, hint, value, onChange, id, options }) {
         onChange={(e) => onChange(e.target.value)}
         className={`${inputClass} cursor-pointer`}
       >
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>
-            {o.label}
-          </option>
-        ))}
+        {groups
+          ? groups.map((group) => (
+              <optgroup key={group.label} label={group.label}>
+                {group.options.map((o) => (
+                  <option key={o.value} value={o.value}>
+                    {o.label}
+                  </option>
+                ))}
+              </optgroup>
+            ))
+          : options.map((o) => (
+              <option key={o.value} value={o.value}>
+                {o.label}
+              </option>
+            ))}
       </select>
+    </div>
+  );
+}
+
+export function RangeField({ label, hint, value, onChange, id, min, max, step = 1, format }) {
+  return (
+    <div>
+      <Label htmlFor={id} hint={hint}>
+        <span className="flex items-baseline justify-between gap-2">
+          {label}
+          <span className="font-mono text-[11px] font-normal text-adm-blue tabular-nums">
+            {format ? format(value) : value}
+          </span>
+        </span>
+      </Label>
+      <input
+        id={id}
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={value}
+        onChange={(e) => onChange(Number(e.target.value))}
+        dir="ltr"
+        className="mt-2 h-6 w-full cursor-pointer appearance-none bg-transparent
+          [&::-webkit-slider-runnable-track]:h-1.5 [&::-webkit-slider-runnable-track]:rounded-full
+          [&::-webkit-slider-runnable-track]:bg-adm-line
+          [&::-webkit-slider-thumb]:mt-[-5px] [&::-webkit-slider-thumb]:h-4 [&::-webkit-slider-thumb]:w-4
+          [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full
+          [&::-webkit-slider-thumb]:bg-adm-blue [&::-webkit-slider-thumb]:shadow
+          [&::-moz-range-track]:h-1.5 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:bg-adm-line
+          [&::-moz-range-thumb]:h-4 [&::-moz-range-thumb]:w-4 [&::-moz-range-thumb]:border-0
+          [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-adm-blue"
+      />
     </div>
   );
 }

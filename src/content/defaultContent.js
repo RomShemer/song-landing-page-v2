@@ -12,6 +12,17 @@ const defaultContent = normalizeContent({
     titleFont: 'system',
     bodyFont: 'system',
     playerStyle: 'light',
+    title: {
+      weight: 200,
+      letterSpacing: 0.5,
+      sizeMin: 3.5,
+      sizeFluid: 9,
+      sizeMax: 8,
+      align: 'center',
+      transform: 'none',
+    },
+    subtitle: { weight: 500, letterSpacing: 0, size: 1.125 },
+    body: { size: 0.9375 },
   },
   media: {
     coverImage: '',

@@ -6,11 +6,11 @@ import {
   FaMusic,
   FaPalette,
   FaPhone,
+  FaFont,
   FaShareAlt,
   FaVideo,
 } from 'react-icons/fa';
 import { Accordion, AccordionItem } from '../../components/ui/Accordion';
-import { FONTS } from '../../fonts';
 import {
   ColorField,
   NumberField,
@@ -23,10 +23,9 @@ import DeleteButton from '../ui/DeleteButton';
 import CreditsEditor from './CreditsEditor';
 import DownloadsEditor from './DownloadsEditor';
 import LinksEditor from './LinksEditor';
+import TypographyEditor from './TypographyEditor';
 import MediaField from './MediaField';
 import PressEditor from './PressEditor';
-
-const fontOptions = FONTS.map((f) => ({ value: f.key, label: f.label }));
 
 export default function ContentTab({ draft, update, replace }) {
   const { song, theme, media, links, content, credits, downloads, contact, flags } = draft;
@@ -74,20 +73,6 @@ export default function ContentTab({ draft, update, replace }) {
             onChange={(v) => update('theme', 'accent', v)}
           />
           <SelectField
-            id="theme-title-font"
-            label="גופן הכותרת"
-            value={theme.titleFont}
-            onChange={(v) => update('theme', 'titleFont', v)}
-            options={fontOptions}
-          />
-          <SelectField
-            id="theme-body-font"
-            label="גופן הטקסט"
-            value={theme.bodyFont}
-            onChange={(v) => update('theme', 'bodyFont', v)}
-            options={fontOptions}
-          />
-          <SelectField
             id="theme-player"
             label="עיצוב הנגן"
             value={theme.playerStyle}
@@ -96,17 +81,6 @@ export default function ContentTab({ draft, update, replace }) {
               { value: 'light', label: 'בהיר (לבן)' },
               { value: 'dark', label: 'כהה (זכוכית)' },
             ]}
-          />
-          <Toggle
-            id="media-show-cover"
-            label="הצגת עטיפת סינגל"
-            hint={
-              media.showCover && !media.coverImage
-                ? 'דולק אך לא הועלתה עטיפה — לא יוצג דבר'
-                : 'כבוי — תמונת הרקע נושאת את העמוד'
-            }
-            value={media.showCover}
-            onChange={(v) => update('media', 'showCover', v)}
           />
         </div>
 
@@ -124,7 +98,19 @@ export default function ContentTab({ draft, update, replace }) {
             accept="image/*"
             value={media.coverImage}
             onChange={(v) => update('media', 'coverImage', v)}
-          />
+          >
+            <Toggle
+              id="media-show-cover"
+              label="הצגת העטיפה בעמוד"
+              hint={
+                media.showCover && !media.coverImage
+                  ? 'דולק אך לא הועלתה עטיפה — לא יוצג דבר'
+                  : undefined
+              }
+              value={media.showCover}
+              onChange={(v) => update('media', 'showCover', v)}
+            />
+          </MediaField>
         </div>
 
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
@@ -137,6 +123,16 @@ export default function ContentTab({ draft, update, replace }) {
             onChange={(v) => update('media', 'audioStreamUrl', v)}
           />
         </div>
+      </AccordionItem>
+
+      <AccordionItem
+        id="typography"
+        title="גופנים וטיפוגרפיה"
+        hint="גופן, עובי, גודל ומרווח לכותרת ולטקסט"
+        tip="הכותרת נמדדת ביחידות רוחב-מכל, כך שהתצוגה המקדימה מציגה את הגודל האמיתי במכשיר ולא ביחס לחלון הדפדפן."
+        icon={FaFont}
+      >
+        <TypographyEditor theme={theme} update={update} />
       </AccordionItem>
 
       <AccordionItem id="socials" title="קישורי סטרימינג ורשתות"

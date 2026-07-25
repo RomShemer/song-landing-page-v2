@@ -2,7 +2,7 @@ export default function Hero({ title, artist, coverImage, showCover, glowImage }
   const glow = glowImage || coverImage;
 
   return (
-    <header className="relative flex flex-col items-center pt-10 pb-6 text-center">
+    <header className="relative flex flex-col items-stretch pt-10 pb-6">
       {glow && (
         <div
           aria-hidden="true"
@@ -25,10 +25,8 @@ export default function Hero({ title, artist, coverImage, showCover, glowImage }
         />
       )}
 
-      <h1 className="font-title text-4xl leading-tight font-black tracking-tight text-white sm:text-5xl">
-        {title}
-      </h1>
-      <p className="mt-2 text-lg font-medium text-neutral-400">{artist}</p>
+      <h1 className="page-title font-title text-white">{title}</h1>
+      <p className="page-subtitle text-neutral-400">{artist}</p>
     </header>
   );
 }

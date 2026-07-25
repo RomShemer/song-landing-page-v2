@@ -23,6 +23,23 @@ export function fontVars({ titleFont, bodyFont } = {}) {
   };
 }
 
+// cqw, not vw: inside the admin preview the page is laid out at a device width
+// inside a scaled box, so viewport units would size type to the browser window
+// and the preview would lie about how the title looks on a phone.
+export function typeVars({ title = {}, subtitle = {}, body = {} } = {}) {
+  return {
+    '--title-size': `clamp(${title.sizeMin}rem, ${title.sizeFluid}cqw, ${title.sizeMax}rem)`,
+    '--title-weight': title.weight,
+    '--title-spacing': `${title.letterSpacing}em`,
+    '--title-align': title.align === 'start' ? 'start' : 'center',
+    '--title-transform': title.transform,
+    '--subtitle-size': `${subtitle.size}rem`,
+    '--subtitle-weight': subtitle.weight,
+    '--subtitle-spacing': `${subtitle.letterSpacing}em`,
+    '--body-size': `${body.size}rem`,
+  };
+}
+
 export function themeVars(theme = {}) {
-  return { ...accentVars(theme.accent), ...fontVars(theme) };
+  return { ...accentVars(theme.accent), ...fontVars(theme), ...typeVars(theme) };
 }

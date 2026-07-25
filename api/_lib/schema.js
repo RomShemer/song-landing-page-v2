@@ -4,12 +4,25 @@ const FONT_KEYS = new Set([
   'heebo',
   'assistant',
   'rubik',
+  'noto-sans-hebrew',
   'alef',
+  'varela-round',
+  'arimo',
+  'frank-ruhl',
+  'noto-serif-hebrew',
+  'david-libre',
+  'miriam-libre',
+  'bellefair',
+  'tinos',
   'secular-one',
   'suez-one',
   'karantina',
   'amatic',
+  'gveret-levin',
 ]);
+
+export const TEXT_ALIGNS = new Set(['center', 'start']);
+export const TEXT_TRANSFORMS = new Set(['none', 'uppercase']);
 
 export const PLAYER_STYLES = new Set(['light', 'dark']);
 
@@ -23,6 +36,17 @@ export const EMPTY_CONTENT = {
     titleFont: 'system',
     bodyFont: 'system',
     playerStyle: 'light',
+    title: {
+      weight: 200,
+      letterSpacing: 0.5,
+      sizeMin: 3.5,
+      sizeFluid: 9,
+      sizeMax: 8,
+      align: 'center',
+      transform: 'none',
+    },
+    subtitle: { weight: 500, letterSpacing: 0, size: 1.125 },
+    body: { size: 0.9375 },
   },
   media: {
     coverImage: '',
@@ -72,6 +96,9 @@ const hexColor = (v, fallback) =>
 const fontKey = (v, fallback) =>
   typeof v === 'string' && FONT_KEYS.has(v) ? v : fallback;
 const oneOf = (v, allowed, fallback) => (allowed.has(v) ? v : fallback);
+/** Clamped number, so a hand-edited document cannot produce unreadable type. */
+const range = (v, min, max, fallback) =>
+  typeof v === 'number' && Number.isFinite(v) ? Math.min(Math.max(v, min), max) : fallback;
 const labelSet = (v, base) =>
   Object.fromEntries(
     Object.keys(base).map((key) => [
@@ -101,6 +128,27 @@ export function normalizeContent(input, base = EMPTY_CONTENT) {
       titleFont: fontKey(obj(i.theme).titleFont, b.theme.titleFont),
       bodyFont: fontKey(obj(i.theme).bodyFont, b.theme.bodyFont),
       playerStyle: oneOf(obj(i.theme).playerStyle, PLAYER_STYLES, b.theme.playerStyle),
+      title: {
+        weight: range(obj(obj(i.theme).title).weight, 100, 900, b.theme.title.weight),
+        letterSpacing: range(obj(obj(i.theme).title).letterSpacing, 0, 1, b.theme.title.letterSpacing),
+        sizeMin: range(obj(obj(i.theme).title).sizeMin, 1.5, 8, b.theme.title.sizeMin),
+        sizeFluid: range(obj(obj(i.theme).title).sizeFluid, 2, 20, b.theme.title.sizeFluid),
+        sizeMax: range(obj(obj(i.theme).title).sizeMax, 2, 16, b.theme.title.sizeMax),
+        align: oneOf(obj(obj(i.theme).title).align, TEXT_ALIGNS, b.theme.title.align),
+        transform: oneOf(
+          obj(obj(i.theme).title).transform,
+          TEXT_TRANSFORMS,
+          b.theme.title.transform
+        ),
+      },
+      subtitle: {
+        weight: range(obj(obj(i.theme).subtitle).weight, 100, 900, b.theme.subtitle.weight),
+        letterSpacing: range(obj(obj(i.theme).subtitle).letterSpacing, 0, 1, b.theme.subtitle.letterSpacing),
+        size: range(obj(obj(i.theme).subtitle).size, 0.75, 3, b.theme.subtitle.size),
+      },
+      body: {
+        size: range(obj(obj(i.theme).body).size, 0.75, 1.5, b.theme.body.size),
+      },
     },
     media: {
       coverImage: str(obj(i.media).coverImage, b.media.coverImage),

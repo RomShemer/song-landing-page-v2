@@ -12,6 +12,7 @@ export default function MediaField({
   value,
   onChange,
   preview = 'image',
+  children,
 }) {
   const inputRef = useRef(null);
   const [dragging, setDragging] = useState(false);
@@ -103,6 +104,8 @@ export default function MediaField({
           placeholder="או הדבקת כתובת קובץ"
           className="mt-2 w-full rounded-lg border border-adm-line bg-white px-2.5 py-1.5 font-mono text-[11px] text-adm-ink2 placeholder:text-adm-muted focus:border-adm-blue focus:outline-none"
         />
+
+        {children && <div className="mt-2">{children}</div>}
       </div>
 
       {pending && (
