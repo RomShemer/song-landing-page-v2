@@ -1,5 +1,12 @@
 import { useEffect, useState } from 'react';
-import { FaChartBar, FaCheck, FaSlidersH, FaSpinner, FaUndo } from 'react-icons/fa';
+import {
+  FaChartBar,
+  FaCheck,
+  FaSignOutAlt,
+  FaSlidersH,
+  FaSpinner,
+  FaUndo,
+} from 'react-icons/fa';
 import { useWebFonts } from '../hooks/useWebFonts';
 import { themeFontKeys } from '../theme';
 import DistributionCard from './DistributionCard';
@@ -16,6 +23,7 @@ const TABS = [
 
 export default function AdminApp() {
   const [authed, setAuthed] = useState(null);
+  const [hasSession, setHasSession] = useState(false);
   const [tab, setTab] = useState('content');
   const { draft, isDirty, status, update, replace, revert, publish } = useDraft();
 
@@ -32,10 +40,20 @@ export default function AdminApp() {
   useEffect(() => {
     fetch('/api/auth/session', { cache: 'no-store' })
       .then((r) => (r.ok ? r.json() : Promise.reject(new Error(r.status))))
-      // No auth service yet, so the gate opens rather than locking the UI out.
-      .then((d) => setAuthed(Boolean(d.authenticated)))
+      .then((d) => {
+        setHasSession(Boolean(d.configured));
+        // Without ADMIN_PASSWORD/ADMIN_SESSION_SECRET set there is no password
+        // to ask for, so the gate opens rather than locking the UI out.
+        setAuthed(Boolean(d.authenticated) || !d.configured);
+      })
+      // No auth route at all — running the plain Vite dev server.
       .catch(() => setAuthed(true));
   }, []);
+
+  const logout = async () => {
+    await fetch('/api/auth/logout', { method: 'POST' }).catch(() => {});
+    setAuthed(false);
+  };
 
   if (authed === null) return null;
   if (!authed) return <Login onSuccess={() => setAuthed(true)} />;
@@ -62,6 +80,17 @@ export default function AdminApp() {
               {label}
             </button>
           ))}
+
+          {hasSession && (
+            <button
+              type="button"
+              onClick={logout}
+              className="mr-auto inline-flex items-center gap-1.5 px-2.5 py-2.5 text-[11px] text-adm-muted transition hover:text-adm-blue"
+            >
+              <FaSignOutAlt />
+              יציאה
+            </button>
+          )}
         </div>
 
         {tab === 'content' ? (
