@@ -55,6 +55,13 @@ export const EMPTY_CONTENT = {
     pressPdf: '',
     imagesZip: '',
     pressImages: [],
+    labels: {
+      wav: { title: '', subtitle: '' },
+      mp3: { title: '', subtitle: '' },
+      pressPdf: { title: '', subtitle: '' },
+      gallery: { title: '', subtitle: '' },
+      imagesZip: { title: '', subtitle: '' },
+    },
   },
   contact: { phone: '', email: '' },
   flags: { downloadsLocked: false, lockedMessage: '' },
@@ -77,6 +84,17 @@ const hexColor = (v, fallback) =>
 const fontKey = (v, fallback) =>
   typeof v === 'string' && FONT_KEYS.has(v) ? v : fallback;
 const oneOf = (v, allowed, fallback) => (allowed.has(v) ? v : fallback);
+/** Per-card wording, so the client owns every string the page shows. */
+const labelSet = (v, base) =>
+  Object.fromEntries(
+    Object.keys(base).map((key) => [
+      key,
+      {
+        title: str(obj(obj(v)[key]).title, base[key].title),
+        subtitle: str(obj(obj(v)[key]).subtitle, base[key].subtitle),
+      },
+    ])
+  );
 const obj = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
 const arr = (v) => (Array.isArray(v) ? v : []);
 
@@ -135,6 +153,7 @@ export function normalizeContent(input, base = EMPTY_CONTENT) {
       )
         .map((img) => ({ src: str(obj(img).src), name: str(obj(img).name) }))
         .filter((img) => img.src),
+      labels: labelSet(obj(i.downloads).labels, b.downloads.labels),
     },
     contact: {
       phone: str(obj(i.contact).phone, b.contact.phone),

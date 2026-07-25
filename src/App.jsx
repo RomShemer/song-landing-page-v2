@@ -13,7 +13,6 @@ import { Accordion, AccordionItem } from './components/ui/Accordion';
 import Modal from './components/ui/Modal';
 import AudioPlayer from './components/AudioPlayer';
 import Hero from './components/Hero';
-import PrimaryActions from './components/PrimaryActions';
 import SocialRow from './components/SocialRow';
 import ClipSection from './components/sections/ClipSection';
 import ContactSection from './components/sections/ContactSection';
@@ -83,14 +82,6 @@ export default function App() {
           title={song.title}
           variant={theme.playerStyle}
           sticky
-        />
-
-        <PrimaryActions
-          downloads={downloads}
-          flags={flags}
-          showDownloads={showDownloads}
-          artist={song.artist}
-          title={song.title}
         />
 
         <Accordion onOpen={trackAccordionOpen}>

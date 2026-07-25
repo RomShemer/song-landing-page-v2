@@ -171,6 +171,15 @@ const defaultContent = normalizeContent({
     showWav: true,
     pressPdf: '/media/press-release.pdf',
     imagesZip: '/media/press-photos.zip',
+    // Every string shown on a download card. Editable in the dashboard, so the
+    // wording lives here and nowhere else — it used to be duplicated in JSX.
+    labels: {
+      wav: { title: 'הורדת WAV לשידור', subtitle: 'איכות מלאה' },
+      mp3: { title: 'הורדת MP3', subtitle: 'להאזנה והפצה' },
+      pressPdf: { title: 'קומוניקט', subtitle: 'PDF לחץ להורדת' },
+      gallery: { title: 'גלריית תמונות יח״צ', subtitle: 'סט תמונות' },
+      imagesZip: { title: 'כל התמונות', subtitle: 'ZIP' },
+    },
     pressImages: [
       { src: '/media/photos/press-official.jpg', name: 'Dor_Shemer_Press_Official.jpg' },
       { src: '/media/photos/press-01.jpg', name: 'Dor_Shemer_Press_01.jpg' },

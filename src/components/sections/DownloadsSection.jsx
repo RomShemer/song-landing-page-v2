@@ -1,18 +1,16 @@
 import { FaFileAlt, FaFileArchive, FaImages, FaMusic } from 'react-icons/fa';
 import DownloadCard from '../DownloadCard';
-import {
-  trackMediaDownload,
-  trackSongDownload,
-} from '../../utils/analytics';
+import { trackMediaDownload, trackSongDownload } from '../../utils/analytics';
 
 /**
- * Master files are gated by the client's downloadsLocked flag, which replaces
- * the hardcoded `const isDemo = true` and its alert(). Press collateral (PDF,
- * photos) stays available either way — only the audio masters are rights-sensitive.
+ * The single place downloads are offered. Every string on a card comes from
+ * downloads.labels so the client owns the wording — it was previously hardcoded
+ * here and again in an above-the-fold block, which is how the two ended up
+ * disagreeing.
  *
- * The whole section is hidden by the caller in listen-only mode, and each audio
- * file additionally respects its own showWav / showMp3 switch so the client can
- * offer, say, MP3 only without deleting the master URL.
+ * Hidden entirely by the caller in listen-only mode. Audio masters are gated by
+ * flags.downloadsLocked, and each respects its own showWav / showMp3 switch so
+ * one can be offered without deleting the other's URL.
  */
 export default function DownloadsSection({
   downloads,
@@ -23,6 +21,7 @@ export default function DownloadsSection({
 }) {
   const locked = Boolean(flags?.downloadsLocked);
   const slug = `${artist} - ${title}`.trim();
+  const label = (key) => downloads.labels?.[key] || {};
 
   return (
     <div className="flex flex-col gap-2.5">
@@ -35,8 +34,8 @@ export default function DownloadsSection({
       {downloads.wavUrl && downloads.showWav && (
         <DownloadCard
           icon={FaMusic}
-          title="הורדת WAV לשידור"
-          subtitle="איכות שידור מלאה"
+          title={label('wav').title}
+          subtitle={label('wav').subtitle}
           href={downloads.wavUrl}
           fileName={slug ? `${slug}.wav` : undefined}
           onClick={() => trackSongDownload('wav')}
@@ -48,8 +47,8 @@ export default function DownloadsSection({
       {downloads.mp3Url && downloads.showMp3 && (
         <DownloadCard
           icon={FaMusic}
-          title="הורדת MP3"
-          subtitle="להאזנה מהירה והפצה"
+          title={label('mp3').title}
+          subtitle={label('mp3').subtitle}
           href={downloads.mp3Url}
           fileName={slug ? `${slug}.mp3` : undefined}
           onClick={() => trackSongDownload('mp3')}
@@ -60,8 +59,8 @@ export default function DownloadsSection({
       {downloads.pressPdf && (
         <DownloadCard
           icon={FaFileAlt}
-          title="קומוניקט"
-          subtitle="PDF"
+          title={label('pressPdf').title}
+          subtitle={label('pressPdf').subtitle}
           href={downloads.pressPdf}
           onClick={() => trackMediaDownload('pressPDF')}
         />
@@ -70,8 +69,8 @@ export default function DownloadsSection({
       {downloads.pressImages?.length > 0 && (
         <DownloadCard
           icon={FaImages}
-          title="גלריית תמונות יח״צ"
-          subtitle="בחירת תמונות להורדה"
+          title={label('gallery').title}
+          subtitle={label('gallery').subtitle}
           onClick={() => {
             trackMediaDownload('gallery_open');
             onOpenGallery();
@@ -82,8 +81,8 @@ export default function DownloadsSection({
       {downloads.imagesZip && (
         <DownloadCard
           icon={FaFileArchive}
-          title="כל התמונות"
-          subtitle="ZIP"
+          title={label('imagesZip').title}
+          subtitle={label('imagesZip').subtitle}
           href={downloads.imagesZip}
           onClick={() => trackMediaDownload('images')}
         />
