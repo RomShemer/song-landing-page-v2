@@ -24,9 +24,9 @@ export default function DownloadsSection({
   const label = (key) => downloads.labels?.[key] || {};
 
   return (
-    <div className="flex flex-col gap-2.5">
+    <div className="grid grid-cols-2 gap-2.5">
       {locked && (
-        <p className="rounded-xl border border-amber-400/25 bg-amber-400/10 px-3 py-2.5 text-xs leading-relaxed text-amber-200">
+        <p className="col-span-2 rounded-xl border border-amber-400/25 bg-amber-400/10 px-3 py-2.5 text-xs leading-relaxed text-amber-200">
           {flags?.lockedMessage || 'ההורדות אינן זמינות כרגע.'}
         </p>
       )}
@@ -40,7 +40,6 @@ export default function DownloadsSection({
           fileName={slug ? `${slug}.wav` : undefined}
           onClick={() => trackSongDownload('wav')}
           locked={locked}
-          emphasis
         />
       )}
 
