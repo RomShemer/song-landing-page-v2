@@ -17,6 +17,26 @@ import { changedSections } from './changedSections';
 const ICONS = { mobile: FaMobileAlt, desktop: FaDesktop };
 const FLASH_MS = 1500;
 
+// Panel chrome above and below the device (header, controls, padding) plus the
+// sticky publish bar. Subtracted from the viewport so the whole card always fits
+// without a scrollbar of its own.
+const CHROME = { inline: 268, expanded: 196 };
+const INLINE_WIDTH = { mobile: 300, desktop: 470 };
+
+function useViewportHeight() {
+  const [height, setHeight] = useState(() =>
+    typeof window === 'undefined' ? 900 : window.innerHeight
+  );
+
+  useEffect(() => {
+    const onResize = () => setHeight(window.innerHeight);
+    window.addEventListener('resize', onResize);
+    return () => window.removeEventListener('resize', onResize);
+  }, []);
+
+  return height;
+}
+
 function useChangeFlash(content, rootRef) {
   const previous = useRef(content);
 
@@ -55,6 +75,7 @@ export default function Preview({ content, isDirty }) {
   const [expanded, setExpanded] = useState(false);
   const [nonce, setNonce] = useState(0);
   const rootRef = useRef(null);
+  const viewportHeight = useViewportHeight();
 
   useChangeFlash(content, rootRef);
 
@@ -70,11 +91,12 @@ export default function Preview({ content, isDirty }) {
     };
   }, [expanded]);
 
-  const { width } = DEVICES[device];
-  const inline = device === 'mobile' ? 300 : 460;
+  const { width, height } = DEVICES[device];
+  const room = viewportHeight - (expanded ? CHROME.expanded : CHROME.inline);
+  const byHeight = Math.max(0.18, room / height);
   const scale = expanded
-    ? Math.min((window.innerWidth - 160) / width, device === 'mobile' ? 0.85 : 0.62)
-    : inline / width;
+    ? Math.min(byHeight, (window.innerWidth - 160) / width, 1)
+    : Math.min(byHeight, INLINE_WIDTH[device] / width);
 
   const previewUrl = `/song?preview=1${mode === 'listen_only' ? '&listen_only=true' : ''}`;
 
@@ -149,7 +171,7 @@ export default function Preview({ content, isDirty }) {
           <h2 className="text-sm font-bold text-adm-ink">תצוגה מקדימה</h2>
           {controls}
         </div>
-        <div className="flex flex-1 items-start justify-center overflow-auto p-6 pb-28">
+        <div className="flex flex-1 items-center justify-center overflow-auto p-6">
           <DeviceFrame device={device} scale={scale}>
             {page}
           </DeviceFrame>

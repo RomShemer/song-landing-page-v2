@@ -64,17 +64,18 @@ export default function AdminApp() {
         </div>
 
         {tab === 'content' ? (
-          <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-start">
-            <ContentTab draft={draft} update={update} replace={replace} />
-            <div
-              className="lg:sticky lg:top-6 lg:max-h-[calc(100dvh-5.5rem)]
-                lg:overflow-y-auto lg:overscroll-contain lg:pe-1
-                lg:[scrollbar-width:thin]
-                lg:[&::-webkit-scrollbar-thumb]:rounded-full
-                lg:[&::-webkit-scrollbar-thumb]:bg-adm-muted/40
-                lg:[&::-webkit-scrollbar]:w-1.5"
-            >
-              <Preview content={draft} isDirty={isDirty} />
+          <div className="grid gap-4 lg:min-h-[calc(100dvh-6rem)] lg:grid-cols-[minmax(0,1fr)_auto]">
+            {/* Trailing space so the grid row outlasts the preview panel; without
+                it the sticky panel rides up at the end of the page. */}
+            <div className="lg:pb-56">
+              <ContentTab draft={draft} update={update} replace={replace} />
+            </div>
+            {/* The cell stretches to the row height so the sticky child has
+                slack to travel in; sticking the cell itself would pin nothing. */}
+            <div>
+              <div className="lg:sticky lg:top-6">
+                <Preview content={draft} isDirty={isDirty} />
+              </div>
             </div>
           </div>
         ) : (
