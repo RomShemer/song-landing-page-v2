@@ -1,5 +1,7 @@
 import { lazy, Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
+// Tailwind first, so its preflight cannot override component styles.
+import './index.css';
 import App from './App';
 import { resolveRoute } from './routes';
 
