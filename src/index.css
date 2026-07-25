@@ -4,11 +4,15 @@
 @theme {
   --font-sans: 'Heebo', system-ui, -apple-system, sans-serif;
 
-  /* Accent — a violet that sits well over the cover art's ambient glow */
-  --color-accent-300: oklch(0.83 0.09 300);
-  --color-accent-400: oklch(0.75 0.14 298);
-  --color-accent-500: oklch(0.66 0.19 296);
-  --color-accent-600: oklch(0.57 0.21 294);
+  /* Accent ramp. These are only the fallbacks: the client picks the base hue in
+     the admin dashboard and src/theme.js overrides these variables at runtime,
+     which re-tints every accent utility at once. */
+  --color-accent-100: color-mix(in oklab, #d99a4e 25%, white);
+  --color-accent-200: color-mix(in oklab, #d99a4e 45%, white);
+  --color-accent-300: color-mix(in oklab, #d99a4e 68%, white);
+  --color-accent-400: color-mix(in oklab, #d99a4e 86%, white);
+  --color-accent-500: #d99a4e;
+  --color-accent-600: color-mix(in oklab, #d99a4e 82%, black);
 
   /* Glassmorphism surfaces */
   --color-glass: color-mix(in oklab, white 8%, transparent);

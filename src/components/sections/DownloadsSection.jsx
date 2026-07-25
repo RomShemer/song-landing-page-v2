@@ -10,7 +10,9 @@ import {
  * the hardcoded `const isDemo = true` and its alert(). Press collateral (PDF,
  * photos) stays available either way — only the audio masters are rights-sensitive.
  *
- * The whole section is hidden by the caller in listen-only mode.
+ * The whole section is hidden by the caller in listen-only mode, and each audio
+ * file additionally respects its own showWav / showMp3 switch so the client can
+ * offer, say, MP3 only without deleting the master URL.
  */
 export default function DownloadsSection({
   downloads,
@@ -30,7 +32,7 @@ export default function DownloadsSection({
         </p>
       )}
 
-      {downloads.wavUrl && (
+      {downloads.wavUrl && downloads.showWav && (
         <DownloadCard
           icon={FaMusic}
           title="הורדת WAV לשידור"
@@ -43,7 +45,7 @@ export default function DownloadsSection({
         />
       )}
 
-      {downloads.mp3Url && (
+      {downloads.mp3Url && downloads.showMp3 && (
         <DownloadCard
           icon={FaMusic}
           title="הורדת MP3"

@@ -25,6 +25,7 @@ import PressSection from './components/sections/PressSection';
 
 import { useContent } from './content/useContent';
 import { useViewMode } from './hooks/useViewMode';
+import { accentVars } from './theme';
 import { trackAccordionOpen, trackMediaDownload } from './utils/analytics';
 
 export default function App() {
@@ -32,7 +33,7 @@ export default function App() {
   const viewMode = useViewMode();
   const [galleryOpen, setGalleryOpen] = useState(false);
 
-  const { song, media, links, content, credits, downloads, contact, flags } = doc;
+  const { song, theme, media, links, content, credits, downloads, contact, flags } = doc;
 
   // Listen-only links go to press who should hear the track but receive no
   // files — masters, press PDF and photo sets are all withheld.
@@ -46,7 +47,11 @@ export default function App() {
   const streamUrl = media.audioStreamUrl || downloads.mp3Url;
 
   return (
-    <div dir="rtl" className="relative min-h-dvh overflow-x-hidden">
+    <div
+      dir="rtl"
+      className="relative min-h-dvh overflow-x-hidden"
+      style={accentVars(theme.accent)}
+    >
       {media.backgroundImage && (
         <div
           aria-hidden="true"
@@ -60,14 +65,19 @@ export default function App() {
       />
 
       <main className="mx-auto flex w-full max-w-xl flex-col gap-5 px-4 pb-8">
-        <Hero title={song.title} artist={song.artist} coverImage={media.coverImage} />
+        <Hero
+          title={song.title}
+          artist={song.artist}
+          coverImage={media.coverImage}
+          showCover={media.showCover}
+          glowImage={media.backgroundImage}
+        />
 
         <SocialRow links={links} />
 
         <AudioPlayer src={streamUrl} title={song.title} artist={song.artist} sticky />
 
         <PrimaryActions
-          links={links}
           downloads={downloads}
           flags={flags}
           showDownloads={showDownloads}

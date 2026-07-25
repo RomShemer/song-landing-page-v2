@@ -10,9 +10,11 @@ export const SCHEMA_VERSION = 1;
 export const EMPTY_CONTENT = {
   schemaVersion: SCHEMA_VERSION,
   song: { title: '', artist: '', releaseYear: null },
+  theme: { accent: '#d99a4e' },
   media: {
     coverImage: '',
     backgroundImage: '',
+    showCover: false,
     audioStreamUrl: '',
     videoUrl: '',
   },
@@ -28,6 +30,8 @@ export const EMPTY_CONTENT = {
   downloads: {
     mp3Url: '',
     wavUrl: '',
+    showMp3: true,
+    showWav: true,
     pressPdf: '',
     imagesZip: '',
     pressImages: [],
@@ -41,6 +45,11 @@ const str = (v, fallback = '') => (typeof v === 'string' ? v : fallback);
 const bool = (v, fallback = false) => (typeof v === 'boolean' ? v : fallback);
 const num = (v, fallback = null) =>
   typeof v === 'number' && Number.isFinite(v) ? v : fallback;
+/** Only #rgb / #rrggbb survive — the value lands in a CSS custom property. */
+const hexColor = (v, fallback) =>
+  typeof v === 'string' && /^#(?:[0-9a-f]{3}|[0-9a-f]{6})$/i.test(v.trim())
+    ? v.trim().toLowerCase()
+    : fallback;
 const obj = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
 const arr = (v) => (Array.isArray(v) ? v : []);
 
@@ -59,8 +68,12 @@ export function normalizeContent(input, base = EMPTY_CONTENT) {
       artist: str(obj(i.song).artist, b.song.artist),
       releaseYear: num(obj(i.song).releaseYear, b.song.releaseYear),
     },
+    theme: {
+      accent: hexColor(obj(i.theme).accent, b.theme.accent),
+    },
     media: {
       coverImage: str(obj(i.media).coverImage, b.media.coverImage),
+      showCover: bool(obj(i.media).showCover, b.media.showCover),
       backgroundImage: str(obj(i.media).backgroundImage, b.media.backgroundImage),
       audioStreamUrl: str(obj(i.media).audioStreamUrl, b.media.audioStreamUrl),
       videoUrl: str(obj(i.media).videoUrl, b.media.videoUrl),
@@ -82,6 +95,8 @@ export function normalizeContent(input, base = EMPTY_CONTENT) {
     downloads: {
       mp3Url: str(obj(i.downloads).mp3Url, b.downloads.mp3Url),
       wavUrl: str(obj(i.downloads).wavUrl, b.downloads.wavUrl),
+      showMp3: bool(obj(i.downloads).showMp3, b.downloads.showMp3),
+      showWav: bool(obj(i.downloads).showWav, b.downloads.showWav),
       pressPdf: str(obj(i.downloads).pressPdf, b.downloads.pressPdf),
       imagesZip: str(obj(i.downloads).imagesZip, b.downloads.imagesZip),
       pressImages: (obj(i.downloads).pressImages === undefined

@@ -12,9 +12,17 @@ const defaultContent = normalizeContent({
     artist: 'דור שמר',
     releaseYear: 2026,
   },
+  theme: {
+    // Warm gold, picked to sit with the existing artwork. Fully client-editable
+    // in the dashboard — nothing downstream hardcodes a colour.
+    accent: '#d99a4e',
+  },
   media: {
-    coverImage: '/media/photos/press-official.jpg',
-    backgroundImage: '/media/background.jpg',
+    // No cover by default: the release photo carries the page as the background,
+    // and the client can upload a square cover and switch it on when there is one.
+    coverImage: '',
+    showCover: false,
+    backgroundImage: '/media/photos/press-official.jpg',
     audioStreamUrl: '',
     videoUrl: 'https://www.youtube.com/embed/jpYKL5SresI',
   },
@@ -152,6 +160,8 @@ const defaultContent = normalizeContent({
   downloads: {
     mp3Url: '',
     wavUrl: '',
+    showMp3: true,
+    showWav: true,
     pressPdf: '/media/press-release.pdf',
     imagesZip: '/media/press-photos.zip',
     pressImages: [

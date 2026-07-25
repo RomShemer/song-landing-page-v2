@@ -1,20 +1,25 @@
 /**
- * Cover art + title, with an ambient glow derived from the artwork itself:
- * the same image, blurred and scaled behind the card, so the page tints to
- * match whatever cover the client uploads.
+ * Title block, with an optional artwork card above it — the client decides in
+ * the dashboard whether to show one at all, since a press page for a single
+ * often looks stronger with the background photo carrying the image.
+ *
+ * The ambient glow is derived from whichever image is available so the page
+ * still tints to the artwork when no cover is shown.
  */
-export default function Hero({ title, artist, coverImage }) {
+export default function Hero({ title, artist, coverImage, showCover, glowImage }) {
+  const glow = glowImage || coverImage;
+
   return (
     <header className="relative flex flex-col items-center pt-10 pb-6 text-center">
-      {coverImage && (
+      {glow && (
         <div
           aria-hidden="true"
           className="pointer-events-none absolute inset-x-0 -top-16 -z-10 h-72 scale-110 bg-cover bg-center opacity-40 blur-3xl"
-          style={{ backgroundImage: `url(${coverImage})` }}
+          style={{ backgroundImage: `url(${glow})` }}
         />
       )}
 
-      {coverImage && (
+      {showCover && coverImage && (
         <img
           src={coverImage}
           alt={`עטיפת הסינגל ${title}`}
