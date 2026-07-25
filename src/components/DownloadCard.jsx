@@ -1,8 +1,8 @@
 import { FaLock } from 'react-icons/fa';
 
 /**
- * One download affordance, laid out vertically so two fit side by side without
- * truncating Hebrew labels.
+ * One download affordance: icon on the reading edge (right, in RTL) with the
+ * label beside it, as the original cards were laid out.
  *
  * Renders as an <a download> when a file is available and unlocked, as a
  * <button> when it opens something in-app (the gallery), and as an inert card
@@ -21,8 +21,8 @@ export default function DownloadCard({
   locked = false,
   fileName,
 }) {
-  const base = `group relative flex h-full flex-col items-center gap-2 overflow-hidden rounded-xl
-    border px-3 py-4 text-center transition-all duration-300`;
+  const base = `group relative flex h-full items-center gap-3 overflow-hidden rounded-xl
+    border px-3 py-3 text-right transition-all duration-300`;
 
   const interactive = `border-white/10 bg-white/[0.04]
     hover:-translate-y-0.5 hover:border-accent-500/50 hover:bg-white/[0.09]
@@ -55,7 +55,9 @@ export default function DownloadCard({
         {locked ? <FaLock /> : <Icon />}
       </span>
 
-      <span className="relative min-w-0">
+      <span className="relative min-w-0 flex-1">
+        {/* Wraps rather than truncates: at two columns on a phone these labels
+            are wider than the card. */}
         <span className="block text-sm leading-snug font-medium text-neutral-100">
           {title}
         </span>

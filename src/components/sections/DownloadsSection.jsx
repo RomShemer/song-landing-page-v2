@@ -31,18 +31,6 @@ export default function DownloadsSection({
         </p>
       )}
 
-      {downloads.wavUrl && downloads.showWav && (
-        <DownloadCard
-          icon={FaMusic}
-          title={label('wav').title}
-          subtitle={label('wav').subtitle}
-          href={downloads.wavUrl}
-          fileName={slug ? `${slug}.wav` : undefined}
-          onClick={() => trackSongDownload('wav')}
-          locked={locked}
-        />
-      )}
-
       {downloads.mp3Url && downloads.showMp3 && (
         <DownloadCard
           icon={FaMusic}
@@ -51,6 +39,18 @@ export default function DownloadsSection({
           href={downloads.mp3Url}
           fileName={slug ? `${slug}.mp3` : undefined}
           onClick={() => trackSongDownload('mp3')}
+          locked={locked}
+        />
+      )}
+
+      {downloads.wavUrl && downloads.showWav && (
+        <DownloadCard
+          icon={FaMusic}
+          title={label('wav').title}
+          subtitle={label('wav').subtitle}
+          href={downloads.wavUrl}
+          fileName={slug ? `${slug}.wav` : undefined}
+          onClick={() => trackSongDownload('wav')}
           locked={locked}
         />
       )}
