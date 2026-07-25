@@ -30,7 +30,7 @@ export default function GallerySection({ images = [] }) {
 
   return (
     <>
-      <div className="group relative flex min-h-[300px] items-center justify-center overflow-hidden rounded-xl border border-white/10 bg-black/40">
+      <div className="group relative flex min-h-[300px] items-center justify-center overflow-hidden rounded-3xl border border-white/10 bg-black/40">
         <img
           src={current.src}
           alt={current.name || `תמונת יח״צ ${index + 1}`}
@@ -94,7 +94,7 @@ export default function GallerySection({ images = [] }) {
           alt={current.name || `תמונת יח״צ ${index + 1}`}
           draggable={false}
           onContextMenu={(e) => e.preventDefault()}
-          className="mx-auto max-h-[85vh] w-auto rounded-xl object-contain"
+          className="mx-auto max-h-[85vh] w-auto rounded-3xl object-contain"
         />
       </Modal>
     </>

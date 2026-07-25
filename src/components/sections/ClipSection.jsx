@@ -6,7 +6,7 @@ export default function ClipSection({ videoUrl }) {
   }
 
   return (
-    <div className="aspect-video w-full overflow-hidden rounded-xl border border-white/10 bg-black">
+    <div className="aspect-video w-full overflow-hidden rounded-3xl border border-white/10 bg-black">
       <iframe
         src={videoUrl}
         title="קליפ רשמי"

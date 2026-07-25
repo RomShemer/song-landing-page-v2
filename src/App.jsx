@@ -148,7 +148,7 @@ export default function App() {
                 href={img.src}
                 download={img.name}
                 onClick={() => trackMediaDownload('gallery_image')}
-                className="group relative overflow-hidden rounded-xl border border-white/10"
+                className="group relative overflow-hidden rounded-2xl border border-white/10"
               >
                 <img
                   src={img.src}
