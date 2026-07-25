@@ -18,12 +18,19 @@ const FONT_KEYS = new Set([
   'amatic',
 ]);
 
+export const PLAYER_STYLES = new Set(['light', 'dark']);
+
 export const SCHEMA_VERSION = 1;
 
 export const EMPTY_CONTENT = {
   schemaVersion: SCHEMA_VERSION,
   song: { title: '', artist: '', releaseYear: null },
-  theme: { accent: '#d99a4e', titleFont: 'system', bodyFont: 'system' },
+  theme: {
+    accent: '#d99a4e',
+    titleFont: 'system',
+    bodyFont: 'system',
+    playerStyle: 'light',
+  },
   media: {
     coverImage: '',
     backgroundImage: '',
@@ -69,6 +76,7 @@ const hexColor = (v, fallback) =>
  */
 const fontKey = (v, fallback) =>
   typeof v === 'string' && FONT_KEYS.has(v) ? v : fallback;
+const oneOf = (v, allowed, fallback) => (allowed.has(v) ? v : fallback);
 const obj = (v) => (v && typeof v === 'object' && !Array.isArray(v) ? v : {});
 const arr = (v) => (Array.isArray(v) ? v : []);
 
@@ -91,6 +99,7 @@ export function normalizeContent(input, base = EMPTY_CONTENT) {
       accent: hexColor(obj(i.theme).accent, b.theme.accent),
       titleFont: fontKey(obj(i.theme).titleFont, b.theme.titleFont),
       bodyFont: fontKey(obj(i.theme).bodyFont, b.theme.bodyFont),
+      playerStyle: oneOf(obj(i.theme).playerStyle, PLAYER_STYLES, b.theme.playerStyle),
     },
     media: {
       coverImage: str(obj(i.media).coverImage, b.media.coverImage),

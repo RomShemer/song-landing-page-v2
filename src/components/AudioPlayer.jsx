@@ -2,27 +2,58 @@ import { FaPause, FaPlay, FaVolumeMute, FaVolumeUp } from 'react-icons/fa';
 import { formatTime, useAudioPlayer } from '../hooks/useAudioPlayer';
 import { trackAudioPlay } from '../utils/analytics';
 
-/** Shared styling for the two range inputs — a filled track with a round thumb. */
+/**
+ * Shared slider styling. The track and thumb colours come from CSS variables set
+ * by the variant below, so one class string serves both the light and dark
+ * player without duplicating the browser-specific pseudo-element selectors.
+ */
 const RANGE = `h-6 cursor-pointer appearance-none bg-transparent
   [&::-webkit-slider-runnable-track]:h-1.5 [&::-webkit-slider-runnable-track]:rounded-full
-  [&::-webkit-slider-runnable-track]:bg-[linear-gradient(to_right,var(--color-accent-400)_var(--progress),rgba(255,255,255,0.18)_var(--progress))]
+  [&::-webkit-slider-runnable-track]:bg-[linear-gradient(to_right,var(--player-fill)_var(--progress),var(--player-track)_var(--progress))]
   [&::-webkit-slider-thumb]:mt-[-4px] [&::-webkit-slider-thumb]:h-3.5 [&::-webkit-slider-thumb]:w-3.5
   [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:rounded-full
-  [&::-webkit-slider-thumb]:bg-white [&::-webkit-slider-thumb]:shadow
-  [&::-moz-range-track]:h-1.5 [&::-moz-range-track]:rounded-full [&::-moz-range-track]:bg-white/18
-  [&::-moz-range-progress]:h-1.5 [&::-moz-range-progress]:rounded-full [&::-moz-range-progress]:bg-accent-400
+  [&::-webkit-slider-thumb]:bg-[var(--player-thumb)] [&::-webkit-slider-thumb]:shadow
+  [&::-moz-range-track]:h-1.5 [&::-moz-range-track]:rounded-full
+  [&::-moz-range-track]:bg-[var(--player-track)]
+  [&::-moz-range-progress]:h-1.5 [&::-moz-range-progress]:rounded-full
+  [&::-moz-range-progress]:bg-[var(--player-fill)]
   [&::-moz-range-thumb]:h-3.5 [&::-moz-range-thumb]:w-3.5 [&::-moz-range-thumb]:border-0
-  [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-white`;
+  [&::-moz-range-thumb]:rounded-full [&::-moz-range-thumb]:bg-[var(--player-thumb)]`;
+
+const VARIANTS = {
+  light: {
+    vars: {
+      '--player-track': 'rgba(0,0,0,0.16)',
+      '--player-fill': 'var(--color-accent-500)',
+      '--player-thumb': '#171717',
+    },
+    shell: 'border-black/10 bg-white shadow-[0_8px_28px_-10px_rgba(0,0,0,0.45)]',
+    time: 'text-neutral-500',
+    volume: 'text-neutral-500 hover:bg-black/5 hover:text-neutral-900',
+    error: 'text-red-600',
+  },
+  dark: {
+    vars: {
+      '--player-track': 'rgba(255,255,255,0.18)',
+      '--player-fill': 'var(--color-accent-400)',
+      '--player-thumb': '#ffffff',
+    },
+    shell: 'border-white/10 bg-white/[0.07] backdrop-blur-md',
+    time: 'text-neutral-400',
+    volume: 'text-neutral-400 hover:bg-white/10 hover:text-neutral-100',
+    error: 'text-red-400',
+  },
+};
 
 /**
  * Single-row player laid out like the native control it replaces: play, elapsed
- * / total, progress, volume. The song title is deliberately not repeated —
- * it is already the largest thing on the page, directly above.
+ * / total, progress, volume. The song title is deliberately not repeated — it is
+ * already the largest thing on the page, directly above.
  *
  * Both sliders are range inputs rather than divs with click handlers, so
  * dragging, keyboard arrows and screen-reader semantics come for free.
  */
-export default function AudioPlayer({ src, title, sticky = false }) {
+export default function AudioPlayer({ src, title, variant = 'light', sticky = false }) {
   const {
     audioRef,
     isPlaying,
@@ -39,16 +70,18 @@ export default function AudioPlayer({ src, title, sticky = false }) {
 
   if (!src) return null;
 
+  const v = VARIANTS[variant] || VARIANTS.light;
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const level = muted ? 0 : volume;
 
   return (
     <div
-      className={
+      style={v.vars}
+      className={`${v.shell} ${
         sticky
-          ? 'sticky bottom-0 z-30 -mx-4 border-t border-white/10 bg-neutral-950/85 px-4 py-3 pb-[calc(0.75rem+var(--safe-bottom))] backdrop-blur-xl sm:static sm:mx-0 sm:rounded-full sm:border sm:bg-white/[0.07] sm:px-4 sm:py-2.5 sm:backdrop-blur-md'
-          : 'rounded-full border border-white/10 bg-white/[0.07] px-4 py-2.5 backdrop-blur-md'
-      }
+          ? 'sticky bottom-0 z-30 -mx-4 border-t px-4 py-3 pb-[calc(0.75rem+var(--safe-bottom))] sm:static sm:mx-0 sm:rounded-full sm:border sm:px-4 sm:py-2.5'
+          : 'rounded-full border px-4 py-2.5'
+      }`}
     >
       {/* Hidden on purpose: the row below is the control surface. */}
       <audio ref={audioRef} src={src} preload="metadata" />
@@ -65,12 +98,12 @@ export default function AudioPlayer({ src, title, sticky = false }) {
         </button>
 
         {error ? (
-          <p dir="rtl" className="flex-1 text-xs text-red-400">
+          <p dir="rtl" className={`flex-1 text-xs ${v.error}`}>
             לא ניתן לטעון את קובץ השמע
           </p>
         ) : (
           <>
-            <span className="shrink-0 text-xs tabular-nums text-neutral-400">
+            <span className={`shrink-0 text-xs tabular-nums ${v.time}`}>
               {formatTime(currentTime)} / {duration ? formatTime(duration) : '--:--'}
             </span>
 
@@ -93,7 +126,7 @@ export default function AudioPlayer({ src, title, sticky = false }) {
                 type="button"
                 onClick={toggleMute}
                 aria-label={muted || volume === 0 ? 'בטל השתקה' : 'השתק'}
-                className="inline-flex h-8 w-8 items-center justify-center rounded-full text-sm text-neutral-400 transition hover:bg-white/10 hover:text-neutral-100"
+                className={`inline-flex h-8 w-8 items-center justify-center rounded-full text-sm transition ${v.volume}`}
               >
                 {muted || volume === 0 ? <FaVolumeMute /> : <FaVolumeUp />}
               </button>

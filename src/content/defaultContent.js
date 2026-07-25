@@ -20,6 +20,9 @@ const defaultContent = normalizeContent({
     // loaded it, so the page always rendered in the OS UI face.
     titleFont: 'system',
     bodyFont: 'system',
+    // 'light' | 'dark' — the player is the one surface that reads better as a
+    // solid card than as glass, so it gets its own switch.
+    playerStyle: 'light',
   },
   media: {
     // No cover by default: the release photo carries the page as the background,
