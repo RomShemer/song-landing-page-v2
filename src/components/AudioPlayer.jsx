@@ -98,7 +98,9 @@ export default function AudioPlayer({ src, title, sticky = false }) {
                 {muted || volume === 0 ? <FaVolumeMute /> : <FaVolumeUp />}
               </button>
 
-              {/* Revealed on pointer devices; on phones the hardware keys own volume. */}
+              {/* Collapsed to nothing until hover or keyboard focus — width alone
+                  left the thumb visible as a stray dot, so opacity carries it.
+                  Hidden entirely on phones, where the hardware keys own volume. */}
               <input
                 type="range"
                 min={0}
@@ -108,7 +110,10 @@ export default function AudioPlayer({ src, title, sticky = false }) {
                 onChange={(e) => setVolume(Number(e.target.value))}
                 aria-label="עוצמת שמע"
                 style={{ '--progress': `${level * 100}%` }}
-                className={`hidden w-0 transition-all group-hover:w-16 focus-within:w-16 sm:block sm:focus:w-16 ${RANGE}`}
+                className={`hidden w-0 opacity-0 transition-all duration-200
+                  group-hover:w-16 group-hover:opacity-100
+                  group-focus-within:w-16 group-focus-within:opacity-100
+                  sm:block ${RANGE}`}
               />
             </div>
           </>
