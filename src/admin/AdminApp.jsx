@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FaChartBar, FaCheck, FaSlidersH, FaSpinner, FaUndo } from 'react-icons/fa';
 import { useWebFonts } from '../hooks/useWebFonts';
+import { themeFontKeys } from '../theme';
 import DistributionCard from './DistributionCard';
 import Login from './Login';
 import AnalyticsTab from './analytics/AnalyticsTab';
@@ -18,7 +19,7 @@ export default function AdminApp() {
   const [tab, setTab] = useState('content');
   const { draft, isDirty, status, update, replace, revert, publish } = useDraft();
 
-  useWebFonts([draft.theme.titleFont, draft.theme.bodyFont]);
+  useWebFonts(themeFontKeys(draft.theme));
 
   useEffect(() => {
     const meta = document.createElement('meta');

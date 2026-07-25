@@ -2,9 +2,11 @@
 
 /* ===== Design tokens ===== */
 @theme {
-  /* Overridden at runtime from theme.titleFont / theme.bodyFont. */
+  /* Overridden at runtime from the theme's per-element font settings. */
   --font-sans: system-ui, -apple-system, 'Segoe UI', Arial, sans-serif;
   --font-title: var(--font-sans);
+  --font-subtitle: var(--font-sans);
+  --font-sections: var(--font-sans);
   --font-body: var(--font-sans);
 
   /* Accent ramp. These are only the fallbacks: the client picks the base hue in
@@ -74,11 +76,18 @@
 }
 
 .page-subtitle {
+  font-family: var(--font-subtitle);
   font-size: var(--subtitle-size, 1.125rem);
   font-weight: var(--subtitle-weight, 500);
   letter-spacing: var(--subtitle-spacing, 0);
   padding-left: var(--subtitle-spacing, 0);
   text-align: var(--title-align, center);
+}
+
+.section-title {
+  font-family: var(--font-sections);
+  font-size: var(--section-size, 1rem);
+  font-weight: var(--section-weight, 500);
 }
 
 .preview-screen {
@@ -117,11 +126,18 @@
 }
 
 .page-subtitle {
+  font-family: var(--font-subtitle);
   font-size: var(--subtitle-size, 1.125rem);
   font-weight: var(--subtitle-weight, 500);
   letter-spacing: var(--subtitle-spacing, 0);
   padding-left: var(--subtitle-spacing, 0);
   text-align: var(--title-align, center);
+}
+
+.section-title {
+  font-family: var(--font-sections);
+  font-size: var(--section-size, 1rem);
+  font-weight: var(--section-weight, 500);
 }
 
 .preview-screen {

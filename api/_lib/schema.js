@@ -33,10 +33,9 @@ export const EMPTY_CONTENT = {
   song: { title: '', artist: '', releaseYear: null },
   theme: {
     accent: '#d99a4e',
-    titleFont: 'system',
-    bodyFont: 'system',
     playerStyle: 'light',
     title: {
+      font: 'system',
       weight: 200,
       letterSpacing: 0.5,
       sizeMin: 3.5,
@@ -45,8 +44,9 @@ export const EMPTY_CONTENT = {
       align: 'center',
       transform: 'none',
     },
-    subtitle: { weight: 500, letterSpacing: 0, size: 1.125 },
-    body: { size: 0.9375 },
+    subtitle: { font: 'system', weight: 500, letterSpacing: 0, size: 1.125 },
+    sections: { font: 'system', weight: 500, size: 1 },
+    body: { font: 'system', size: 0.9375 },
   },
   media: {
     coverImage: '',
@@ -125,10 +125,14 @@ export function normalizeContent(input, base = EMPTY_CONTENT) {
     },
     theme: {
       accent: hexColor(obj(i.theme).accent, b.theme.accent),
-      titleFont: fontKey(obj(i.theme).titleFont, b.theme.titleFont),
-      bodyFont: fontKey(obj(i.theme).bodyFont, b.theme.bodyFont),
       playerStyle: oneOf(obj(i.theme).playerStyle, PLAYER_STYLES, b.theme.playerStyle),
       title: {
+        // titleFont / bodyFont were flat before the per-element split; read them
+        // as a fallback so an already-saved document keeps its fonts.
+        font: fontKey(
+          obj(obj(i.theme).title).font ?? obj(i.theme).titleFont,
+          b.theme.title.font
+        ),
         weight: range(obj(obj(i.theme).title).weight, 100, 900, b.theme.title.weight),
         letterSpacing: range(obj(obj(i.theme).title).letterSpacing, 0, 1, b.theme.title.letterSpacing),
         sizeMin: range(obj(obj(i.theme).title).sizeMin, 1.5, 8, b.theme.title.sizeMin),
@@ -142,11 +146,21 @@ export function normalizeContent(input, base = EMPTY_CONTENT) {
         ),
       },
       subtitle: {
+        font: fontKey(obj(obj(i.theme).subtitle).font, b.theme.subtitle.font),
         weight: range(obj(obj(i.theme).subtitle).weight, 100, 900, b.theme.subtitle.weight),
         letterSpacing: range(obj(obj(i.theme).subtitle).letterSpacing, 0, 1, b.theme.subtitle.letterSpacing),
         size: range(obj(obj(i.theme).subtitle).size, 0.75, 3, b.theme.subtitle.size),
       },
+      sections: {
+        font: fontKey(obj(obj(i.theme).sections).font, b.theme.sections.font),
+        weight: range(obj(obj(i.theme).sections).weight, 100, 900, b.theme.sections.weight),
+        size: range(obj(obj(i.theme).sections).size, 0.8, 1.6, b.theme.sections.size),
+      },
       body: {
+        font: fontKey(
+          obj(obj(i.theme).body).font ?? obj(i.theme).bodyFont,
+          b.theme.body.font
+        ),
         size: range(obj(obj(i.theme).body).size, 0.75, 1.5, b.theme.body.size),
       },
     },

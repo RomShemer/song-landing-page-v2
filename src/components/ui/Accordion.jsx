@@ -9,7 +9,7 @@ const VARIANTS = {
     shell: 'border-white/10 bg-white/[0.06] backdrop-blur-md',
     header: 'text-right hover:bg-white/[0.04]',
     icon: 'bg-accent-500/20 text-accent-300',
-    title: 'text-neutral-100',
+    title: 'section-title text-neutral-100',
     chevron: 'text-neutral-400',
     panel: 'border-t border-white/10',
   },
@@ -17,7 +17,7 @@ const VARIANTS = {
     shell: 'border-adm-line bg-adm-card shadow-[0_2px_12px_-6px_rgba(15,43,92,0.18)]',
     header: 'text-right hover:bg-adm-blue-soft/60',
     icon: 'bg-adm-blue-soft text-adm-blue',
-    title: 'text-adm-ink',
+    title: 'text-base font-medium text-adm-ink',
     chevron: 'text-adm-muted',
     panel: 'border-t border-adm-line',
   },
@@ -75,7 +75,7 @@ export function AccordionItem({ id, title, hint, tip, icon: Icon, children }) {
           </span>
         )}
         <span className="min-w-0 flex-1">
-          <span className={`flex items-center gap-1.5 text-base font-medium ${v.title}`}>
+          <span className={`flex items-center gap-1.5 ${v.title}`}>
             {title}
             {tip && <InfoTip id={tipId} text={tip} />}
           </span>

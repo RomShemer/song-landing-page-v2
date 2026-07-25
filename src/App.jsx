@@ -25,7 +25,7 @@ import PressSection from './components/sections/PressSection';
 import { useContent } from './content/useContent';
 import { useViewMode } from './hooks/useViewMode';
 import { useWebFonts } from './hooks/useWebFonts';
-import { themeVars } from './theme';
+import { themeFontKeys, themeVars } from './theme';
 import { trackAccordionOpen, trackMediaDownload } from './utils/analytics';
 
 export default function App({ content: override, viewMode: viewModeOverride }) {
@@ -37,7 +37,7 @@ export default function App({ content: override, viewMode: viewModeOverride }) {
 
   const { song, theme, media, links, content, credits, downloads, contact, flags } = doc;
 
-  useWebFonts([theme.titleFont, theme.bodyFont]);
+  useWebFonts(themeFontKeys(theme));
 
   const showDownloads = viewMode === 'full';
 

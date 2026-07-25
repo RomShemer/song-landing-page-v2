@@ -9,10 +9,9 @@ const defaultContent = normalizeContent({
   },
   theme: {
     accent: '#d99a4e',
-    titleFont: 'system',
-    bodyFont: 'system',
     playerStyle: 'light',
     title: {
+      font: 'system',
       weight: 200,
       letterSpacing: 0.5,
       sizeMin: 3.5,
@@ -21,8 +20,9 @@ const defaultContent = normalizeContent({
       align: 'center',
       transform: 'none',
     },
-    subtitle: { weight: 500, letterSpacing: 0, size: 1.125 },
-    body: { size: 0.9375 },
+    subtitle: { font: 'system', weight: 500, letterSpacing: 0, size: 1.125 },
+    sections: { font: 'system', weight: 500, size: 1 },
+    body: { font: 'system', size: 0.9375 },
   },
   media: {
     coverImage: '',
