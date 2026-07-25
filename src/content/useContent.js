@@ -54,8 +54,13 @@ export function useContent({ fresh = false, skip = false } = {}) {
       signal: controller.signal,
       cache: fresh ? 'no-store' : 'default',
     })
-      .then((res) => (res.ok ? res.json() : Promise.reject(new Error(res.status))))
+      // 204 means the API is up but nothing has been published; the defaults
+      // already on screen are the right answer, so there is nothing to do.
+      .then((res) =>
+        res.status === 204 ? null : res.ok ? res.json() : Promise.reject(new Error(res.status))
+      )
       .then((doc) => {
+        if (!doc) return;
         setContent(withDevMedia(normalizeContent(doc, defaultContent)));
         setIsLive(true);
       })

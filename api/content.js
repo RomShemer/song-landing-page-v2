@@ -16,7 +16,10 @@ export default async function handler(request) {
     const fresh = searchParams.get('fresh') === '1';
     const doc = await readContent();
     if (!doc) {
-      return fail(404, 'nothing published yet', noStore);
+      // 204, not 404: the resource exists and is empty, which is the normal
+      // state of a fresh deploy. A 404 also puts a red error in every visitor's
+      // console for a condition that is not an error.
+      return new Response(null, { status: 204, headers: noStore });
     }
     return json(doc, { headers: fresh ? noStore : CACHED });
   }

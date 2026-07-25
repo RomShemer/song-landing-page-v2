@@ -22,9 +22,13 @@ export function useDraft() {
   useEffect(() => {
     let alive = true;
     fetch('/api/content?fresh=1', { cache: 'no-store' })
-      .then((r) => (r.ok ? r.json() : Promise.reject(new Error(r.status))))
+      // 204 = nothing published yet, so the defaults stay as the baseline the
+      // dirty check compares against.
+      .then((r) =>
+        r.status === 204 ? null : r.ok ? r.json() : Promise.reject(new Error(r.status))
+      )
       .then((doc) => {
-        if (!alive) return;
+        if (!alive || !doc) return;
         const live = normalizeContent(doc, defaultContent);
         setPublished(live);
         if (!loadStored()) setDraft(live);
