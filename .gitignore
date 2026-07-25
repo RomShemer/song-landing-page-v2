@@ -27,6 +27,10 @@ dist-ssr
 *.mp3
 *.wav
 
+# Local-only master files. Served at /local-media by vite dev and never copied
+# into dist/, so nothing here can be published by a deploy.
+local-media/
+
 
 # dependencies
 node_modules/
