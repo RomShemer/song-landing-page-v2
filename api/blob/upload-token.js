@@ -54,7 +54,11 @@ export default async function handler(req, res) {
     return send(res, 401, { error: 'unauthorized' });
   }
   if (!process.env.BLOB_READ_WRITE_TOKEN) {
-    return send(res, 503, { error: 'blob storage is not configured' });
+    return send(res, 503, {
+      error:
+        'BLOB_READ_WRITE_TOKEN is missing — link a Blob store to this Vercel ' +
+        'project, then redeploy so the variable is injected',
+    });
   }
 
   const body = await readBody(req);
