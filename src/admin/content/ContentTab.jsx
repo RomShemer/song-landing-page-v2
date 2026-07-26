@@ -25,10 +25,17 @@ import DownloadsEditor from './DownloadsEditor';
 import LinksEditor from './LinksEditor';
 import TypographyEditor from './TypographyEditor';
 import MediaField from './MediaField';
+import { useToast } from '../ui/toastContext';
 import PressEditor from './PressEditor';
 
 export default function ContentTab({ draft, update, replace }) {
   const { song, theme, media, links, content, credits, downloads, contact, flags } = draft;
+  const toast = useToast();
+
+  const removeImage = (i) => {
+    update('downloads', 'pressImages', downloads.pressImages.filter((_, idx) => idx !== i));
+    toast.success(`תמונה ${i + 1} נמחקה — יש לפרסם כדי לעדכן את העמוד`);
+  };
 
   const setLabel = (key, field, value) =>
     update('downloads', 'labels', {
@@ -161,13 +168,7 @@ export default function ContentTab({ draft, update, replace }) {
                 />
                 <DeleteButton
                   label={`מחיקת תמונה ${i + 1}`}
-                  onClick={() =>
-                    update(
-                      'downloads',
-                      'pressImages',
-                      downloads.pressImages.filter((_, idx) => idx !== i)
-                    )
-                  }
+                  onClick={() => removeImage(i)}
                 />
               </div>
             ))}

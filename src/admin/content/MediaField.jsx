@@ -2,6 +2,7 @@ import { useRef, useState } from 'react';
 import { upload } from '@vercel/blob/client';
 import { FaTimes, FaUpload } from 'react-icons/fa';
 import { Label } from '../ui/Field';
+import { useToast } from '../ui/toastContext';
 
 // The folder decides the size and type limits the server will allow, so it is
 // derived from the same `accept` the picker uses. Names must match FOLDERS in
@@ -24,9 +25,28 @@ function safeName(name) {
   return cleaned.length > 3 ? cleaned.slice(-80) : `file-${cleaned}`;
 }
 
+// The SDK reports "Failed to retrieve the client token" whatever our route
+// actually answered, so the reason it refused — no Blob store, or an expired
+// session — is lost. The session endpoint knows both, so ask it.
+async function explainFailure(error) {
+  const raw = error?.message || '';
+  if (/client token/i.test(raw)) {
+    try {
+      const info = await (await fetch('/api/auth/session', { cache: 'no-store' })).json();
+      if (!info.authenticated) return 'פג תוקף החיבור — יש להתחבר מחדש ולנסות שוב';
+      if (info.stores && !info.stores.blob) {
+        return 'אחסון הקבצים (Vercel Blob) אינו מחובר לפרויקט — אפשר להדביק כתובת קובץ בינתיים';
+      }
+    } catch {
+      /* no session route — fall through to whatever the SDK said */
+    }
+  }
+  return raw || 'ההעלאה נכשלה';
+}
+
 // Drag-and-drop shell for a single asset. The browser uploads straight to Vercel
 // Blob; a pasted URL still works, and if the upload route is unavailable the
-// field falls back to a local preview rather than losing the choice.
+// field keeps the stored value rather than substituting one that only works here.
 export default function MediaField({
   label,
   hint,
@@ -37,6 +57,7 @@ export default function MediaField({
   children,
 }) {
   const inputRef = useRef(null);
+  const toast = useToast();
   const [dragging, setDragging] = useState(false);
   const [pending, setPending] = useState(null);
   const [progress, setProgress] = useState(null);
@@ -58,14 +79,24 @@ export default function MediaField({
       setPending(null);
       setProgress(null);
       onChange(blob.url);
+      toast.success(`${label}: הקובץ הועלה — יש לפרסם כדי שיופיע בעמוד`);
     } catch (error) {
       // Deliberately does not write anything: a blob: URL lives only in this tab,
       // so publishing one would leave the page pointing at nothing. The stored
       // value stays as it was until a real upload replaces it.
       setProgress(null);
       setPending(null);
-      setFailure(error?.message || 'ההעלאה נכשלה');
+      const reason = await explainFailure(error);
+      setFailure(reason);
+      toast.error(`${label}: ${reason}`);
     }
+  };
+
+  const clear = () => {
+    setPending(null);
+    setFailure('');
+    onChange('');
+    toast.success(`${label}: הקובץ הוסר — יש לפרסם כדי לעדכן את העמוד`);
   };
 
   return (
@@ -108,10 +139,7 @@ export default function MediaField({
             </code>
             <button
               type="button"
-              onClick={() => {
-                setPending(null);
-                onChange('');
-              }}
+              onClick={clear}
               aria-label="הסרה"
               className="inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-adm-line bg-white text-xs text-adm-ink2 transition hover:border-red-300 hover:bg-red-50 hover:text-red-500"
             >
@@ -168,7 +196,7 @@ export default function MediaField({
 
       {failure && (
         <p className="mt-1.5 text-[11px] text-amber-600">
-          ההעלאה נכשלה ({failure}) — הקובץ לא נשמר. אפשר להדביק כתובת קובץ למטה.
+          ההעלאה נכשלה — {failure}
         </p>
       )}
     </div>

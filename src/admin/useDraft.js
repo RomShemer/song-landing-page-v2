@@ -80,15 +80,18 @@ export function useDraft() {
     localStorage.removeItem(STORAGE_KEY);
   }, [published]);
 
+  /** @returns {Promise<{ok: boolean, status: number}>} so the caller can say why. */
   const publish = useCallback(async () => {
     setStatus('saving');
     const body = { ...draft, updatedAt: new Date().toISOString() };
+    let outcome = { ok: false, status: 0 };
     try {
       const res = await fetch('/api/content', {
         method: 'PUT',
         headers: { 'content-type': 'application/json' },
         body: JSON.stringify(body),
       });
+      outcome = { ok: res.ok, status: res.status };
       if (!res.ok) throw new Error(res.status);
       setPublished(normalizeContent(body, defaultContent));
       localStorage.removeItem(STORAGE_KEY);
@@ -97,6 +100,7 @@ export function useDraft() {
       setStatus('error');
     }
     setTimeout(() => setStatus('idle'), 4000);
+    return outcome;
   }, [draft]);
 
   return { draft, published, isDirty, status, update, replace, revert, publish };

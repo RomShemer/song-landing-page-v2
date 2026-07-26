@@ -1,6 +1,7 @@
 import { FaArrowDown, FaArrowUp, FaPlus } from 'react-icons/fa';
 import DeleteButton from '../ui/DeleteButton';
 import TipButton from '../ui/TipButton';
+import { useToast } from '../ui/toastContext';
 
 const ROLES = [
   'מילים',
@@ -16,6 +17,14 @@ const ROLES = [
 ];
 
 export default function CreditsEditor({ credits, onChange }) {
+  const toast = useToast();
+
+  const remove = (i) => {
+    const credit = credits[i];
+    onChange(credits.filter((_, idx) => idx !== i));
+    toast.success(`${credit.role || 'הקרדיט'} נמחק — יש לפרסם כדי לעדכן את העמוד`);
+  };
+
   const set = (i, key, value) =>
     onChange(credits.map((c, idx) => (idx === i ? { ...c, [key]: value } : c)));
 
@@ -70,7 +79,7 @@ export default function CreditsEditor({ credits, onChange }) {
               disabled={i === credits.length - 1}
             />
             <DeleteButton
-              onClick={() => onChange(credits.filter((_, idx) => idx !== i))}
+              onClick={() => remove(i)}
               label={`מחיקת ${credit.role || 'קרדיט'}`}
             />
           </div>

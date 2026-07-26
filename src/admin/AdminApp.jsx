@@ -14,6 +14,8 @@ import Login from './Login';
 import AnalyticsTab from './analytics/AnalyticsTab';
 import ContentTab from './content/ContentTab';
 import Preview from './content/Preview';
+import { ToastProvider } from './ui/Toast';
+import { useToast } from './ui/toastContext';
 import { useDraft } from './useDraft';
 
 const TABS = [
@@ -21,13 +23,44 @@ const TABS = [
   { key: 'analytics', label: 'נתונים', icon: FaChartBar },
 ];
 
+// The provider has to sit above anything calling useToast, and the dashboard
+// itself does, so the export is the wrapper.
 export default function AdminApp() {
+  return (
+    <ToastProvider>
+      <Dashboard />
+    </ToastProvider>
+  );
+}
+
+function Dashboard() {
   const [authed, setAuthed] = useState(null);
   const [hasSession, setHasSession] = useState(false);
   const [tab, setTab] = useState('content');
   const { draft, isDirty, status, update, replace, revert, publish } = useDraft();
+  const toast = useToast();
 
   useWebFonts(themeFontKeys(draft.theme));
+
+  const onPublish = async () => {
+    const { ok, status: code } = await publish();
+    if (ok) {
+      toast.success('השינויים פורסמו — העמוד הציבורי מתעדכן תוך כדקה');
+      return;
+    }
+    toast.error(
+      code === 401
+        ? 'הפרסום נכשל — יש להתחבר מחדש'
+        : code === 0
+          ? 'הפרסום נכשל — אין חיבור לשרת'
+          : `הפרסום נכשל (שגיאה ${code})`
+    );
+  };
+
+  const onRevert = () => {
+    revert();
+    toast.success('השינויים בוטלו וחזרנו לגרסה שפורסמה');
+  };
 
   useEffect(() => {
     const meta = document.createElement('meta');
@@ -116,20 +149,16 @@ export default function AdminApp() {
       {tab === 'content' && (
         <div className="sticky bottom-0 border-t border-adm-line bg-adm-card/95 backdrop-blur-xl">
           <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3">
+            {/* Only the draft state lives here now; the outcome of a publish is
+                the toast's job, and saying it twice aged badly the first time. */}
             <span className="text-xs text-adm-ink2">
-              {status === 'saved'
-                ? 'השינויים פורסמו'
-                : status === 'error'
-                  ? 'הפרסום נכשל — שירות השמירה עדיין לא מחובר'
-                  : isDirty
-                    ? 'יש שינויים שלא פורסמו'
-                    : 'אין שינויים'}
+              {isDirty ? 'יש שינויים שלא פורסמו' : 'אין שינויים'}
             </span>
 
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={revert}
+                onClick={onRevert}
                 disabled={!isDirty}
                 className="inline-flex items-center gap-2 rounded-xl border border-adm-line bg-white px-3 py-2 text-xs font-medium text-adm-ink2 transition hover:border-adm-blue hover:text-adm-blue disabled:opacity-30"
               >
@@ -138,7 +167,7 @@ export default function AdminApp() {
               </button>
               <button
                 type="button"
-                onClick={publish}
+                onClick={onPublish}
                 disabled={!isDirty || status === 'saving'}
                 className="inline-flex items-center gap-2 rounded-xl bg-adm-blue px-4 py-2 text-xs font-semibold text-white shadow-[0_6px_18px_-6px_var(--color-adm-blue)] transition hover:bg-adm-blue-hover disabled:opacity-40 disabled:shadow-none"
               >
