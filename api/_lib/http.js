@@ -30,8 +30,12 @@ export async function readJson(request, maxBytes = 512 * 1024) {
 }
 
 export function readCookie(request, name) {
-  const header = request.headers.get('cookie') || '';
-  for (const part of header.split(';')) {
+  return readCookieValue(request.headers.get('cookie'), name);
+}
+
+/** Takes the raw header, so it also serves the Node-runtime route. */
+export function readCookieValue(header, name) {
+  for (const part of (header || '').split(';')) {
     const eq = part.indexOf('=');
     if (eq === -1) continue;
     if (part.slice(0, eq).trim() === name) return decodeURIComponent(part.slice(eq + 1).trim());

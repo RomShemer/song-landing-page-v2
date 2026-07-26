@@ -30,17 +30,24 @@ export default function devApi({ dir = 'api' } = {}) {
         if (route.split('/')[0].startsWith('_')) return next();
         if (!file.startsWith(root) || !existsSync(file)) return next();
 
-        const chunks = [];
-        for await (const chunk of req) chunks.push(chunk);
-
-        const request = new Request(url, {
-          method: req.method,
-          headers: req.headers,
-          body: chunks.length ? Buffer.concat(chunks) : undefined,
-        });
-
         try {
           const module = await server.ssrLoadModule(file);
+
+          // Mirror Vercel's dispatch: an edge function is called with a Web
+          // Request, a Node one with (req, res) — which is what we already hold.
+          if (module.config?.runtime !== 'edge') {
+            await module.default(req, res);
+            return;
+          }
+
+          const chunks = [];
+          for await (const chunk of req) chunks.push(chunk);
+          const request = new Request(url, {
+            method: req.method,
+            headers: req.headers,
+            body: chunks.length ? Buffer.concat(chunks) : undefined,
+          });
+
           const response = await module.default(request);
 
           res.statusCode = response.status;

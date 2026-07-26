@@ -1,4 +1,4 @@
-import { readCookie } from './http.js';
+import { readCookieValue } from './http.js';
 import { COOKIE_NAME, verifySession } from './session.js';
 
 export function sessionSecret() {
@@ -10,12 +10,17 @@ export function adminPassword() {
 }
 
 /**
- * True when the request carries a valid admin cookie. Without a configured
- * secret nothing authenticates — a missing env var must lock the door, not
- * open it.
+ * True when this Cookie header carries a valid admin session. Without a
+ * configured secret nothing authenticates — a missing env var must lock the
+ * door, not open it.
  */
-export async function isAdmin(request) {
+export async function isAdminCookie(header) {
   const secret = sessionSecret();
   if (!secret) return false;
-  return Boolean(await verifySession(secret, readCookie(request, COOKIE_NAME)));
+  return Boolean(await verifySession(secret, readCookieValue(header, COOKIE_NAME)));
+}
+
+/** The same check for a Web Request. */
+export async function isAdmin(request) {
+  return isAdminCookie(request.headers.get('cookie'));
 }

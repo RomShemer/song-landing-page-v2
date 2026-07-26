@@ -1,8 +1,15 @@
 import { handleUpload } from '@vercel/blob/client';
-import { isAdmin } from '../_lib/auth.js';
-import { fail, json, methodNotAllowed, noStore, readJson } from '../_lib/http.js';
+import { isAdminCookie } from '../_lib/auth.js';
 
-export const config = { runtime: 'edge' };
+// The only route on the Node runtime. @vercel/blob reaches for node:crypto and
+// undici, which the edge runtime refuses to bundle — and the token signing it
+// does is exactly why the package is worth having. Every other route stays on
+// edge, none of them importing anything from node_modules.
+//
+// Vercel's Node runtime calls the handler with (req, res), and handleUpload
+// takes that shape directly: it branches on `"credentials" in request` to tell
+// a Web Request from a Node one.
+export const config = { runtime: 'nodejs' };
 
 // The browser uploads to Vercel Blob directly and this route only mints a
 // scoped, short-lived token for it. A serverless request body caps at 4.5 MB
@@ -19,17 +26,43 @@ const FOLDERS = {
   archives: { types: ['application/zip', 'application/x-zip-compressed'], mb: 300 },
 };
 
-export default async function handler(request) {
-  if (request.method !== 'POST') return methodNotAllowed(['POST']);
-  if (!(await isAdmin(request))) return fail(401, 'unauthorized', noStore);
-  if (!process.env.BLOB_READ_WRITE_TOKEN) return fail(503, 'blob storage is not configured', noStore);
+function send(res, status, body) {
+  res.statusCode = status;
+  res.setHeader('content-type', 'application/json; charset=utf-8');
+  res.setHeader('cache-control', 'no-store, max-age=0');
+  res.end(JSON.stringify(body));
+}
 
-  const body = await readJson(request, 64 * 1024);
-  if (!body) return fail(400, 'expected a JSON body', noStore);
+/** Vercel parses a JSON body for us; the dev server does not. */
+async function readBody(req) {
+  if (req.body && typeof req.body === 'object') return req.body;
+  const chunks = [];
+  for await (const chunk of req) chunks.push(chunk);
+  try {
+    return JSON.parse(Buffer.concat(chunks).toString('utf8'));
+  } catch {
+    return null;
+  }
+}
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    res.setHeader('allow', 'POST');
+    return send(res, 405, { error: 'method not allowed' });
+  }
+  if (!(await isAdminCookie(req.headers.cookie))) {
+    return send(res, 401, { error: 'unauthorized' });
+  }
+  if (!process.env.BLOB_READ_WRITE_TOKEN) {
+    return send(res, 503, { error: 'blob storage is not configured' });
+  }
+
+  const body = await readBody(req);
+  if (!body) return send(res, 400, { error: 'expected a JSON body' });
 
   try {
     const result = await handleUpload({
-      request,
+      request: req,
       body,
       token: process.env.BLOB_READ_WRITE_TOKEN,
       onBeforeGenerateToken: async (pathname) => {
@@ -43,8 +76,8 @@ export default async function handler(request) {
         };
       },
     });
-    return json(result, { headers: noStore });
+    return send(res, 200, result);
   } catch (error) {
-    return fail(400, error.message || 'upload token refused', noStore);
+    return send(res, 400, { error: error.message || 'upload token refused' });
   }
 }
