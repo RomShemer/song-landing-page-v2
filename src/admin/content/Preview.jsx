@@ -21,7 +21,10 @@ const FLASH_MS = 1500;
 // sticky publish bar. Subtracted from the viewport so the whole card always fits
 // without a scrollbar of its own.
 const CHROME = { inline: 268, expanded: 196 };
-const INLINE_WIDTH = { mobile: 300, desktop: 470 };
+// Widest the device shell may be before it is measured for real, and the space
+// its bezel and the card's own padding take out of the column.
+const INLINE_FALLBACK = { mobile: 300, desktop: 470 };
+const SHELL_ALLOWANCE = 28;
 
 function useViewportHeight() {
   const [height, setHeight] = useState(() =>
@@ -35,6 +38,28 @@ function useViewportHeight() {
   }, []);
 
   return height;
+}
+
+// The column the preview sits in, measured rather than assumed. It used to be a
+// constant 470px for the desktop shell, which is wider than a phone — so choosing
+// the desktop preview on a phone made the browser expand the layout viewport and
+// scale the whole dashboard down.
+function useAvailableWidth(ref, fallback) {
+  const [width, setWidth] = useState(fallback);
+
+  useEffect(() => {
+    const el = ref.current;
+    if (!el || typeof ResizeObserver === 'undefined') return;
+
+    const observer = new ResizeObserver(([entry]) => {
+      const next = entry.contentRect.width;
+      if (next > 0) setWidth(next);
+    });
+    observer.observe(el);
+    return () => observer.disconnect();
+  }, [ref]);
+
+  return width;
 }
 
 function useChangeFlash(content, rootRef) {
@@ -75,7 +100,9 @@ export default function Preview({ content, isDirty }) {
   const [expanded, setExpanded] = useState(false);
   const [nonce, setNonce] = useState(0);
   const rootRef = useRef(null);
+  const shellRef = useRef(null);
   const viewportHeight = useViewportHeight();
+  const available = useAvailableWidth(shellRef, INLINE_FALLBACK[device]);
 
   useChangeFlash(content, rootRef);
 
@@ -94,9 +121,10 @@ export default function Preview({ content, isDirty }) {
   const { width, height } = DEVICES[device];
   const room = viewportHeight - (expanded ? CHROME.expanded : CHROME.inline);
   const byHeight = Math.max(0.18, room / height);
+  const byWidth = Math.max(available - SHELL_ALLOWANCE, 120) / width;
   const scale = expanded
     ? Math.min(byHeight, (window.innerWidth - 160) / width, 1)
-    : Math.min(byHeight, INLINE_WIDTH[device] / width);
+    : Math.min(byHeight, byWidth, INLINE_FALLBACK[device] / width);
 
   const previewUrl = `/song?preview=1${mode === 'listen_only' ? '&listen_only=true' : ''}`;
 
@@ -196,7 +224,7 @@ export default function Preview({ content, isDirty }) {
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">{controls}</div>
 
-      <div className="mt-4 flex justify-center">
+      <div ref={shellRef} className="mt-4 flex justify-center">
         <DeviceFrame device={device} scale={scale}>
           {page}
         </DeviceFrame>
