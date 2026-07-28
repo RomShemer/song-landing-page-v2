@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FaAlignCenter, FaFont, FaHeading, FaParagraph, FaUser } from 'react-icons/fa';
 import { FONTS, FONT_CATEGORIES, fontWeights } from '../../fonts';
-import { RangeField, SelectField } from '../ui/Field';
+import { ColorField, RangeField, SelectField } from '../ui/Field';
 
 const fontGroups = FONT_CATEGORIES.map((c) => ({
   label: c.label,
@@ -110,6 +110,13 @@ export default function TypographyEditor({ theme, update }) {
               value={theme.title.font}
               onChange={(v) => setTitle({ font: v })}
             />
+            <ColorField
+              id="title-color"
+              label="צבע"
+              hint="צבע כותרת השיר"
+              value={theme.title.color}
+              onChange={(v) => setTitle({ color: v })}
+            />
             <div className="grid gap-3 sm:grid-cols-2">
               <SelectField
                 id="title-weight"
@@ -183,6 +190,13 @@ export default function TypographyEditor({ theme, update }) {
               value={theme.subtitle.font}
               onChange={(v) => setSubtitle({ font: v })}
             />
+            <ColorField
+              id="subtitle-color"
+              label="צבע"
+              hint="צבע שם האמן/ית"
+              value={theme.subtitle.color}
+              onChange={(v) => setSubtitle({ color: v })}
+            />
             <div className="grid gap-3 sm:grid-cols-2">
               <SelectField
                 id="subtitle-weight"
@@ -223,6 +237,13 @@ export default function TypographyEditor({ theme, update }) {
               value={theme.sections.font}
               onChange={(v) => setSections({ font: v })}
             />
+            <ColorField
+              id="sections-color"
+              label="צבע"
+              hint="צבע כותרות המקטעים"
+              value={theme.sections.color}
+              onChange={(v) => setSections({ color: v })}
+            />
             <div className="grid gap-3 sm:grid-cols-2">
               <SelectField
                 id="sections-weight"
@@ -252,6 +273,13 @@ export default function TypographyEditor({ theme, update }) {
               group="הטקסט הרץ"
               value={theme.body.font}
               onChange={(v) => setBody({ font: v })}
+            />
+            <ColorField
+              id="body-color"
+              label="צבע"
+              hint="צבע הקומוניקט, המילים והקרדיטים"
+              value={theme.body.color}
+              onChange={(v) => setBody({ color: v })}
             />
             <RangeField
               id="body-size"

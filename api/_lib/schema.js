@@ -26,6 +26,11 @@ export const TEXT_TRANSFORMS = new Set(['none', 'uppercase']);
 
 export const PLAYER_STYLES = new Set(['light', 'dark']);
 
+// `stretch` fills the viewport at the cost of the aspect ratio; `contain` shows
+// the whole photo and may letterbox. Both are legitimate for a backdrop.
+export const BACKGROUND_SIZES = new Set(['cover', 'contain', 'stretch', 'auto']);
+export const BACKGROUND_POSITIONS = new Set(['center', 'top', 'bottom', 'start', 'end']);
+
 export const SCHEMA_VERSION = 1;
 
 export const EMPTY_CONTENT = {
@@ -43,10 +48,21 @@ export const EMPTY_CONTENT = {
       sizeMax: 8,
       align: 'center',
       transform: 'none',
+      color: '#ffffff',
     },
-    subtitle: { font: 'system', weight: 500, letterSpacing: 0, size: 1.125 },
-    sections: { font: 'system', weight: 500, size: 1 },
-    body: { font: 'system', size: 0.9375 },
+    subtitle: { font: 'system', weight: 500, letterSpacing: 0, size: 1.125, color: '#bdbdbd' },
+    sections: { font: 'system', weight: 500, size: 1, color: '#f5f5f5' },
+    body: { font: 'system', size: 0.9375, color: '#d4d4d4' },
+    // The photo behind the page. `overlay` is the dark scrim over it, and it
+    // used to be hardcoded at 0.8 with the image at 0.25 opacity, which is why
+    // the artwork was barely visible.
+    background: {
+      opacity: 0.55,
+      blur: 0,
+      size: 'cover',
+      position: 'center',
+      overlay: 0.55,
+    },
   },
   media: {
     coverImage: '',
@@ -156,17 +172,20 @@ export function normalizeContent(input, base = EMPTY_CONTENT) {
           TEXT_TRANSFORMS,
           b.theme.title.transform
         ),
+        color: hexColor(obj(obj(i.theme).title).color, b.theme.title.color),
       },
       subtitle: {
         font: fontKey(obj(obj(i.theme).subtitle).font, b.theme.subtitle.font),
         weight: range(obj(obj(i.theme).subtitle).weight, 100, 900, b.theme.subtitle.weight),
         letterSpacing: range(obj(obj(i.theme).subtitle).letterSpacing, 0, 1, b.theme.subtitle.letterSpacing),
         size: range(obj(obj(i.theme).subtitle).size, 0.75, 3, b.theme.subtitle.size),
+        color: hexColor(obj(obj(i.theme).subtitle).color, b.theme.subtitle.color),
       },
       sections: {
         font: fontKey(obj(obj(i.theme).sections).font, b.theme.sections.font),
         weight: range(obj(obj(i.theme).sections).weight, 100, 900, b.theme.sections.weight),
         size: range(obj(obj(i.theme).sections).size, 0.8, 1.6, b.theme.sections.size),
+        color: hexColor(obj(obj(i.theme).sections).color, b.theme.sections.color),
       },
       body: {
         font: fontKey(
@@ -174,6 +193,18 @@ export function normalizeContent(input, base = EMPTY_CONTENT) {
           b.theme.body.font
         ),
         size: range(obj(obj(i.theme).body).size, 0.75, 1.5, b.theme.body.size),
+        color: hexColor(obj(obj(i.theme).body).color, b.theme.body.color),
+      },
+      background: {
+        opacity: range(obj(obj(i.theme).background).opacity, 0, 1, b.theme.background.opacity),
+        blur: range(obj(obj(i.theme).background).blur, 0, 40, b.theme.background.blur),
+        size: oneOf(obj(obj(i.theme).background).size, BACKGROUND_SIZES, b.theme.background.size),
+        position: oneOf(
+          obj(obj(i.theme).background).position,
+          BACKGROUND_POSITIONS,
+          b.theme.background.position
+        ),
+        overlay: range(obj(obj(i.theme).background).overlay, 0, 1, b.theme.background.overlay),
       },
     },
     media: {

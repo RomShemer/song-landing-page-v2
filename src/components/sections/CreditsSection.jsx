@@ -26,7 +26,7 @@ export default function CreditsSection({ credits = [] }) {
           <dt className="relative text-[0.72em] tracking-wide text-neutral-500 uppercase transition-colors group-hover:text-accent-300">
             {credit.role}
           </dt>
-          <dd className="relative mt-0.5 text-[0.95em] font-medium text-neutral-100">
+          <dd className="relative mt-0.5 text-[0.95em] font-medium">
             {credit.name}
           </dd>
         </div>

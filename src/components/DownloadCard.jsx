@@ -1,4 +1,5 @@
 import { FaLock } from 'react-icons/fa';
+import { downloadUrl } from '../utils/downloadUrl';
 
 export default function DownloadCard({
   icon: Icon,
@@ -76,7 +77,9 @@ export default function DownloadCard({
 
   return (
     <a
-      href={href}
+      href={downloadUrl(href)}
+      // Kept for the same-origin case, where the browser does honour it. The
+      // ?download=1 above is what handles files served from Blob.
       download={fileName || true}
       onClick={onClick}
       className={`${base} ${interactive}`}

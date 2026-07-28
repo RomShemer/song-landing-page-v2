@@ -6,7 +6,7 @@ export default function PressSection({ html }) {
   return (
     <ScrollArea maxHeight="30rem">
       <div
-        className="pb-8 leading-relaxed text-neutral-300
+        className="pb-8 leading-relaxed
           [&_strong]:font-bold [&_strong]:text-white
           [&_em]:text-accent-300 [&_em]:not-italic
           [&_a]:text-accent-300 [&_a]:underline

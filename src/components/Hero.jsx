@@ -21,12 +21,12 @@ export default function Hero({ title, artist, coverImage, showCover, glowImage }
           decoding="async"
           draggable={false}
           onContextMenu={(e) => e.preventDefault()}
-          className="mb-6 aspect-square w-56 rounded-3xl border border-white/10 object-cover shadow-[0_24px_60px_-20px_rgba(0,0,0,0.9)] sm:w-64"
+          className="page-cover mb-6 aspect-square w-56 rounded-3xl border border-white/10 object-cover shadow-[0_24px_60px_-20px_rgba(0,0,0,0.9)] sm:w-64"
         />
       )}
 
-      <h1 className="page-title font-title text-white">{title}</h1>
-      <p className="page-subtitle text-neutral-400">{artist}</p>
+      <h1 className="page-title font-title">{title}</h1>
+      <p className="page-subtitle">{artist}</p>
     </header>
   );
 }

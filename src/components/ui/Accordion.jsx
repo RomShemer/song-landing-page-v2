@@ -9,7 +9,7 @@ const VARIANTS = {
     shell: 'border-white/10 bg-white/[0.06] backdrop-blur-md',
     header: 'text-right hover:bg-white/[0.04]',
     icon: 'bg-accent-500/20 text-accent-300',
-    title: 'section-title text-neutral-100',
+    title: 'section-title',
     chevron: 'text-neutral-400',
     panel: 'border-t border-white/10',
   },

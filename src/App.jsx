@@ -27,6 +27,7 @@ import { useViewMode } from './hooks/useViewMode';
 import { useWebFonts } from './hooks/useWebFonts';
 import { themeFontKeys, themeVars } from './theme';
 import { trackAccordionOpen, trackMediaDownload, trackPageView } from './utils/analytics';
+import { downloadUrl } from './utils/downloadUrl';
 
 export default function App({ content: override, viewMode: viewModeOverride }) {
   const live = useContent({ skip: Boolean(override) });
@@ -60,14 +61,11 @@ export default function App({ content: override, viewMode: viewModeOverride }) {
       {media.backgroundImage && (
         <div
           aria-hidden="true"
-          className="pointer-events-none fixed inset-0 -z-20 bg-cover bg-center opacity-25"
+          className="page-backdrop pointer-events-none fixed inset-0 -z-20"
           style={{ backgroundImage: `url(${media.backgroundImage})` }}
         />
       )}
-      <div
-        aria-hidden="true"
-        className="pointer-events-none fixed inset-0 -z-10 bg-neutral-950/80"
-      />
+      <div aria-hidden="true" className="page-overlay pointer-events-none fixed inset-0 -z-10" />
 
       <main className="mx-auto flex w-full max-w-xl flex-col gap-5 px-4 pb-8">
         <div data-section="hero">
@@ -149,7 +147,7 @@ export default function App({ content: override, viewMode: viewModeOverride }) {
             {downloads.pressImages.map((img) => (
               <a
                 key={img.src}
-                href={img.src}
+                href={downloadUrl(img.src)}
                 download={img.name}
                 onClick={() => trackMediaDownload('gallery_image')}
                 className="group relative overflow-hidden rounded-2xl border border-white/10"

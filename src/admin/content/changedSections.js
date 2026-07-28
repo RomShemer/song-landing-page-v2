@@ -16,6 +16,8 @@ const RULES = [
   [['theme', 'sections'], ACCORDIONS],
   [['theme', 'body'], PROSE],
   [['theme', 'playerStyle'], ['player']],
+  // The backdrop sits behind everything, so every block is affected by it.
+  [['theme', 'background'], EVERYTHING],
 
   [['media', 'coverImage'], ['hero']],
   [['media', 'showCover'], ['hero']],

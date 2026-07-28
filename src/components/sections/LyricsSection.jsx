@@ -5,7 +5,7 @@ export default function LyricsSection({ lyrics }) {
 
   return (
     <ScrollArea maxHeight="26rem">
-      <p className="pb-8 leading-loose whitespace-pre-line text-neutral-300">
+      <p className="pb-8 leading-loose whitespace-pre-line">
         {lyrics}
       </p>
     </ScrollArea>

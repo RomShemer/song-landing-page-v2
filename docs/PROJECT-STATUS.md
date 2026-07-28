@@ -59,8 +59,11 @@ hardcoded in a component.
 
 ```
 song      title, artist, releaseYear
-theme     accent, playerStyle, title{font,weight,letterSpacing,sizeMin,sizeFluid,
-          sizeMax,align,transform}, subtitle{...}, sections{...}, body{...}
+theme     accent, playerStyle,
+          title{font,weight,letterSpacing,sizeMin,sizeFluid,sizeMax,align,
+                transform,color}, subtitle{...,color}, sections{...,color},
+          body{...,color},
+          background{opacity,blur,size,position,overlay}
 media     coverImage, backgroundImage, showCover, audioStreamUrl, videoUrl
 links     spotify, appleMusic, youtube, tiktok, instagram
 content   prText, prHtml, lyrics
@@ -350,6 +353,15 @@ Two different problems with two different answers — see `docs/media-files.md`.
   as an arbitrary `font-family`.
 - **Every font must carry Hebrew glyphs.** A Latin-only face renders the page in a
   fallback.
+- **`downloadUrl()` exists because the `download` attribute is same-origin only.**
+  Once the masters moved to Blob, clicking a download opened the file in the tab —
+  an audio player instead of a save dialog. `?download=1` makes Blob answer with
+  `Content-Disposition: attachment`, and it is the only thing that works: a proxy
+  cannot pass a 43 MB body through a function.
+- **Backdrop legibility is a floor, not a hope.** `theme.background.overlay` is
+  what keeps text readable over any artwork. At the defaults, over a pure white
+  patch of photo, the title holds 9.3:1 and body copy 6.3:1. Lower the overlay far
+  and that guarantee goes with it.
 - **`normalizeContent` reads the old flat `titleFont`/`bodyFont` keys** as a
   fallback, so a document saved before the per-element typography split keeps its
   fonts.

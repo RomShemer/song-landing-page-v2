@@ -14,12 +14,14 @@ import { Accordion, AccordionItem } from '../../components/ui/Accordion';
 import {
   ColorField,
   NumberField,
+  RangeField,
   SelectField,
   TextArea,
   TextField,
   Toggle,
 } from '../ui/Field';
 import DeleteButton from '../ui/DeleteButton';
+import InfoTip from '../ui/InfoTip';
 import CreditsEditor from './CreditsEditor';
 import DownloadsEditor from './DownloadsEditor';
 import LinksEditor from './LinksEditor';
@@ -31,6 +33,9 @@ import PressEditor from './PressEditor';
 export default function ContentTab({ draft, update, replace }) {
   const { song, theme, media, links, content, credits, downloads, contact, flags } = draft;
   const toast = useToast();
+  const background = theme.background;
+  const setBackground = (values) =>
+    update('theme', 'background', { ...theme.background, ...values });
 
   const removeImage = (i) => {
     update('downloads', 'pressImages', downloads.pressImages.filter((_, idx) => idx !== i));
@@ -94,7 +99,7 @@ export default function ContentTab({ draft, update, replace }) {
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <MediaField
             label="תמונת רקע"
-            hint="מוצגת מטושטשת מאחורי כל העמוד"
+            hint="מוצגת מאחורי כל העמוד"
             accept="image/*"
             value={media.backgroundImage}
             onChange={(v) => update('media', 'backgroundImage', v)}
@@ -118,6 +123,74 @@ export default function ContentTab({ draft, update, replace }) {
               onChange={(v) => update('media', 'showCover', v)}
             />
           </MediaField>
+        </div>
+
+        <div className="mt-3 rounded-xl border border-adm-line bg-adm-bg/40 p-3">
+          <p className="flex items-center gap-1.5 text-xs font-semibold text-adm-ink">
+            עיצוב תמונת הרקע
+            <InfoTip text="הבהירות והכיסוי קובעים כמה מהתמונה נראה. אם הרקע נראה שחור — צריך להעלות את הבהירות או להנמיך את הכיסוי." />
+          </p>
+
+          <div className="mt-2.5 grid gap-3 sm:grid-cols-2">
+            <RangeField
+              id="bg-opacity"
+              label="בהירות התמונה"
+              hint="0% מסתיר אותה לגמרי"
+              value={background.opacity}
+              onChange={(v) => setBackground({ opacity: v })}
+              min={0}
+              max={1}
+              step={0.05}
+              format={(v) => `${Math.round(v * 100)}%`}
+            />
+            <RangeField
+              id="bg-overlay"
+              label="כיסוי כהה מעל התמונה"
+              hint="מבטיח שהטקסט יישאר קריא"
+              value={background.overlay}
+              onChange={(v) => setBackground({ overlay: v })}
+              min={0}
+              max={1}
+              step={0.05}
+              format={(v) => `${Math.round(v * 100)}%`}
+            />
+            <RangeField
+              id="bg-blur"
+              label="טשטוש"
+              hint="0 = תמונה חדה"
+              value={background.blur}
+              onChange={(v) => setBackground({ blur: v })}
+              min={0}
+              max={40}
+              step={1}
+              format={(v) => `${v}px`}
+            />
+            <SelectField
+              id="bg-size"
+              label="התאמת התמונה"
+              value={background.size}
+              onChange={(v) => setBackground({ size: v })}
+              options={[
+                { value: 'cover', label: 'מכסה את המסך (חיתוך בקצוות)' },
+                { value: 'contain', label: 'התמונה כולה נראית' },
+                { value: 'stretch', label: 'מתיחה לכל המסך' },
+                { value: 'auto', label: 'גודל מקורי' },
+              ]}
+            />
+            <SelectField
+              id="bg-position"
+              label="מיקום התמונה"
+              value={background.position}
+              onChange={(v) => setBackground({ position: v })}
+              options={[
+                { value: 'center', label: 'מרכז' },
+                { value: 'top', label: 'למעלה' },
+                { value: 'bottom', label: 'למטה' },
+                { value: 'start', label: 'לימין' },
+                { value: 'end', label: 'לשמאל' },
+              ]}
+            />
+          </div>
         </div>
 
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
