@@ -176,6 +176,17 @@
   }
 }
 
+/* Hover tooltips are unreachable on a touch device, but an absolutely positioned
+   box still counts toward the page's scroll width — a 224px tooltip centred on an
+   icon near the screen edge was pushing the admin 36px wider than the viewport and
+   shifting the whole layout. Screen readers are unaffected: aria-describedby
+   computes its text from the element whether or not it is displayed. */
+@media (hover: none) {
+  [role='tooltip'] {
+    display: none;
+  }
+}
+
 @layer base {
   html {
     scroll-behavior: smooth;

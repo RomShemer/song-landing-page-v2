@@ -54,7 +54,7 @@ export default function DistributionCard({ song, origin }) {
         </a>
       </header>
 
-      <div className="mt-4 grid gap-2.5 sm:grid-cols-2">
+      <div className="mt-4 grid grid-cols-1 gap-2.5 sm:grid-cols-2">
         {LINKS.map(({ key, icon: Icon, label, hint, description, path }) =>
           generated[key] ? (
             <CopyField key={key} label={label} hint={hint} value={`${base}${path}`} />

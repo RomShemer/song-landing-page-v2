@@ -64,7 +64,7 @@ export default function ContentTab({ draft, update, replace }) {
         tip="שם השיר, צבע מוביל, גופנים, רקע ועיצוב הנגן — כל מה שחל על העמוד כולו."
         icon={FaPalette}
       >
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div>
             <TextField
               id="song-title"
@@ -152,7 +152,7 @@ export default function ContentTab({ draft, update, replace }) {
               />
             </div>
 
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <RangeField
                 id="bg-opacity"
                 label="בהירות התמונה"
@@ -242,7 +242,7 @@ export default function ContentTab({ draft, update, replace }) {
               </MediaField>
             </div>
 
-            <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
               <RangeField
                 id="cover-width"
                 label="גודל"
@@ -316,7 +316,7 @@ export default function ContentTab({ draft, update, replace }) {
             <InfoTip text="רוחב העמוד, המרווח בין הבלוקים והמרווח מעל הכותרת. משפיע על כל העמוד." />
           </p>
 
-          <div className="mt-2.5 grid gap-3 sm:grid-cols-3">
+          <div className="mt-2.5 grid grid-cols-1 gap-3 sm:grid-cols-3">
             <RangeField
               id="layout-width"
               label="רוחב מקסימלי"
@@ -351,7 +351,7 @@ export default function ContentTab({ draft, update, replace }) {
           </div>
         </div>
 
-        <div className="mt-3 grid gap-3 sm:grid-cols-2">
+        <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <MediaField
             label="קובץ האזנה"
             hint="ריק — הנגן ישתמש בקובץ ה-MP3"
@@ -416,7 +416,7 @@ export default function ContentTab({ draft, update, replace }) {
               הוספת תמונה
             </button>
 
-            <div className="grid gap-3 border-t border-adm-line pt-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 border-t border-adm-line pt-3 sm:grid-cols-2">
               <TextField
                 id="label-gallery-title"
                 label="כותרת כרטיס הגלריה"
@@ -476,7 +476,7 @@ export default function ContentTab({ draft, update, replace }) {
 
       <AccordionItem id="contact" title="יצירת קשר"
         tip="טלפון ואימייל בתחתית העמוד. שדה ריק מסתיר את הכפתור." icon={FaPhone}>
-          <div className="grid gap-3 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
             <TextField
               id="contact-phone"
               label="טלפון"

@@ -380,6 +380,14 @@ Two different problems with two different answers — see `docs/media-files.md`.
   an audio player instead of a save dialog. `?download=1` makes Blob answer with
   `Content-Disposition: attachment`, and it is the only thing that works: a proxy
   cannot pass a 43 MB body through a function.
+- **Every grid in the dashboard needs a base `grid-cols-1`.** A grid whose column
+  count is only declared at a breakpoint falls back to one *implicit* column, which
+  is sized `auto` — from its content's minimum, not the container — so the widest
+  control decided the page width and Chrome zoomed the whole dashboard out to
+  426px on a 390px phone. `grid-cols-1` is `minmax(0,1fr)`, which can shrink.
+- **Hover tooltips are hidden on touch devices** (`@media (hover: none)`). They can
+  never be shown there, but an absolutely positioned 224px box still counts toward
+  scroll width, and one near the screen edge widened the page on its own.
 - **The document owns the design, so nothing about it is hardcoded.** Fifty-odd
   theme fields drive CSS custom properties (`src/theme.js` → `src/index.css`), and
   a hardcoded Tailwind colour or size in a component silently beats its variable —

@@ -118,7 +118,7 @@ export default function TypographyEditor({ theme, update }) {
               value={theme.title.color}
               onChange={(v) => setTitle({ color: v })}
             />
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <RangeField
                 id="title-gap-above"
                 label="מרווח מעל הכותרת"
@@ -140,7 +140,7 @@ export default function TypographyEditor({ theme, update }) {
                 format={(v) => `${v}rem`}
               />
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <SelectField
                 id="title-weight"
                 label="עובי"
@@ -180,7 +180,7 @@ export default function TypographyEditor({ theme, update }) {
               step={0.5}
               format={(v) => `${v}cqw`}
             />
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <RangeField
                 id="title-min"
                 label="גודל מינימלי"
@@ -220,7 +220,7 @@ export default function TypographyEditor({ theme, update }) {
               value={theme.subtitle.color}
               onChange={(v) => setSubtitle({ color: v })}
             />
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <SelectField
                 id="subtitle-weight"
                 label="עובי"
@@ -267,7 +267,7 @@ export default function TypographyEditor({ theme, update }) {
               value={theme.sections.color}
               onChange={(v) => setSections({ color: v })}
             />
-            <div className="grid gap-3 sm:grid-cols-2">
+            <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
               <SelectField
                 id="sections-weight"
                 label="עובי"
@@ -293,7 +293,7 @@ export default function TypographyEditor({ theme, update }) {
                 <InfoTip text="הכרטיסים של הגלריה, הקומוניקט, המילים והשאר. השקיפות היא של הצבע מעל הרקע — 0% שקוף לגמרי." />
               </p>
 
-              <div className="mt-2.5 grid gap-3 sm:grid-cols-2">
+              <div className="mt-2.5 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 <ColorField
                   id="panel-color"
                   label="צבע הכרטיס"

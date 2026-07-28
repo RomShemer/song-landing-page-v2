@@ -12,7 +12,7 @@ export default function DeleteButton({ onClick, label = 'מחיקה', className 
       <FaTrash />
       <span
         role="tooltip"
-        className="pointer-events-none absolute top-full right-1/2 z-40 mt-1 w-max max-w-48
+        className="pointer-events-none absolute top-full right-1/2 z-40 mt-1 w-max max-w-[min(12rem,calc(100vw-2rem))]
           translate-x-1/2 rounded-lg border border-adm-line bg-white px-2 py-1 text-[11px]
           font-normal whitespace-nowrap text-adm-ink2 opacity-0 shadow-lg transition-opacity
           duration-150 group-hover/tip:opacity-100"

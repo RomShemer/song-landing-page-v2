@@ -135,7 +135,7 @@ function Dashboard() {
         </div>
 
         {tab === 'content' ? (
-          <div className="grid gap-4 lg:min-h-[calc(100dvh-6rem)] lg:grid-cols-[minmax(0,1fr)_auto]">
+          <div className="grid grid-cols-1 gap-4 lg:min-h-[calc(100dvh-6rem)] lg:grid-cols-[minmax(0,1fr)_auto]">
             {/* Trailing space so the grid row outlasts the preview panel; without
                 it the sticky panel rides up at the end of the page. */}
             <div className="lg:pb-56">
