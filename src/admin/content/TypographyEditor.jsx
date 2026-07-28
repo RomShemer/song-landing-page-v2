@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { FaAlignCenter, FaFont, FaHeading, FaParagraph, FaUser } from 'react-icons/fa';
 import { FONTS, FONT_CATEGORIES, fontWeights } from '../../fonts';
-import { ColorField, RangeField, SelectField, Toggle } from '../ui/Field';
+import { ColorField, RangeField, SelectField } from '../ui/Field';
 import InfoTip from '../ui/InfoTip';
 
 const fontGroups = FONT_CATEGORIES.map((c) => ({
@@ -118,17 +118,6 @@ export default function TypographyEditor({ theme, update }) {
               value={theme.title.color}
               onChange={(v) => setTitle({ color: v })}
             />
-            <Toggle
-              id="title-show"
-              label="הצגת שם השיר בעמוד"
-              hint={
-                theme.title.show
-                  ? undefined
-                  : 'מוסתר — שם השיר עדיין מופיע בכותרת הדפדפן ובשיתוף'
-              }
-              value={theme.title.show}
-              onChange={(v) => setTitle({ show: v })}
-            />
             <div className="grid gap-3 sm:grid-cols-2">
               <RangeField
                 id="title-gap-above"
@@ -230,12 +219,6 @@ export default function TypographyEditor({ theme, update }) {
               hint="צבע שם האמן/ית"
               value={theme.subtitle.color}
               onChange={(v) => setSubtitle({ color: v })}
-            />
-            <Toggle
-              id="subtitle-show"
-              label="הצגת שם האמן/ית בעמוד"
-              value={theme.subtitle.show}
-              onChange={(v) => setSubtitle({ show: v })}
             />
             <div className="grid gap-3 sm:grid-cols-2">
               <SelectField

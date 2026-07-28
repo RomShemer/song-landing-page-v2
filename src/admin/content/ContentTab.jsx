@@ -36,6 +36,9 @@ export default function ContentTab({ draft, update, replace }) {
   const background = theme.background;
   const setBackground = (values) =>
     update('theme', 'background', { ...theme.background, ...values });
+  const setTitleTheme = (values) => update('theme', 'title', { ...theme.title, ...values });
+  const setSubtitleTheme = (values) =>
+    update('theme', 'subtitle', { ...theme.subtitle, ...values });
   const cover = theme.cover;
   const setCover = (values) => update('theme', 'cover', { ...theme.cover, ...values });
   const layout = theme.layout;
@@ -62,18 +65,48 @@ export default function ContentTab({ draft, update, replace }) {
         icon={FaPalette}
       >
         <div className="grid gap-3 sm:grid-cols-2">
-          <TextField
-            id="song-title"
-            label="שם השיר"
-            value={song.title}
-            onChange={(v) => update('song', 'title', v)}
-          />
-          <TextField
-            id="song-artist"
-            label="שם האמן/ית"
-            value={song.artist}
-            onChange={(v) => update('song', 'artist', v)}
-          />
+          <div>
+            <TextField
+              id="song-title"
+              label="שם השיר"
+              value={song.title}
+              onChange={(v) => update('song', 'title', v)}
+            />
+            <div className="mt-2">
+              <Toggle
+                id="title-show"
+                label="הצגת שם השיר בעמוד"
+                hint={
+                  theme.title.show
+                    ? undefined
+                    : 'מוסתר בעמוד — עדיין מופיע בכותרת החלון ובשיתוף'
+                }
+                value={theme.title.show}
+                onChange={(v) => setTitleTheme({ show: v })}
+              />
+            </div>
+          </div>
+          <div>
+            <TextField
+              id="song-artist"
+              label="שם האמן/ית"
+              value={song.artist}
+              onChange={(v) => update('song', 'artist', v)}
+            />
+            <div className="mt-2">
+              <Toggle
+                id="subtitle-show"
+                label="הצגת שם האמן/ית בעמוד"
+                hint={
+                  theme.subtitle.show
+                    ? undefined
+                    : 'מוסתר בעמוד — עדיין מופיע בכותרת החלון ובשיתוף'
+                }
+                value={theme.subtitle.show}
+                onChange={(v) => setSubtitleTheme({ show: v })}
+              />
+            </div>
+          </div>
           <NumberField
             id="song-year"
             label="שנת יציאה"
