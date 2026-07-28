@@ -1,6 +1,6 @@
 import { isAdmin } from './_lib/auth.js';
 import { dayRange } from './_lib/days.js';
-import { fail, json, methodNotAllowed, noStore } from './_lib/http.js';
+import { fail, forMethod, isRead, json, methodNotAllowed, noStore } from './_lib/http.js';
 import { fromFlat, hgetallNumeric, pipeline } from './_lib/kv.js';
 
 export const config = { runtime: 'edge' };
@@ -32,7 +32,7 @@ function withBuckets(flat) {
 }
 
 export default async function handler(request) {
-  if (request.method !== 'GET') return methodNotAllowed(['GET']);
+  if (!isRead(request)) return methodNotAllowed(['GET', 'HEAD']);
   if (!(await isAdmin(request))) return fail(401, 'unauthorized', noStore);
 
   const asked = Number(new URL(request.url).searchParams.get('days'));
@@ -51,5 +51,5 @@ export default async function handler(request) {
     return { ...row, ...filled };
   });
 
-  return json({ days, totals: withBuckets(totals), series }, { headers: noStore });
+  return forMethod(request, json({ days, totals: withBuckets(totals), series }, { headers: noStore }));
 }

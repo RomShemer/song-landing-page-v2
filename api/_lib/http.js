@@ -15,6 +15,17 @@ export function methodNotAllowed(allow) {
   return fail(405, 'method not allowed', { allow: allow.join(', ') });
 }
 
+export const isRead = (request) => request.method === 'GET' || request.method === 'HEAD';
+
+/**
+ * HEAD has to answer exactly as GET does but without a body (RFC 9110), or
+ * uptime monitors and link checkers see a 405 on a perfectly readable resource.
+ */
+export function forMethod(request, response) {
+  if (request.method !== 'HEAD') return response;
+  return new Response(null, { status: response.status, headers: response.headers });
+}
+
 /** Parsed JSON body, or null when it is absent, malformed or oversized. */
 export async function readJson(request, maxBytes = 512 * 1024) {
   const declared = Number(request.headers.get('content-length') || 0);

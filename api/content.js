@@ -1,6 +1,6 @@
 import { isAdmin } from './_lib/auth.js';
 import { readContent, writeContent } from './_lib/content.js';
-import { fail, json, methodNotAllowed, noStore, readJson } from './_lib/http.js';
+import { fail, forMethod, isRead, json, methodNotAllowed, noStore, readJson } from './_lib/http.js';
 import { normalizeContent } from './_lib/schema.js';
 
 export const config = { runtime: 'edge' };
@@ -12,7 +12,7 @@ const CACHED = { 'cache-control': 'public, s-maxage=60, stale-while-revalidate=6
 export default async function handler(request) {
   const { searchParams } = new URL(request.url);
 
-  if (request.method === 'GET') {
+  if (isRead(request)) {
     const fresh = searchParams.get('fresh') === '1';
     const doc = await readContent();
     if (!doc) {
@@ -21,7 +21,7 @@ export default async function handler(request) {
       // console for a condition that is not an error.
       return new Response(null, { status: 204, headers: noStore });
     }
-    return json(doc, { headers: fresh ? noStore : CACHED });
+    return forMethod(request, json(doc, { headers: fresh ? noStore : CACHED }));
   }
 
   if (request.method === 'PUT') {
@@ -37,5 +37,5 @@ export default async function handler(request) {
     return json({ ok: true, version, updatedAt: doc.updatedAt }, { headers: noStore });
   }
 
-  return methodNotAllowed(['GET', 'PUT']);
+  return methodNotAllowed(['GET', 'HEAD', 'PUT']);
 }
