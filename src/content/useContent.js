@@ -40,14 +40,30 @@ function withDevMedia(doc) {
   };
 }
 
+// /api/page inlines the published document into the HTML, so the very first
+// paint is the real content instead of the defaults flashing past. Absent — the
+// admin, a local `vite preview`, a stale CDN copy — the fetch below still runs.
+function readInlined() {
+  try {
+    const doc = window.__EPK_CONTENT__;
+    return doc && typeof doc === 'object' ? normalizeContent(doc, defaultContent) : null;
+  } catch {
+    return null;
+  }
+}
+
 export function useContent({ fresh = false, skip = false } = {}) {
   const [previewDoc] = useState(readDraftPreview);
-  const [content, setContent] = useState(() => withDevMedia(previewDoc || defaultContent));
-  const [isLive, setIsLive] = useState(false);
+  const [inlined] = useState(readInlined);
+  const [content, setContent] = useState(() =>
+    withDevMedia(previewDoc || inlined || defaultContent)
+  );
+  const [isLive, setIsLive] = useState(Boolean(inlined) && !previewDoc);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (skip || previewDoc) return;
+    // `fresh` is the dashboard asking for the live document regardless.
+    if (skip || previewDoc || (inlined && !fresh)) return;
     const controller = new AbortController();
 
     fetch(fresh ? '/api/content?fresh=1' : '/api/content', {
@@ -69,7 +85,7 @@ export function useContent({ fresh = false, skip = false } = {}) {
       });
 
     return () => controller.abort();
-  }, [fresh, skip, previewDoc]);
+  }, [fresh, skip, previewDoc, inlined]);
 
   return { content, isLive, error, setContent };
 }

@@ -79,12 +79,19 @@ contact   phone, email
 flags     downloadsLocked, lockedMessage
 ```
 
-**Content loading.** `src/content/defaultContent.js` renders on first paint, then
-`useContent()` fetches `/api/content` and merges it over the top. No spinner, and
-the page stays fully usable if the API is unreachable. `GET` answers **204**, not
-an empty document, when nothing has been published — a blank document would merge
-its empty strings over those defaults and wipe the page, and a 404 would put a
-console error in front of every visitor to a fresh deploy.
+**Content loading.** `/` and `/song` are served by `api/page.js`, an edge function
+that fetches the built `index.html` and inlines the published document into it as
+`window.__EPK_CONTENT__`, rewriting `<title>` and the OG/Twitter tags on the way
+through. `useContent()` reads that synchronously, so **the first painted frame is
+already the real content** — previously the defaults painted first and the real
+document replaced them a frame later, which showed the previous song title and
+artwork to every visitor. Without the inlined document (the dashboard, a local
+`vite preview`, a KV outage) the fetch path still runs, so nothing depends on it.
+
+`GET /api/content` answers **204**, not an empty document, when nothing has been
+published — a blank document would merge its empty strings over the defaults and
+wipe the page, and a 404 would put a console error in front of every visitor to a
+fresh deploy.
 
 **Theming.** The client's choices become CSS custom properties on the page root
 (`src/theme.js`). Tailwind's accent utilities compile to `var(--color-accent-N)`
@@ -379,10 +386,14 @@ Two different problems with two different answers — see `docs/media-files.md`.
   which is exactly how `text-white` and `text-neutral-300` made the first colour
   pickers do nothing. If a control appears not to work, look for a utility class
   winning over the variable before looking anywhere else.
-- **The tab title follows `song.title`** at runtime, but the **OG/Twitter tags in
-  `index.html` are static** — link-preview crawlers do not run JavaScript, so a
-  shared link still shows whatever is in the HTML. Making those follow the
-  document needs HTML rewriting at the edge.
+- **`api/page.js` is what makes the first paint correct**, and the rewrites in
+  `vercel.json` are what point `/` and `/song` at it. Remove either and the page
+  still works — it just goes back to flashing the previous song for a frame, and
+  link previews go back to the literals in `index.html`.
+- **The dev plugin must load `_lib/content.js` through `ssrLoadModule`**, not a
+  plain `import()`. A plain import gets its own module instance, and with the
+  in-memory KV fallback that means its own empty store — the injection silently
+  did nothing until this was fixed.
 - **Backdrop legibility is a floor, not a hope.** `theme.background.overlay` is
   what keeps text readable over any artwork. At the defaults, over a pure white
   patch of photo, the title holds 9.3:1 and body copy 6.3:1. Lower the overlay far
