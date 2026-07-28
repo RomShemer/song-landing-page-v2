@@ -48,6 +48,15 @@ export default function App({ content: override, viewMode: viewModeOverride }) {
     if (!isPreview) trackPageView(viewMode);
   }, [isPreview, viewMode]);
 
+  // The tab follows the song, so renaming it in the dashboard renames the page.
+  // Skipped for the admin's inline preview, which would otherwise retitle the
+  // dashboard's own tab.
+  useEffect(() => {
+    if (isPreview) return;
+    const name = [song.title, song.artist].filter(Boolean).join(' · ');
+    if (name) document.title = name;
+  }, [isPreview, song.title, song.artist]);
+
   const showDownloads = viewMode === 'full';
 
   const streamUrl = media.audioStreamUrl || downloads.mp3Url;
