@@ -58,6 +58,12 @@ export function fontWeights(key) {
   return font.weights.split(';').map(Number);
 }
 
+// `block` rather than `swap`: swap paints the text in a fallback face and
+// re-lays it out when the real font arrives, which on a display-size title is a
+// visible jump in size. `block` holds the text back until the font is there — the
+// spec caps that at 3 seconds, after which the fallback is used anyway — so the
+// title is painted once, at the size it keeps. Both the link this builds and the
+// one api/page.js ships in the HTML must agree, or the hook replaces the other's.
 export function googleFontsHref(keys) {
   const families = [...new Set(keys)]
     .map((key) => BY_KEY.get(key))
@@ -68,5 +74,5 @@ export function googleFontsHref(keys) {
     );
 
   if (!families.length) return null;
-  return `https://fonts.googleapis.com/css2?${families.join('&')}&display=swap`;
+  return `https://fonts.googleapis.com/css2?${families.join('&')}&display=block`;
 }
