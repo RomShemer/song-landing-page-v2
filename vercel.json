@@ -5,10 +5,6 @@
   "outputDirectory": "dist",
   "rewrites": [
     {
-      "source": "/",
-      "destination": "/api/page"
-    },
-    {
       "source": "/song",
       "destination": "/api/page"
     },
@@ -51,6 +47,13 @@
           "value": "public, max-age=31536000, immutable"
         }
       ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/song",
+      "permanent": false
     }
   ]
 }

@@ -34,9 +34,18 @@ export default function devApi({ dir = 'api' } = {}) {
         .replaceAll('\u2029', '\\u2029');
       const title = [doc.song?.title, doc.song?.artist].filter(Boolean).join(' \u00b7 ');
 
+      const [{ googleFontsHref }, { themeFontKeys }] = await Promise.all([
+        server.ssrLoadModule('/src/fonts.js'),
+        server.ssrLoadModule('/src/theme.js'),
+      ]);
+      const fonts = googleFontsHref(themeFontKeys(doc.theme || {}).filter(Boolean));
+      const fontLink = fonts
+        ? `<link id="dynamic-webfonts" rel="stylesheet" href="${fonts}">`
+        : '';
+
       return html
         .replace(/<title>[^<]*<\/title>/i, `<title>${title}</title>`)
-        .replace('</head>', `<script>window.__EPK_CONTENT__=${json}</script></head>`);
+        .replace('</head>', `${fontLink}<script>window.__EPK_CONTENT__=${json}</script></head>`);
     },
 
     configureServer(devServer) {

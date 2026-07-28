@@ -1,5 +1,7 @@
 import { readContent } from './_lib/content.js';
 import { forMethod, isRead, methodNotAllowed } from './_lib/http.js';
+import { googleFontsHref } from '../src/fonts.js';
+import { themeFontKeys } from '../src/theme.js';
 
 export const config = { runtime: 'edge' };
 
@@ -54,10 +56,18 @@ function withDocument(html, doc) {
     out = replaceMeta(out, 'twitter:image', image);
   }
 
+  // The font the document asks for, requested while the HTML is still parsing
+  // rather than after React boots. The id is the one useWebFonts owns, so it
+  // finds this link, sees the href it would have written, and does nothing.
+  const fonts = googleFontsHref(themeFontKeys(doc.theme || {}).filter(Boolean));
+  const fontLink = fonts
+    ? `<link id="dynamic-webfonts" rel="stylesheet" href="${escapeHtml(fonts)}">`
+    : '';
+
   // Read synchronously by useContent, so the first paint is already correct.
   return out.replace(
     '</head>',
-    `<script>window.__EPK_CONTENT__=${inlineJson(doc)}</script></head>`
+    `${fontLink}<script>window.__EPK_CONTENT__=${inlineJson(doc)}</script></head>`
   );
 }
 
