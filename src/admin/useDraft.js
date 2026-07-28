@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react';
 import { normalizeContent } from '@schema';
 import defaultContent from '../content/defaultContent';
 import { DRAFT_STORAGE_KEY as STORAGE_KEY } from './draftStorage';
+import { useToast } from './ui/toastContext';
 
 // The draft is persisted locally as well as published, so unpublished edits
 // survive a reload and are never visible to anyone else.
@@ -14,10 +15,25 @@ function loadStored() {
   }
 }
 
+// A stored draft is the right thing to show only while it was based on the
+// document that is currently published. Once the server is newer — published from
+// another tab, browser or phone — the local copy is stale, and preferring it is
+// how the dashboard ends up showing old content while the live page shows new.
+function serverIsNewer(stored, live) {
+  if (!stored) return true;
+  return (Date.parse(live.updatedAt || '') || 0) > (Date.parse(stored.updatedAt || '') || 0);
+}
+
 export function useDraft() {
   const [published, setPublished] = useState(defaultContent);
-  const [draft, setDraft] = useState(() => loadStored() || defaultContent);
+  // Read once, during the first render. The effect below persists the draft on
+  // every change, so by the time the fetch resolves storage already holds a
+  // document this hook wrote — reading it again there would mistake our own
+  // write for a draft the artist left behind.
+  const [storedAtMount] = useState(loadStored);
+  const [draft, setDraft] = useState(storedAtMount || defaultContent);
   const [status, setStatus] = useState('idle');
+  const toast = useToast();
 
   useEffect(() => {
     let alive = true;
@@ -31,12 +47,27 @@ export function useDraft() {
         if (!alive || !doc) return;
         const live = normalizeContent(doc, defaultContent);
         setPublished(live);
-        if (!loadStored()) setDraft(live);
+
+        if (!serverIsNewer(storedAtMount, live)) return;
+
+        if (storedAtMount) {
+          // Replacing someone's edits without a trace is worse than the stale
+          // draft was, so the old one is kept under its own key.
+          try {
+            localStorage.setItem(`${STORAGE_KEY}:replaced`, JSON.stringify(storedAtMount));
+          } catch {
+            /* quota — the copy is a courtesy, not a guarantee */
+          }
+          toast.success('נטענה הגרסה שפורסמה — היא חדשה יותר מהטיוטה שהייתה בדפדפן');
+        }
+        setDraft(live);
       })
       .catch(() => {});
     return () => {
       alive = false;
     };
+    // Runs once: this is the initial load, not a subscription.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const isDirty = useMemo(

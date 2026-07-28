@@ -62,6 +62,14 @@ function Dashboard() {
     toast.success('השינויים בוטלו וחזרנו לגרסה שפורסמה');
   };
 
+  // The dashboard names its own tab: with two tabs open, one is the page and one
+  // is its dashboard, and both saying the same thing is useless.
+  useEffect(() => {
+    document.title = draft.song.title
+      ? `ניהול · ${draft.song.title}`
+      : 'ניהול עמוד הסינגל';
+  }, [draft.song.title]);
+
   useEffect(() => {
     const meta = document.createElement('meta');
     meta.name = 'robots';
