@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { FaAlignCenter, FaFont, FaHeading, FaParagraph, FaUser } from 'react-icons/fa';
 import { FONTS, FONT_CATEGORIES, fontWeights } from '../../fonts';
-import { ColorField, RangeField, SelectField } from '../ui/Field';
+import { ColorField, RangeField, SelectField, Toggle } from '../ui/Field';
+import InfoTip from '../ui/InfoTip';
 
 const fontGroups = FONT_CATEGORIES.map((c) => ({
   label: c.label,
@@ -117,6 +118,39 @@ export default function TypographyEditor({ theme, update }) {
               value={theme.title.color}
               onChange={(v) => setTitle({ color: v })}
             />
+            <Toggle
+              id="title-show"
+              label="הצגת שם השיר בעמוד"
+              hint={
+                theme.title.show
+                  ? undefined
+                  : 'מוסתר — שם השיר עדיין מופיע בכותרת הדפדפן ובשיתוף'
+              }
+              value={theme.title.show}
+              onChange={(v) => setTitle({ show: v })}
+            />
+            <div className="grid gap-3 sm:grid-cols-2">
+              <RangeField
+                id="title-gap-above"
+                label="מרווח מעל הכותרת"
+                value={theme.title.gapAbove}
+                onChange={(v) => setTitle({ gapAbove: v })}
+                min={0}
+                max={6}
+                step={0.125}
+                format={(v) => `${v}rem`}
+              />
+              <RangeField
+                id="title-gap-below"
+                label="מרווח עד שם האמן/ית"
+                value={theme.title.gapBelow}
+                onChange={(v) => setTitle({ gapBelow: v })}
+                min={0}
+                max={6}
+                step={0.125}
+                format={(v) => `${v}rem`}
+              />
+            </div>
             <div className="grid gap-3 sm:grid-cols-2">
               <SelectField
                 id="title-weight"
@@ -197,6 +231,12 @@ export default function TypographyEditor({ theme, update }) {
               value={theme.subtitle.color}
               onChange={(v) => setSubtitle({ color: v })}
             />
+            <Toggle
+              id="subtitle-show"
+              label="הצגת שם האמן/ית בעמוד"
+              value={theme.subtitle.show}
+              onChange={(v) => setSubtitle({ show: v })}
+            />
             <div className="grid gap-3 sm:grid-cols-2">
               <SelectField
                 id="subtitle-weight"
@@ -262,6 +302,88 @@ export default function TypographyEditor({ theme, update }) {
                 step={0.0625}
                 format={(v) => `${v}rem`}
               />
+            </div>
+
+            <div className="rounded-xl border border-adm-line bg-adm-bg/40 p-3">
+              <p className="flex items-center gap-1.5 text-xs font-semibold text-adm-ink">
+                עיצוב המקטעים המתקפלים
+                <InfoTip text="הכרטיסים של הגלריה, הקומוניקט, המילים והשאר. השקיפות היא של הצבע מעל הרקע — 0% שקוף לגמרי." />
+              </p>
+
+              <div className="mt-2.5 grid gap-3 sm:grid-cols-2">
+                <ColorField
+                  id="panel-color"
+                  label="צבע הכרטיס"
+                  value={theme.sections.panelColor}
+                  onChange={(v) => setSections({ panelColor: v })}
+                />
+                <RangeField
+                  id="panel-opacity"
+                  label="שקיפות הכרטיס"
+                  value={theme.sections.panelOpacity}
+                  onChange={(v) => setSections({ panelOpacity: v })}
+                  min={0}
+                  max={1}
+                  step={0.02}
+                  format={(v) => `${Math.round(v * 100)}%`}
+                />
+                <ColorField
+                  id="panel-border-color"
+                  label="צבע המסגרת"
+                  value={theme.sections.borderColor}
+                  onChange={(v) => setSections({ borderColor: v })}
+                />
+                <RangeField
+                  id="panel-border-opacity"
+                  label="שקיפות המסגרת"
+                  value={theme.sections.borderOpacity}
+                  onChange={(v) => setSections({ borderOpacity: v })}
+                  min={0}
+                  max={1}
+                  step={0.02}
+                  format={(v) => `${Math.round(v * 100)}%`}
+                />
+                <RangeField
+                  id="panel-radius"
+                  label="עיגול הפינות"
+                  value={theme.sections.radius}
+                  onChange={(v) => setSections({ radius: v })}
+                  min={0}
+                  max={40}
+                  step={1}
+                  format={(v) => `${v}px`}
+                />
+                <RangeField
+                  id="panel-gap"
+                  label="מרווח בין הכרטיסים"
+                  value={theme.sections.gap}
+                  onChange={(v) => setSections({ gap: v })}
+                  min={0}
+                  max={2.5}
+                  step={0.125}
+                  format={(v) => `${v}rem`}
+                />
+                <RangeField
+                  id="panel-padding"
+                  label="ריפוד פנימי"
+                  value={theme.sections.padding}
+                  onChange={(v) => setSections({ padding: v })}
+                  min={0.25}
+                  max={2.5}
+                  step={0.125}
+                  format={(v) => `${v}rem`}
+                />
+                <SelectField
+                  id="panel-icon-tint"
+                  label="צבע האייקונים"
+                  value={theme.sections.iconTint}
+                  onChange={(v) => setSections({ iconTint: v })}
+                  options={[
+                    { value: 'accent', label: 'בצבע המוביל' },
+                    { value: 'neutral', label: 'אפור עדין' },
+                  ]}
+                />
+              </div>
             </div>
           </>
         )}

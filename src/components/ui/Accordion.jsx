@@ -6,12 +6,14 @@ const AccordionContext = createContext(null);
 
 const VARIANTS = {
   dark: {
-    shell: 'border-white/10 bg-white/[0.06] backdrop-blur-md',
+    // Colour, border, corners, spacing and icon tint all come from the document.
+    shell: 'page-panel backdrop-blur-md',
     header: 'text-right hover:bg-white/[0.04]',
-    icon: 'bg-accent-500/20 text-accent-300',
+    icon: 'panel-icon',
     title: 'section-title',
     chevron: 'text-neutral-400',
     panel: 'border-t border-white/10',
+    pad: 'panel-pad',
   },
   light: {
     shell: 'border-adm-line bg-adm-card shadow-[0_2px_12px_-6px_rgba(15,43,92,0.18)]',
@@ -20,6 +22,7 @@ const VARIANTS = {
     title: 'text-base font-medium text-adm-ink',
     chevron: 'text-adm-muted',
     panel: 'border-t border-adm-line',
+    pad: 'px-4 py-4',
   },
 };
 
@@ -40,7 +43,7 @@ export function Accordion({
 
   return (
     <AccordionContext.Provider value={{ openId, toggle, variant }}>
-      <div id={containerId} className={`flex flex-col gap-3 ${className}`}>
+      <div id={containerId} className={`panel-stack flex flex-col ${className}`}>
         {children}
       </div>
     </AccordionContext.Provider>
@@ -65,7 +68,7 @@ export function AccordionItem({ id, title, hint, tip, icon: Icon, children }) {
         aria-expanded={isOpen}
         aria-controls={panelId}
         aria-describedby={tip ? tipId : undefined}
-        className={`flex w-full items-center gap-3 px-4 py-4 transition ${v.header}`}
+        className={`flex w-full items-center gap-3 transition ${v.pad} ${v.header}`}
       >
         {Icon && (
           <span
@@ -90,7 +93,7 @@ export function AccordionItem({ id, title, hint, tip, icon: Icon, children }) {
       </button>
 
       {isOpen && (
-        <div id={panelId} className={`px-4 py-4 ${v.panel}`}>
+        <div id={panelId} className={`${v.pad} ${v.panel}`}>
           {children}
         </div>
       )}

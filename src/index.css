@@ -80,10 +80,47 @@
   background-color: rgb(10 10 10 / var(--bg-overlay, 0.55));
 }
 
-/* Follows the title's alignment, so a centred title gets a centred cover. */
+/* The artwork: placement, size, corners, filters and shadow are all settings. */
 .page-cover {
+  width: var(--cover-width, 14rem);
+  border-radius: var(--cover-radius, 24px);
+  filter: var(--cover-filter, none);
+  box-shadow: var(--cover-shadow, 0 24px 60px -20px rgb(0 0 0 / 0.9));
   margin-inline-start: var(--cover-start, auto);
   margin-inline-end: var(--cover-end, auto);
+}
+
+/* Page frame. */
+.page-shell {
+  max-width: var(--layout-width, 36rem);
+}
+
+.page-stack {
+  gap: var(--layout-gap, 1.25rem);
+}
+
+.page-hero {
+  padding-top: var(--layout-top, 2.5rem);
+}
+
+/* The accordion surface — the page's main furniture, so all of it is editable. */
+.page-panel {
+  background-color: var(--panel-bg, rgb(255 255 255 / 0.06));
+  border-color: var(--panel-border, rgb(255 255 255 / 0.1));
+  border-radius: var(--panel-radius, 16px);
+}
+
+.panel-stack {
+  gap: var(--panel-gap, 0.75rem);
+}
+
+.panel-pad {
+  padding: var(--panel-padding, 1rem);
+}
+
+.panel-icon {
+  background: var(--panel-icon-bg, rgb(255 255 255 / 0.1));
+  color: var(--panel-icon-color, #fff);
 }
 
 .page-title {
@@ -95,8 +132,8 @@
   text-transform: var(--title-transform, none);
   text-align: var(--title-align, center);
   line-height: 1.05;
-  margin-top: 15px;
-  margin-bottom: 25px;
+  margin-top: var(--title-gap-above, 0.9375rem);
+  margin-bottom: var(--title-gap-below, 1.5625rem);
 }
 
 .page-subtitle {

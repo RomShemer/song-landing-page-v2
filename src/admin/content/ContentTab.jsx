@@ -36,6 +36,10 @@ export default function ContentTab({ draft, update, replace }) {
   const background = theme.background;
   const setBackground = (values) =>
     update('theme', 'background', { ...theme.background, ...values });
+  const cover = theme.cover;
+  const setCover = (values) => update('theme', 'cover', { ...theme.cover, ...values });
+  const layout = theme.layout;
+  const setLayout = (values) => update('theme', 'layout', { ...theme.layout, ...values });
 
   const removeImage = (i) => {
     update('downloads', 'pressImages', downloads.pressImages.filter((_, idx) => idx !== i));
@@ -189,6 +193,120 @@ export default function ContentTab({ draft, update, replace }) {
                 { value: 'start', label: 'לימין' },
                 { value: 'end', label: 'לשמאל' },
               ]}
+            />
+          </div>
+        </div>
+
+        <div className="mt-3 rounded-xl border border-adm-line bg-adm-bg/40 p-3">
+          <p className="flex items-center gap-1.5 text-xs font-semibold text-adm-ink">
+            עיצוב עטיפת הסינגל
+            <InfoTip text="חל על העטיפה המרובעת מעל הכותרת. מוצג רק אם המתג ״הצגת העטיפה בעמוד״ דולק ויש תמונה." />
+          </p>
+
+          <div className="mt-2.5 grid gap-3 sm:grid-cols-2">
+            <RangeField
+              id="cover-width"
+              label="גודל"
+              value={cover.width}
+              onChange={(v) => setCover({ width: v })}
+              min={6}
+              max={26}
+              step={0.5}
+              format={(v) => `${v}rem`}
+            />
+            <SelectField
+              id="cover-position"
+              label="מיקום"
+              value={cover.position}
+              onChange={(v) => setCover({ position: v })}
+              options={[
+                { value: 'center', label: 'מרכז' },
+                { value: 'start', label: 'לימין' },
+                { value: 'end', label: 'לשמאל' },
+              ]}
+            />
+            <RangeField
+              id="cover-radius"
+              label="עיגול הפינות"
+              hint="גדול מאוד יוצר עיגול"
+              value={cover.radius}
+              onChange={(v) => setCover({ radius: v })}
+              min={0}
+              max={200}
+              step={2}
+              format={(v) => `${v}px`}
+            />
+            <RangeField
+              id="cover-brightness"
+              label="בהירות"
+              value={cover.brightness}
+              onChange={(v) => setCover({ brightness: v })}
+              min={0.2}
+              max={1.6}
+              step={0.05}
+              format={(v) => `${Math.round(v * 100)}%`}
+            />
+            <RangeField
+              id="cover-blur"
+              label="טשטוש"
+              value={cover.blur}
+              onChange={(v) => setCover({ blur: v })}
+              min={0}
+              max={20}
+              step={1}
+              format={(v) => `${v}px`}
+            />
+            <SelectField
+              id="cover-shadow"
+              label="צל"
+              value={cover.shadow}
+              onChange={(v) => setCover({ shadow: v })}
+              options={[
+                { value: 'strong', label: 'עמוק' },
+                { value: 'soft', label: 'עדין' },
+                { value: 'none', label: 'בלי צל' },
+              ]}
+            />
+          </div>
+        </div>
+
+        <div className="mt-3 rounded-xl border border-adm-line bg-adm-bg/40 p-3">
+          <p className="flex items-center gap-1.5 text-xs font-semibold text-adm-ink">
+            מבנה העמוד
+            <InfoTip text="רוחב העמוד, המרווח בין הבלוקים והמרווח מעל הכותרת. משפיע על כל העמוד." />
+          </p>
+
+          <div className="mt-2.5 grid gap-3 sm:grid-cols-3">
+            <RangeField
+              id="layout-width"
+              label="רוחב מקסימלי"
+              hint="במסך רחב"
+              value={layout.maxWidth}
+              onChange={(v) => setLayout({ maxWidth: v })}
+              min={20}
+              max={60}
+              step={1}
+              format={(v) => `${v}rem`}
+            />
+            <RangeField
+              id="layout-gap"
+              label="מרווח בין הבלוקים"
+              value={layout.blockGap}
+              onChange={(v) => setLayout({ blockGap: v })}
+              min={0}
+              max={4}
+              step={0.125}
+              format={(v) => `${v}rem`}
+            />
+            <RangeField
+              id="layout-top"
+              label="מרווח בראש העמוד"
+              value={layout.topSpace}
+              onChange={(v) => setLayout({ topSpace: v })}
+              min={0}
+              max={8}
+              step={0.25}
+              format={(v) => `${v}rem`}
             />
           </div>
         </div>

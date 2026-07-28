@@ -31,6 +31,10 @@ export const PLAYER_STYLES = new Set(['light', 'dark']);
 export const BACKGROUND_SIZES = new Set(['cover', 'contain', 'stretch', 'auto']);
 export const BACKGROUND_POSITIONS = new Set(['center', 'top', 'bottom', 'start', 'end']);
 
+export const BLOCK_POSITIONS = new Set(['center', 'start', 'end']);
+export const SHADOWS = new Set(['none', 'soft', 'strong']);
+export const ICON_TINTS = new Set(['accent', 'neutral']);
+
 export const SCHEMA_VERSION = 1;
 
 export const EMPTY_CONTENT = {
@@ -49,10 +53,46 @@ export const EMPTY_CONTENT = {
       align: 'center',
       transform: 'none',
       color: '#ffffff',
+      show: true,
+      gapAbove: 0.9375,
+      gapBelow: 1.5625,
     },
-    subtitle: { font: 'system', weight: 500, letterSpacing: 0, size: 1.125, color: '#bdbdbd' },
-    sections: { font: 'system', weight: 500, size: 1, color: '#f5f5f5' },
+    subtitle: {
+      font: 'system',
+      weight: 500,
+      letterSpacing: 0,
+      size: 1.125,
+      color: '#bdbdbd',
+      show: true,
+    },
+    // Beyond type: the accordion panels are the page's main surface, so their
+    // colour, border, corners, spacing and icon tint are all editable.
+    sections: {
+      font: 'system',
+      weight: 500,
+      size: 1,
+      color: '#f5f5f5',
+      panelColor: '#ffffff',
+      panelOpacity: 0.06,
+      borderColor: '#ffffff',
+      borderOpacity: 0.1,
+      radius: 16,
+      gap: 0.75,
+      padding: 1,
+      iconTint: 'accent',
+    },
     body: { font: 'system', size: 0.9375, color: '#d4d4d4' },
+    // How the single artwork is presented. `media.showCover` still decides
+    // whether it appears at all.
+    cover: {
+      width: 14,
+      radius: 24,
+      blur: 0,
+      brightness: 1,
+      position: 'center',
+      shadow: 'strong',
+    },
+    layout: { maxWidth: 36, blockGap: 1.25, topSpace: 2.5 },
     // The photo behind the page. `overlay` is the dark scrim over it, and it
     // used to be hardcoded at 0.8 with the image at 0.25 opacity, which is why
     // the artwork was barely visible.
@@ -173,6 +213,9 @@ export function normalizeContent(input, base = EMPTY_CONTENT) {
           b.theme.title.transform
         ),
         color: hexColor(obj(obj(i.theme).title).color, b.theme.title.color),
+        show: bool(obj(obj(i.theme).title).show, b.theme.title.show),
+        gapAbove: range(obj(obj(i.theme).title).gapAbove, 0, 6, b.theme.title.gapAbove),
+        gapBelow: range(obj(obj(i.theme).title).gapBelow, 0, 6, b.theme.title.gapBelow),
       },
       subtitle: {
         font: fontKey(obj(obj(i.theme).subtitle).font, b.theme.subtitle.font),
@@ -180,12 +223,21 @@ export function normalizeContent(input, base = EMPTY_CONTENT) {
         letterSpacing: range(obj(obj(i.theme).subtitle).letterSpacing, 0, 1, b.theme.subtitle.letterSpacing),
         size: range(obj(obj(i.theme).subtitle).size, 0.75, 3, b.theme.subtitle.size),
         color: hexColor(obj(obj(i.theme).subtitle).color, b.theme.subtitle.color),
+        show: bool(obj(obj(i.theme).subtitle).show, b.theme.subtitle.show),
       },
       sections: {
         font: fontKey(obj(obj(i.theme).sections).font, b.theme.sections.font),
         weight: range(obj(obj(i.theme).sections).weight, 100, 900, b.theme.sections.weight),
         size: range(obj(obj(i.theme).sections).size, 0.8, 1.6, b.theme.sections.size),
         color: hexColor(obj(obj(i.theme).sections).color, b.theme.sections.color),
+        panelColor: hexColor(obj(obj(i.theme).sections).panelColor, b.theme.sections.panelColor),
+        panelOpacity: range(obj(obj(i.theme).sections).panelOpacity, 0, 1, b.theme.sections.panelOpacity),
+        borderColor: hexColor(obj(obj(i.theme).sections).borderColor, b.theme.sections.borderColor),
+        borderOpacity: range(obj(obj(i.theme).sections).borderOpacity, 0, 1, b.theme.sections.borderOpacity),
+        radius: range(obj(obj(i.theme).sections).radius, 0, 40, b.theme.sections.radius),
+        gap: range(obj(obj(i.theme).sections).gap, 0, 2.5, b.theme.sections.gap),
+        padding: range(obj(obj(i.theme).sections).padding, 0.25, 2.5, b.theme.sections.padding),
+        iconTint: oneOf(obj(obj(i.theme).sections).iconTint, ICON_TINTS, b.theme.sections.iconTint),
       },
       body: {
         font: fontKey(
@@ -194,6 +246,19 @@ export function normalizeContent(input, base = EMPTY_CONTENT) {
         ),
         size: range(obj(obj(i.theme).body).size, 0.75, 1.5, b.theme.body.size),
         color: hexColor(obj(obj(i.theme).body).color, b.theme.body.color),
+      },
+      cover: {
+        width: range(obj(obj(i.theme).cover).width, 6, 26, b.theme.cover.width),
+        radius: range(obj(obj(i.theme).cover).radius, 0, 200, b.theme.cover.radius),
+        blur: range(obj(obj(i.theme).cover).blur, 0, 20, b.theme.cover.blur),
+        brightness: range(obj(obj(i.theme).cover).brightness, 0.2, 1.6, b.theme.cover.brightness),
+        position: oneOf(obj(obj(i.theme).cover).position, BLOCK_POSITIONS, b.theme.cover.position),
+        shadow: oneOf(obj(obj(i.theme).cover).shadow, SHADOWS, b.theme.cover.shadow),
+      },
+      layout: {
+        maxWidth: range(obj(obj(i.theme).layout).maxWidth, 20, 60, b.theme.layout.maxWidth),
+        blockGap: range(obj(obj(i.theme).layout).blockGap, 0, 4, b.theme.layout.blockGap),
+        topSpace: range(obj(obj(i.theme).layout).topSpace, 0, 8, b.theme.layout.topSpace),
       },
       background: {
         opacity: range(obj(obj(i.theme).background).opacity, 0, 1, b.theme.background.opacity),

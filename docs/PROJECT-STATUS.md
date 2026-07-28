@@ -61,8 +61,13 @@ hardcoded in a component.
 song      title, artist, releaseYear
 theme     accent, playerStyle,
           title{font,weight,letterSpacing,sizeMin,sizeFluid,sizeMax,align,
-                transform,color}, subtitle{...,color}, sections{...,color},
-          body{...,color},
+                transform,color,show,gapAbove,gapBelow},
+          subtitle{font,weight,letterSpacing,size,color,show},
+          sections{font,weight,size,color,panelColor,panelOpacity,borderColor,
+                   borderOpacity,radius,gap,padding,iconTint},
+          body{font,size,color},
+          cover{width,radius,blur,brightness,position,shadow},
+          layout{maxWidth,blockGap,topSpace},
           background{opacity,blur,size,position,overlay}
 media     coverImage, backgroundImage, showCover, audioStreamUrl, videoUrl
 links     spotify, appleMusic, youtube, tiktok, instagram
@@ -167,8 +172,18 @@ shortcut. Full link and `?listen_only=true`.
 **Tab 1 — תוכן ועיצוב.** Nine collapsible sections in page order, the first open
 on load:
 
-1. **הגדרות כלליות** — title, artist, year, accent colour, player style, background and cover uploads (cover visibility switch lives inside its uploader)
-2. **גופנים וטיפוגרפיה** — four inner tabs, each affecting only its own element: song title / artist name / section headings / body copy. Font, weight, size and tracking per group
+1. **הגדרות כלליות** — title, artist, year, accent colour, player style, background
+   and cover uploads, plus three design groups: **background** (brightness,
+   overlay, blur, fit, position), **cover art** (size, position, corners,
+   brightness, blur, shadow) and **page frame** (max width, gap between blocks,
+   space above the title)
+2. **גופנים וטיפוגרפיה** — four inner tabs, each affecting only its own element:
+   song title / artist name / section headings / body copy. Font, weight, size,
+   tracking **and colour** per group; the title and artist each have a
+   show/hide switch and the title owns the spacing either side of it; the
+   sections tab also carries the accordion's own design — panel colour and
+   opacity, border colour and opacity, corner radius, gap between cards, inner
+   padding and icon tint
 3. **קישורי סטרימינג ורשתות** — five platform cards with brand icons
 4. **גלריית תמונות** — add, replace, remove photos; gallery card wording
 5. **קליפ רשמי** — YouTube embed URL
@@ -358,6 +373,16 @@ Two different problems with two different answers — see `docs/media-files.md`.
   an audio player instead of a save dialog. `?download=1` makes Blob answer with
   `Content-Disposition: attachment`, and it is the only thing that works: a proxy
   cannot pass a 43 MB body through a function.
+- **The document owns the design, so nothing about it is hardcoded.** Fifty-odd
+  theme fields drive CSS custom properties (`src/theme.js` → `src/index.css`), and
+  a hardcoded Tailwind colour or size in a component silently beats its variable —
+  which is exactly how `text-white` and `text-neutral-300` made the first colour
+  pickers do nothing. If a control appears not to work, look for a utility class
+  winning over the variable before looking anywhere else.
+- **The tab title follows `song.title`** at runtime, but the **OG/Twitter tags in
+  `index.html` are static** — link-preview crawlers do not run JavaScript, so a
+  shared link still shows whatever is in the HTML. Making those follow the
+  document needs HTML rewriting at the edge.
 - **Backdrop legibility is a floor, not a hope.** `theme.background.overlay` is
   what keeps text readable over any artwork. At the defaults, over a pure white
   patch of photo, the title holds 9.3:1 and body copy 6.3:1. Lower the overlay far

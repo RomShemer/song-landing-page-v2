@@ -67,7 +67,7 @@ export default function App({ content: override, viewMode: viewModeOverride }) {
       )}
       <div aria-hidden="true" className="page-overlay pointer-events-none fixed inset-0 -z-10" />
 
-      <main className="mx-auto flex w-full max-w-xl flex-col gap-5 px-4 pb-8">
+      <main className="page-shell page-stack mx-auto flex w-full flex-col px-4 pb-8">
         <div data-section="hero">
           <Hero
             title={song.title}
@@ -75,6 +75,8 @@ export default function App({ content: override, viewMode: viewModeOverride }) {
             coverImage={media.coverImage}
             showCover={media.showCover}
             glowImage={media.backgroundImage}
+            showTitle={theme.title.show}
+            showArtist={theme.subtitle.show}
           />
         </div>
 

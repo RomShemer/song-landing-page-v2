@@ -1,8 +1,16 @@
-export default function Hero({ title, artist, coverImage, showCover, glowImage }) {
+export default function Hero({
+  title,
+  artist,
+  coverImage,
+  showCover,
+  glowImage,
+  showTitle = true,
+  showArtist = true,
+}) {
   const glow = glowImage || coverImage;
 
   return (
-    <header className="relative flex flex-col items-stretch pt-10 pb-6">
+    <header className="page-hero relative flex flex-col items-stretch pb-6">
       {glow && (
         <div
           aria-hidden="true"
@@ -21,12 +29,12 @@ export default function Hero({ title, artist, coverImage, showCover, glowImage }
           decoding="async"
           draggable={false}
           onContextMenu={(e) => e.preventDefault()}
-          className="page-cover mb-6 aspect-square w-56 rounded-3xl border border-white/10 object-cover shadow-[0_24px_60px_-20px_rgba(0,0,0,0.9)] sm:w-64"
+          className="page-cover mb-6 aspect-square border border-white/10 object-cover"
         />
       )}
 
-      <h1 className="page-title font-title">{title}</h1>
-      <p className="page-subtitle">{artist}</p>
+      {showTitle && <h1 className="page-title font-title">{title}</h1>}
+      {showArtist && <p className="page-subtitle">{artist}</p>}
     </header>
   );
 }
